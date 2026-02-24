@@ -1,0 +1,3 @@
+# Notion OAuth secrets — get from https://www.notion.so/profile/integrations
+NOTION_CLIENT_ID=your-client-id-here
+NOTION_CLIENT_SECRET=your-client-secret-here
