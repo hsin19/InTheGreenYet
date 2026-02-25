@@ -120,7 +120,7 @@ async function handleOAuthCallback(request: Request, url: URL, env: Env, origin:
 		body: JSON.stringify({
 			grant_type: "authorization_code",
 			code,
-			redirect_uri: `${origin}/auth/notion/callback`,
+			redirect_uri: `${url.origin}/auth/notion/callback`,
 		}),
 	});
 
