@@ -13,6 +13,7 @@ interface NotionState {
   transactionDataSourceId: string | null
   login: () => void
   logout: () => void
+  setAuthData: (auth: NotionAuth) => void
   setTransactionDataSourceId: (id: string) => void
 }
 
@@ -49,13 +50,18 @@ export function NotionProvider({ children }: { children: ReactNode }) {
     setTransactionDataSourceIdState(null)
   }
 
+  const setAuthData = (newAuth: NotionAuth) => {
+    localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(newAuth))
+    setAuth(newAuth)
+  }
+
   const setTransactionDataSourceId = (id: string) => {
     localStorage.setItem(STORAGE_DB_KEY, id)
     setTransactionDataSourceIdState(id)
   }
 
   return (
-    <NotionContext value={{ auth, transactionDataSourceId, login, logout, setTransactionDataSourceId }}>
+    <NotionContext value={{ auth, transactionDataSourceId, login, logout, setAuthData, setTransactionDataSourceId }}>
       {children}
     </NotionContext>
   )

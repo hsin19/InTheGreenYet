@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNotion } from '../hooks/useNotion'
 
 function Callback() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
+  const { setAuthData } = useNotion()
 
   useEffect(() => {
     const accessToken = searchParams.get('access_token')
@@ -22,11 +24,11 @@ function Callback() {
         workspace_name: workspaceName ?? undefined,
         workspace_id: searchParams.get('workspace_id') ?? undefined,
       }
-      localStorage.setItem('notion_auth', JSON.stringify(authData))
+      setAuthData(authData)
     }
 
     navigate('/', { replace: true })
-  }, [searchParams, navigate])
+  }, [searchParams, navigate, setAuthData])
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
