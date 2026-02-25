@@ -1,0 +1,39 @@
+name: Deploy Proxy Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'proxy/**'
+      - '.github/workflows/deploy-proxy.yml'
+
+jobs:
+  deploy-proxy:
+    name: Deploy Proxy Worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        working-directory: proxy
+        run: npm ci
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: proxy
+          command: deploy
+          secrets: |
+            NOTION_CLIENT_ID
+            NOTION_CLIENT_SECRET
+            FRONTEND_URL
+        env:
+          NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
+          NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
+          FRONTEND_URL: https://${{ vars.CLOUDFLARE_PAGE_NAME }}.pages.dev
