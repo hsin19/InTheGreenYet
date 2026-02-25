@@ -3,6 +3,8 @@
  * All domain logic lives in proxy/src/notion.ts.
  */
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+
 /**
  * Setup: find or create the Transaction data source.
  * Returns the transactionDataSourceId and whether it was newly created.
@@ -10,7 +12,7 @@
 export async function setup(
     token: string,
 ): Promise<{ transactionDataSourceId: string; created: boolean }> {
-    const res = await fetch('/api/setup', {
+    const res = await fetch(`${API_BASE_URL}/api/setup`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -2,4 +2,5 @@
 interface Env {
     NOTION_CLIENT_ID: string;
     NOTION_CLIENT_SECRET: string;
+    FRONTEND_URL?: string;
 }
