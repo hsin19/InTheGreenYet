@@ -1,17 +1,17 @@
+import { searchDataSource, createTransactionDataSource } from "./notion";
+
 export default {
 	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
 
 		// --- OAuth callback ---
 		if (url.pathname === "/auth/notion/callback") {
-			return handleOAuthCallback(url, env);
+			return handleOAuthCallback(request, url, env);
 		}
 
-		// --- CORS preflight ---
-		if (request.method === "OPTIONS") {
-			return new Response(null, {
-				headers: corsHeaders(env.FRONTEND_URL),
-			});
+		// --- Setup: find or create Transaction data source ---
+		if (url.pathname === "/api/setup" && request.method === "POST") {
+			return handleSetup(request, env);
 		}
 
 		// --- Health check ---
@@ -19,15 +19,65 @@ export default {
 	},
 } satisfies ExportedHandler<Env>;
 
+// ─── Setup handler ────────────────────────────────────────────
+
+function getToken(request: Request): string {
+	const auth = request.headers.get("Authorization");
+	if (!auth?.startsWith("Bearer ")) {
+		throw new Error("Missing Authorization header");
+	}
+	return auth.slice(7);
+}
+
+function jsonResponse(data: unknown, status = 200): Response {
+	return new Response(JSON.stringify(data), {
+		status,
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+}
+
+async function handleSetup(request: Request, env: Env): Promise<Response> {
+	try {
+		const token = getToken(request);
+
+		// 1. Search for existing Transaction data source
+		const existing = await searchDataSource(token, "Transaction");
+		if (existing) {
+			return jsonResponse({ transactionDataSourceId: existing.id, created: false });
+		}
+
+		// 2. Not found → create database + data source
+		const result = await createTransactionDataSource(token);
+		return jsonResponse({ transactionDataSourceId: result.dataSourceId, created: true });
+	} catch (err) {
+		const message = err instanceof Error ? err.message : "Unknown error";
+		return jsonResponse({ error: message }, 400);
+	}
+}
+
+// ─── Helpers ──────────────────────────────────────────────────
+
+/** Resolve the real client-facing origin (respects X-Forwarded-* from Vite proxy in dev). */
+function getOrigin(request: Request, url: URL): string {
+	const fwdHost = request.headers.get("X-Forwarded-Host");
+	if (fwdHost) {
+		const proto = request.headers.get("X-Forwarded-Proto") ?? "https";
+		return `${proto}://${fwdHost}`;
+	}
+	return url.origin;
+}
+
 // ─── OAuth callback handler ───────────────────────────────────
 
-async function handleOAuthCallback(url: URL, env: Env): Promise<Response> {
+async function handleOAuthCallback(request: Request, url: URL, env: Env): Promise<Response> {
 	const code = url.searchParams.get("code");
 	const error = url.searchParams.get("error");
 
 	// User denied access on Notion side
 	if (error) {
-		const target = new URL(env.FRONTEND_URL);
+		const target = new URL("/", getOrigin(request, url));
 		target.searchParams.set("error", error);
 		return Response.redirect(target.toString(), 302);
 	}
@@ -49,14 +99,14 @@ async function handleOAuthCallback(url: URL, env: Env): Promise<Response> {
 		body: JSON.stringify({
 			grant_type: "authorization_code",
 			code,
-			redirect_uri: `${url.origin}/auth/notion/callback`,
+			redirect_uri: `${getOrigin(request, url)}/auth/notion/callback`,
 		}),
 	});
 
 	if (!tokenRes.ok) {
 		const errBody = await tokenRes.text();
 		console.error("Token exchange failed:", errBody);
-		const target = new URL(env.FRONTEND_URL);
+		const target = new URL("/", getOrigin(request, url));
 		target.searchParams.set("error", "token_exchange_failed");
 		return Response.redirect(target.toString(), 302);
 	}
@@ -69,7 +119,7 @@ async function handleOAuthCallback(url: URL, env: Env): Promise<Response> {
 	};
 
 	// Redirect back to frontend /callback with token info
-	const callbackUrl = new URL("/callback", env.FRONTEND_URL);
+	const callbackUrl = new URL("/callback", getOrigin(request, url));
 	callbackUrl.searchParams.set("access_token", data.access_token);
 	if (data.workspace_name) {
 		callbackUrl.searchParams.set("workspace_name", data.workspace_name);
@@ -81,12 +131,3 @@ async function handleOAuthCallback(url: URL, env: Env): Promise<Response> {
 	return Response.redirect(callbackUrl.toString(), 302);
 }
 
-// ─── CORS helpers ─────────────────────────────────────────────
-
-function corsHeaders(origin: string): HeadersInit {
-	return {
-		"Access-Control-Allow-Origin": origin,
-		"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-		"Access-Control-Allow-Headers": "Content-Type, Authorization",
-	};
-}
