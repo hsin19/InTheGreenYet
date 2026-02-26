@@ -7,7 +7,7 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     server: {
         proxy: {
-            // Forward /auth/* and /api/* to the CF Worker proxy during dev
+            // Forward /auth/* and /api/* to the CF Worker backend during dev
             "/auth": {
                 target: "http://localhost:8787",
                 changeOrigin: true,

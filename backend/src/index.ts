@@ -24,7 +24,7 @@ export default {
         }
 
         // --- Health check ---
-        return jsonResponse({ status: "ok", service: "inthegreen-proxy" }, 200, origin);
+        return jsonResponse({ status: "ok", service: "inthegreen-backend" }, 200, origin);
     },
 } satisfies ExportedHandler<Env>;
 

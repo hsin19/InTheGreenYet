@@ -4,12 +4,12 @@
   "description": "It's not about today's profit — it's about knowing where you truly stand.",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently -n frontend,proxy -c cyan,magenta \"npm run dev:frontend\" \"npm run dev:proxy\"",
+    "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev:proxy": "npm --prefix proxy run dev",
+    "dev:backend": "npm --prefix backend run dev",
     "build": "npm --prefix frontend run build",
     "lint": "npm --prefix frontend run lint",
-    "postinstall": "npm --prefix frontend install && npm --prefix proxy install",
+    "postinstall": "npm --prefix frontend install && npm --prefix backend install",
     "format": "dprint fmt",
     "format:check": "dprint check"
   },

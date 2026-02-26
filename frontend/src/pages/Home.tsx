@@ -19,14 +19,12 @@ function Home() {
         if (!auth) return;
 
         if (transactionDataSourceId) {
-            setStatus("ready");
             return;
         }
 
         let cancelled = false;
-        setStatus("loading");
-
         const init = async () => {
+            setStatus("loading");
             try {
                 const result = await setup(auth.access_token);
                 if (cancelled) return;

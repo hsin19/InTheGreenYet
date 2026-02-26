@@ -8,10 +8,10 @@ A personal investment tracking app powered by [Notion](https://www.notion.so/) a
 
 ```
 frontend/   → React + TypeScript + Tailwind (Vite)
-proxy/      → Cloudflare Worker (OAuth + Notion API)
+backend/     → Cloudflare Worker (OAuth + Notion API)
 ```
 
-The **proxy** worker handles all Notion API interactions (OAuth, database setup, schema management) so the frontend stays a thin client. The two can be deployed on the same or different domains.
+The **backend** worker handles all Notion API interactions (OAuth, database setup, schema management) so the frontend stays a thin client. The two can be deployed on the same or different domains.
 
 ## Getting Started
 
@@ -27,8 +27,8 @@ The **proxy** worker handles all Notion API interactions (OAuth, database setup,
 ### Setup
 
 ```bash
-# Proxy — configure secrets
-cd proxy
+# Backend — configure secrets
+cd backend
 cp .dev.vars.example .dev.vars
 # Edit .dev.vars → fill in NOTION_CLIENT_ID, NOTION_CLIENT_SECRET
 npm install
@@ -43,8 +43,8 @@ npm install
 ### Run
 
 ```bash
-# Terminal 1 — Proxy Worker (port 8787)
-cd proxy && npm run dev
+# Terminal 1 — Backend Worker (port 8787)
+cd backend && npm run dev
 
 # Terminal 2 — Frontend (port 5173)
 cd frontend && npm run dev
@@ -59,7 +59,7 @@ Open [http://localhost:5173](http://localhost:5173) and click **Connect to Notio
 Deployments are handled via GitHub Actions (`.github/workflows/deploy.yml`):
 
 - **Frontend** → Cloudflare Pages
-- **Proxy** → Cloudflare Workers
+- **Backend** → Cloudflare Workers
 
 ### GitHub Secrets & Variables
 

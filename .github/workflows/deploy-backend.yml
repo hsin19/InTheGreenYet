@@ -1,15 +1,15 @@
-name: Deploy Proxy Worker
+name: Deploy Backend Worker
 
 on:
   push:
     branches: [main]
     paths:
-      - 'proxy/**'
-      - '.github/workflows/deploy-proxy.yml'
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
 
 jobs:
-  deploy-proxy:
-    name: Deploy Proxy Worker
+  deploy-backend:
+    name: Deploy Backend Worker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,7 +19,7 @@ jobs:
           node-version: 22
 
       - name: Install
-        working-directory: proxy
+        working-directory: backend
         run: npm ci
 
       - name: Deploy Worker
@@ -27,7 +27,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: proxy
+          workingDirectory: backend
           command: deploy
           secrets: |
             NOTION_CLIENT_ID
