@@ -4,7 +4,7 @@ import {
 } from "./notion";
 
 export default {
-    async fetch(request, env, ctx): Promise<Response> {
+    async fetch(request, env, _ctx): Promise<Response> {
         const url = new URL(request.url);
         const origin = getFrontendOrigin(request, url, env);
 

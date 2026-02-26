@@ -19,7 +19,7 @@ The **backend** worker handles all Notion API interactions (OAuth, database setu
 
 1. [Node.js](https://nodejs.org/) v22+
 2. A **Notion Public Integration**:
-   - Go to [notion.so/profile/integrations](https://www.notion.so/profile/integrations)
+   - Go to [notion.so/profile/integrations/public](https://www.notion.so/profile/integrations/public)
    - Create a new **Public** integration
    - Set Redirect URI to `http://localhost:5173/auth/notion/callback`
    - Copy your **Client ID** and **Client Secret**
@@ -27,27 +27,19 @@ The **backend** worker handles all Notion API interactions (OAuth, database setu
 ### Setup
 
 ```bash
-# Backend — configure secrets
-cd backend
-cp .dev.vars.example .dev.vars
-# Edit .dev.vars → fill in NOTION_CLIENT_ID, NOTION_CLIENT_SECRET
+# Install dependencies for both frontend and backend
 npm install
 
-# Frontend — configure env
-cd ../frontend
-cp .env.example .env.local
-# Edit .env.local → fill in VITE_NOTION_CLIENT_ID
-npm install
+# Copy example environment variables and fill in the values
+cp -n backend/.dev.vars.example backend/.dev.vars
+cp -n frontend/.env.example frontend/.env.local
 ```
 
 ### Run
 
 ```bash
-# Terminal 1 — Backend Worker (port 8787)
-cd backend && npm run dev
-
-# Terminal 2 — Frontend (port 5173)
-cd frontend && npm run dev
+# Run both frontend and backend
+npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) and click **Connect to Notion** to start.
@@ -67,7 +59,7 @@ Add these in **Settings > Secrets and variables > Actions**:
 
 #### Repository Secrets (Sensitive)
 
-> **Tip:** Use separate Notion integrations for local dev and production to avoid accidentally revoking tokens or misconfiguring Redirect URIs.
+> **Tip:** Use separate [Notion integrations](https://www.notion.so/profile/integrations/public) for local dev and production to avoid accidentally revoking tokens or misconfiguring Redirect URIs.
 
 | Secret                 | Description                                                                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |

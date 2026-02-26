@@ -2,16 +2,18 @@
   "name": "inthegreenyet",
   "version": "1.0.0",
   "description": "It's not about today's profit — it's about knowing where you truly stand.",
-  "main": "index.js",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "dev": "concurrently -n frontend,backend -c cyan,magenta \"npm run dev:frontend\" \"npm run dev:backend\"",
-    "dev:frontend": "npm --prefix frontend run dev",
-    "dev:backend": "npm --prefix backend run dev",
-    "build": "npm --prefix frontend run build",
-    "lint": "npm --prefix frontend run lint",
-    "postinstall": "npm --prefix frontend install && npm --prefix backend install",
+    "dev:frontend": "npm run dev --workspace=@inthegreenyet/frontend",
+    "dev:backend": "npm run dev --workspace=@inthegreenyet/backend",
     "format": "dprint fmt",
-    "format:check": "dprint check"
+    "format:check": "dprint check",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   },
   "repository": {
     "type": "git",
@@ -26,7 +28,17 @@
   },
   "homepage": "https://github.com/hsin19/InTheGreenYet#readme",
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260305.0",
+    "@eslint/js": "^9.39.1",
+    "@types/node": "^25.3.0",
     "concurrently": "^9.2.1",
-    "dprint": "^0.52.0"
+    "dprint": "^0.52.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.48.0",
+    "vitest": "~3.2.0"
   }
 }

@@ -77,6 +77,7 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
     );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useNotion(): NotionState {
     const ctx = useContext(NotionContext);
     if (!ctx) throw new Error("useNotion must be used within <NotionProvider>");
