@@ -11,7 +11,7 @@ async function notionFetch(
     const url = `${NOTION_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 
     const headers: Record<string, string> = {
-        Authorization: `Bearer ${token}`,
+        "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
         "Notion-Version": NOTION_API_VERSION,
         ...((options.headers as Record<string, string>) ?? {}),
@@ -28,7 +28,7 @@ async function notionFetch(
 export async function searchDataSource(
     token: string,
     title: string,
-): Promise<{ id: string; title: string } | null> {
+): Promise<{ id: string; title: string; } | null> {
     const res = await notionFetch("/search", token, {
         method: "POST",
         body: JSON.stringify({
@@ -45,13 +45,11 @@ export async function searchDataSource(
         results: Array<{
             id: string;
             object: string;
-            title: Array<{ plain_text: string }>;
+            title: Array<{ plain_text: string; }>;
         }>;
     };
 
-    const match = data.results.find((item) =>
-        item.title?.some((t) => t.plain_text === title),
-    );
+    const match = data.results.find(item => item.title?.some(t => t.plain_text === title));
 
     return match ? { id: match.id, title } : null;
 }
@@ -76,7 +74,7 @@ async function findParentPage(token: string, pageName: string): Promise<string> 
             id: string;
             properties?: Record<
                 string,
-                { title?: Array<{ plain_text: string }> }
+                { title?: Array<{ plain_text: string; }>; }
             >;
         }>;
     };
@@ -89,12 +87,12 @@ async function findParentPage(token: string, pageName: string): Promise<string> 
 
     const getTitle = (page: (typeof data.results)[0]): string => {
         if (!page.properties) return "";
-        const titleProp = Object.values(page.properties).find((p) => p.title);
-        return titleProp?.title?.map((t) => t.plain_text).join("") ?? "";
+        const titleProp = Object.values(page.properties).find(p => p.title);
+        return titleProp?.title?.map(t => t.plain_text).join("") ?? "";
     };
 
-    const exact = data.results.find((p) => getTitle(p) === pageName);
-    const partial = data.results.find((p) => getTitle(p).includes(pageName));
+    const exact = data.results.find(p => getTitle(p) === pageName);
+    const partial = data.results.find(p => getTitle(p).includes(pageName));
     return (exact ?? partial ?? data.results[0]).id;
 }
 
@@ -120,7 +118,7 @@ async function createDatabase(
         );
     }
 
-    const db = (await res.json()) as { id: string };
+    const db = (await res.json()) as { id: string; };
     return db.id;
 }
 
@@ -148,7 +146,7 @@ async function createDataSourceInternal(
         );
     }
 
-    const ds = (await res.json()) as { id: string };
+    const ds = (await res.json()) as { id: string; };
     return ds.id;
 }
 
@@ -159,10 +157,10 @@ const DATABASE_NAME = "InTheGreenYet DB";
 const DATASOURCE_NAME = "Transaction";
 
 const TRANSACTION_PROPERTIES = {
-    Title: { title: {} },
-    Amount: { number: { format: "number" } },
-    Fee: { number: { format: "number" } },
-    Currency: {
+    "Title": { title: {} },
+    "Amount": { number: { format: "number" } },
+    "Fee": { number: { format: "number" } },
+    "Currency": {
         select: {
             options: [
                 { name: "TWD", color: "green" },
@@ -174,17 +172,17 @@ const TRANSACTION_PROPERTIES = {
         },
     },
     "Exchange Rate": { number: { format: "number" } },
-    From: { rich_text: {} },
-    To: { rich_text: {} },
-    Date: { date: {} },
-    Note: { rich_text: {} },
+    "From": { rich_text: {} },
+    "To": { rich_text: {} },
+    "Date": { date: {} },
+    "Note": { rich_text: {} },
 } as const;
 
 // ─── Orchestrator: find/create DB → create data source ───────
 
 export async function createTransactionDataSource(
     token: string,
-): Promise<{ databaseId: string; dataSourceId: string }> {
+): Promise<{ databaseId: string; dataSourceId: string; }> {
     // Try to find existing database first
     const existingDb = await searchDataSource(token, DATABASE_NAME);
     let databaseId = existingDb?.id ?? null;

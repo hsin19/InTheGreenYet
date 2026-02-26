@@ -3,7 +3,7 @@
  * All domain logic lives in proxy/src/notion.ts.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 /**
  * Setup: find or create the Transaction data source.
@@ -11,19 +11,19 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
  */
 export async function setup(
     token: string,
-): Promise<{ transactionDataSourceId: string; created: boolean }> {
+): Promise<{ transactionDataSourceId: string; created: boolean; }> {
     const res = await fetch(`${API_BASE_URL}/api/setup`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
         },
-    })
-    const data = await res.json() as { transactionDataSourceId?: string; created?: boolean; error?: string }
+    });
+    const data = await res.json() as { transactionDataSourceId?: string; created?: boolean; error?: string; };
 
     if (!res.ok) {
-        throw new Error(data.error ?? `Setup failed: ${res.status}`)
+        throw new Error(data.error ?? `Setup failed: ${res.status}`);
     }
 
-    return { transactionDataSourceId: data.transactionDataSourceId!, created: data.created! }
+    return { transactionDataSourceId: data.transactionDataSourceId!, created: data.created! };
 }
