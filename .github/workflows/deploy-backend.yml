@@ -19,8 +19,7 @@ jobs:
           node-version: 22
 
       - name: Install
-        working-directory: backend
-        run: npm ci
+        run: npm ci --workspace=@inthegreenyet/backend
 
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
