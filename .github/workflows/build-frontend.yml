@@ -1,0 +1,45 @@
+name: Build Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/build-frontend.yml'
+      - 'package.json'
+      - 'package-lock.json'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/build-frontend.yml'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  build:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install & Build
+        env:
+          VITE_NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
+          VITE_API_BASE_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
+        run: |
+          npm ci --workspace=@inthegreenyet/frontend
+          npm run build --workspace=@inthegreenyet/frontend
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 1
