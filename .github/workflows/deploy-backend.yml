@@ -8,6 +8,8 @@ on:
   paths:
     - 'backend/**'
     - '.github/workflows/deploy-backend.yml'
+    - 'package.json'
+    - 'package-lock.json'
 
 jobs:
   deploy-backend:
