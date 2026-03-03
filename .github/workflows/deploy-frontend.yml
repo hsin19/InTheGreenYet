@@ -42,3 +42,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy frontend/dist --project-name=${{ vars.CLOUDFLARE_PAGE_NAME }} --branch ${{ github.ref_name }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
