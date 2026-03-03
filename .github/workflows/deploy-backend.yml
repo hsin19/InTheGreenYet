@@ -30,7 +30,15 @@ jobs:
       - name: Install
         run: npm ci --workspace=@inthegreenyet/backend
 
+      - name: Build Check (Dry Run)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        working-directory: backend
+        run: npx wrangler deploy --dry-run
+
       - name: Deploy Worker
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
