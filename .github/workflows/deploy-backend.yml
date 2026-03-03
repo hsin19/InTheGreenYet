@@ -3,13 +3,18 @@ name: Deploy Backend Worker
 on:
   push:
     branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+      - 'package.json'
+      - 'package-lock.json'
   pull_request:
     branches: [main]
-  paths:
-    - 'backend/**'
-    - '.github/workflows/deploy-backend.yml'
-    - 'package.json'
-    - 'package-lock.json'
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+      - 'package.json'
+      - 'package-lock.json'
 
 jobs:
   deploy-backend:

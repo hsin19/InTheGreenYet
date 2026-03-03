@@ -3,13 +3,18 @@ name: Deploy Frontend
 on:
   push:
     branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+      - 'package.json'
+      - 'package-lock.json'
   pull_request:
     branches: [main]
-  paths:
-    - 'frontend/**'
-    - '.github/workflows/deploy-frontend.yml'
-    - 'package.json'
-    - 'package-lock.json'
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+      - 'package.json'
+      - 'package-lock.json'
 
 jobs:
   deploy-frontend:
