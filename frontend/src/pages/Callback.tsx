@@ -13,6 +13,7 @@ function Callback() {
     useEffect(() => {
         const accessToken = searchParams.get("access_token");
         const workspaceName = searchParams.get("workspace_name");
+        const workspaceId = searchParams.get("workspace_id");
         const error = searchParams.get("error");
 
         if (error) {
@@ -22,14 +23,14 @@ function Callback() {
         }
 
         if (accessToken) {
-            const authData = {
+            setAuthData({
                 access_token: accessToken,
                 workspace_name: workspaceName ?? undefined,
-                workspace_id: searchParams.get("workspace_id") ?? undefined,
-            };
-            setAuthData(authData);
+                workspace_id: workspaceId ?? undefined,
+            });
         }
 
+        // Navigate to root which will then be handled by AppLayout/Navigate
         navigate("/", { replace: true });
     }, [searchParams, navigate, setAuthData]);
 

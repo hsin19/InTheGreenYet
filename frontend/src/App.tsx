@@ -1,11 +1,13 @@
 import {
     BrowserRouter,
+    Navigate,
     Route,
     Routes,
 } from "react-router-dom";
 import { NotionProvider } from "./hooks/useNotion";
+import AppLayout from "./layouts/AppLayout";
 import Callback from "./pages/Callback";
-import Home from "./pages/Home";
+import Landing from "./pages/Landing";
 import Transfers from "./pages/Transfers";
 
 function App() {
@@ -13,9 +15,12 @@ function App() {
         <NotionProvider>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/landing" element={<Landing />} />
                     <Route path="/callback" element={<Callback />} />
-                    <Route path="/transfers" element={<Transfers />} />
+                    <Route element={<AppLayout />}>
+                        <Route index element={<Navigate to="/transfers" replace />} />
+                        <Route path="/transfers" element={<Transfers />} />
+                    </Route>
                 </Routes>
             </BrowserRouter>
         </NotionProvider>

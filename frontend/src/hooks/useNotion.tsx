@@ -1,6 +1,7 @@
 import {
     createContext,
     type ReactNode,
+    useCallback,
     useContext,
     useState,
 } from "react";
@@ -46,29 +47,29 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         () => localStorage.getItem(STORAGE_TRANSFER_DS_KEY),
     );
 
-    const login = () => {
+    const login = useCallback(() => {
         const apiBase = import.meta.env.VITE_API_BASE_URL || window.location.origin;
         const redirectUri = `${apiBase}/auth/notion/callback`;
         const url = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${NOTION_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`;
         window.location.href = url;
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem(STORAGE_AUTH_KEY);
         localStorage.removeItem(STORAGE_TRANSFER_DS_KEY);
         setAuth(null);
         setTransferDataSourceIdState(null);
-    };
+    }, []);
 
-    const setAuthData = (newAuth: NotionAuth) => {
+    const setAuthData = useCallback((newAuth: NotionAuth) => {
         localStorage.setItem(STORAGE_AUTH_KEY, JSON.stringify(newAuth));
         setAuth(newAuth);
-    };
+    }, []);
 
-    const setTransferDataSourceId = (id: string) => {
+    const setTransferDataSourceId = useCallback((id: string) => {
         localStorage.setItem(STORAGE_TRANSFER_DS_KEY, id);
         setTransferDataSourceIdState(id);
-    };
+    }, []);
 
     return (
         <NotionContext value={{ auth, transferDataSourceId, login, logout, setAuthData, setTransferDataSourceId }}>

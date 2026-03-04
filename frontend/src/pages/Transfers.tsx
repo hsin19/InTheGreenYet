@@ -2,7 +2,6 @@ import {
     useEffect,
     useState,
 } from "react";
-import { Link } from "react-router-dom";
 import { useNotion } from "../hooks/useNotion";
 import { fetchTransfers, type Transfer } from "../lib/notion";
 
@@ -16,11 +15,7 @@ function Transfers() {
     const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
-        if (!auth) {
-            setStatus("unauthenticated");
-            return;
-        }
-        if (!transferDataSourceId) {
+        if (!auth || !transferDataSourceId) {
             setStatus("unauthenticated");
             return;
         }
@@ -50,13 +45,7 @@ function Transfers() {
     return (
         <div className="flex min-h-screen flex-col px-4 py-8 max-w-2xl mx-auto">
             {/* Header */}
-            <div className="flex items-center gap-4 mb-8">
-                <Link
-                    to="/"
-                    className="text-sm text-muted hover:text-white transition-colors"
-                >
-                    ← Home
-                </Link>
+            <div className="mb-8">
                 <h1 className="text-2xl font-bold text-white">Transfers</h1>
             </div>
 
@@ -71,12 +60,6 @@ function Transfers() {
             {status === "unauthenticated" && (
                 <div className="bg-surface-card border border-white/10 rounded-2xl px-8 py-8 flex flex-col items-center gap-4 shadow-lg">
                     <p className="text-muted text-sm">You need to connect to Notion first.</p>
-                    <Link
-                        to="/"
-                        className="px-4 py-2 bg-green-500 hover:bg-green-400 rounded-lg text-sm text-white font-medium transition-colors"
-                    >
-                        Go to Home
-                    </Link>
                 </div>
             )}
 
