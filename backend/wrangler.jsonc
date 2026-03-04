@@ -30,7 +30,9 @@
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/
 	 */
-  "vars": {}
+  "vars": {
+    "FRONTEND_URL": "http://localhost:5173"
+  }
   // Secrets (set via .dev.vars locally, `wrangler secret put` for prod):
   // NOTION_CLIENT_ID, NOTION_CLIENT_SECRET
   /**
