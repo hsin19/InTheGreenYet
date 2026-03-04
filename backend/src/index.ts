@@ -1,5 +1,6 @@
 import {
-    createTransactionDataSource,
+    createTransferDataSource,
+    queryTransfers,
     searchDataSource,
 } from "./notion";
 
@@ -21,6 +22,11 @@ export default {
         // --- Setup: find or create Transaction data source ---
         if (url.pathname === "/api/setup" && request.method === "POST") {
             return handleSetup(request, env, origin);
+        }
+
+        // --- Get transfers ---
+        if (url.pathname === "/api/transfers" && request.method === "GET") {
+            return handleGetTransfers(request, url, env, origin);
         }
 
         // --- Health check ---
@@ -78,15 +84,32 @@ async function handleSetup(request: Request, env: Env, origin: string): Promise<
     try {
         const token = getToken(request);
 
-        // 1. Search for existing Transaction data source
-        const existing = await searchDataSource(token, "Transaction");
+        // 1. Search for existing Transfer data source
+        const existing = await searchDataSource(token, "Transfer");
         if (existing) {
-            return jsonResponse({ transactionDataSourceId: existing.id, created: false }, 200, origin);
+            return jsonResponse({ transferDataSourceId: existing.id, created: false }, 200, origin);
         }
 
         // 2. Not found → create database + data source
-        const result = await createTransactionDataSource(token);
-        return jsonResponse({ transactionDataSourceId: result.dataSourceId, created: true }, 200, origin);
+        const result = await createTransferDataSource(token);
+        return jsonResponse({ transferDataSourceId: result.dataSourceId, created: true }, 200, origin);
+    } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
+        return jsonResponse({ error: message }, 400, origin);
+    }
+}
+
+// ─── Get transfers handler ─────────────────────────────────────
+
+async function handleGetTransfers(request: Request, url: URL, env: Env, origin: string): Promise<Response> {
+    try {
+        const token = getToken(request);
+        const dataSourceId = url.searchParams.get("dataSourceId");
+        if (!dataSourceId) {
+            return jsonResponse({ error: "Missing dataSourceId parameter" }, 400, origin);
+        }
+        const transfers = await queryTransfers(token, dataSourceId);
+        return jsonResponse({ transfers }, 200, origin);
     } catch (err) {
         const message = err instanceof Error ? err.message : "Unknown error";
         return jsonResponse({ error: message }, 400, origin);

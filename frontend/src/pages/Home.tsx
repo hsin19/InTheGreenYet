@@ -2,6 +2,7 @@ import {
     useEffect,
     useState,
 } from "react";
+import { Link } from "react-router-dom";
 import { GitHubIcon } from "../components/icons/GitHubIcon";
 import { NotionIcon } from "../components/icons/NotionIcon";
 import { useNotion } from "../hooks/useNotion";
@@ -10,7 +11,7 @@ import { setup } from "../lib/notion";
 type SetupStatus = "idle" | "loading" | "ready" | "error";
 
 function Home() {
-    const { auth, transactionDataSourceId, setTransactionDataSourceId, login, logout } = useNotion();
+    const { auth, transferDataSourceId, setTransferDataSourceId, login, logout } = useNotion();
     const [status, setStatus] = useState<SetupStatus>("idle");
     const [error, setError] = useState<string | null>(null);
 
@@ -18,7 +19,7 @@ function Home() {
     useEffect(() => {
         if (!auth) return;
 
-        if (transactionDataSourceId) {
+        if (transferDataSourceId) {
             return;
         }
 
@@ -28,7 +29,7 @@ function Home() {
             try {
                 const result = await setup(auth.access_token);
                 if (cancelled) return;
-                setTransactionDataSourceId(result.transactionDataSourceId);
+                setTransferDataSourceId(result.transferDataSourceId);
                 setStatus("ready");
             } catch (err) {
                 if (cancelled) return;
@@ -42,7 +43,7 @@ function Home() {
         return () => {
             cancelled = true;
         };
-    }, [auth, transactionDataSourceId, setTransactionDataSourceId]);
+    }, [auth, transferDataSourceId, setTransferDataSourceId]);
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -106,14 +107,22 @@ function Home() {
                                         Workspace: <span className="text-white font-medium">{auth.workspace_name}</span>
                                     </p>
                                 )}
-                                {transactionDataSourceId && (
+                                {transferDataSourceId && (
+                                    <Link
+                                        to="/transfers"
+                                        className="inline-flex items-center gap-1.5 text-sm text-green-400 hover:text-green-300 transition-colors font-medium"
+                                    >
+                                        View Transfers →
+                                    </Link>
+                                )}
+                                {transferDataSourceId && (
                                     <a
-                                        href={`https://www.notion.so/${transactionDataSourceId.replace(/-/g, "")}`}
+                                        href={`https://www.notion.so/${transferDataSourceId.replace(/-/g, "")}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-white transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/40"
                                     >
-                                        Transaction data source ↗
+                                        Transfer data source ↗
                                     </a>
                                 )}
                             </div>

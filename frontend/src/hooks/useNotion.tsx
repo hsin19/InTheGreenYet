@@ -15,15 +15,15 @@ interface NotionAuth {
 
 interface NotionState {
     auth: NotionAuth | null;
-    transactionDataSourceId: string | null;
+    transferDataSourceId: string | null;
     login: () => void;
     logout: () => void;
     setAuthData: (auth: NotionAuth) => void;
-    setTransactionDataSourceId: (id: string) => void;
+    setTransferDataSourceId: (id: string) => void;
 }
 
 const STORAGE_AUTH_KEY = "notion_auth";
-const STORAGE_DB_KEY = "notion_db_id";
+const STORAGE_TRANSFER_DS_KEY = "notion_transfer_ds_id";
 
 const NOTION_CLIENT_ID = import.meta.env.VITE_NOTION_CLIENT_ID;
 
@@ -42,8 +42,8 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
             return null;
         }
     });
-    const [transactionDataSourceId, setTransactionDataSourceIdState] = useState<string | null>(
-        () => localStorage.getItem(STORAGE_DB_KEY),
+    const [transferDataSourceId, setTransferDataSourceIdState] = useState<string | null>(
+        () => localStorage.getItem(STORAGE_TRANSFER_DS_KEY),
     );
 
     const login = () => {
@@ -55,9 +55,9 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
 
     const logout = () => {
         localStorage.removeItem(STORAGE_AUTH_KEY);
-        localStorage.removeItem(STORAGE_DB_KEY);
+        localStorage.removeItem(STORAGE_TRANSFER_DS_KEY);
         setAuth(null);
-        setTransactionDataSourceIdState(null);
+        setTransferDataSourceIdState(null);
     };
 
     const setAuthData = (newAuth: NotionAuth) => {
@@ -65,13 +65,13 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         setAuth(newAuth);
     };
 
-    const setTransactionDataSourceId = (id: string) => {
-        localStorage.setItem(STORAGE_DB_KEY, id);
-        setTransactionDataSourceIdState(id);
+    const setTransferDataSourceId = (id: string) => {
+        localStorage.setItem(STORAGE_TRANSFER_DS_KEY, id);
+        setTransferDataSourceIdState(id);
     };
 
     return (
-        <NotionContext value={{ auth, transactionDataSourceId, login, logout, setAuthData, setTransactionDataSourceId }}>
+        <NotionContext value={{ auth, transferDataSourceId, login, logout, setAuthData, setTransferDataSourceId }}>
             {children}
         </NotionContext>
     );

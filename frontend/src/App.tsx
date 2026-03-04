@@ -6,6 +6,7 @@ import {
 import { NotionProvider } from "./hooks/useNotion";
 import Callback from "./pages/Callback";
 import Home from "./pages/Home";
+import Transfers from "./pages/Transfers";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/callback" element={<Callback />} />
+                    <Route path="/transfers" element={<Transfers />} />
                 </Routes>
             </BrowserRouter>
         </NotionProvider>

@@ -54,6 +54,80 @@ export async function searchDataSource(
     return match ? { id: match.id, title } : null;
 }
 
+// ─── Query transfers from a data source ───────────────────────
+
+export interface NotionTransferRow {
+    id: string;
+    title: string;
+    amount: number | null;
+    currency: string | null;
+    date: string | null;
+    from: string;
+    to: string;
+}
+
+type NotionQueryResponse = {
+    object: "list";
+    results: Array<{
+        object: string;
+        id: string;
+        properties: Record<string, {
+            type: string;
+            title?: Array<{ plain_text: string; }>;
+            number?: number | null;
+            select?: { name: string; } | null;
+            date?: { start: string; } | null;
+            rich_text?: Array<{ plain_text: string; }>;
+        }>;
+    }>;
+    has_more: boolean;
+    next_cursor: string | null;
+};
+
+export async function queryTransfers(
+    token: string,
+    dataSourceId: string,
+): Promise<NotionTransferRow[]> {
+    const rows: NotionTransferRow[] = [];
+    let cursor: string | undefined;
+
+    do {
+        const body: Record<string, unknown> = {
+            sorts: [{ property: "Date", direction: "descending" }],
+        };
+        if (cursor) body.start_cursor = cursor;
+
+        const res = await notionFetch(`/data_sources/${dataSourceId}/query`, token, {
+            method: "POST",
+            body: JSON.stringify(body),
+        });
+
+        if (!res.ok) {
+            throw new Error(`Query failed: ${res.status}`);
+        }
+
+        const data = (await res.json()) as NotionQueryResponse;
+
+        for (const item of data.results) {
+            if (item.object !== "page") continue;
+            const props = item.properties;
+            rows.push({
+                id: item.id,
+                title: props["Title"]?.title?.map(t => t.plain_text).join("") ?? "",
+                amount: props["Amount"]?.number ?? null,
+                currency: props["Currency"]?.select?.name ?? null,
+                date: props["Date"]?.date?.start ?? null,
+                from: props["From"]?.rich_text?.map(t => t.plain_text).join("") ?? "",
+                to: props["To"]?.rich_text?.map(t => t.plain_text).join("") ?? "",
+            });
+        }
+
+        cursor = data.has_more && data.next_cursor ? data.next_cursor : undefined;
+    } while (cursor);
+
+    return rows;
+}
+
 // ─── Find parent page ─────────────────────────────────────────
 // Priority: exact match > contains > first page
 
@@ -150,13 +224,13 @@ async function createDataSourceInternal(
     return ds.id;
 }
 
-// ─── Transaction schema ───────────────────────────────────────
+// ─── Transfer schema ──────────────────────────────────────────
 
 const PAGE_NAME = "InTheGreenYet";
 const DATABASE_NAME = "InTheGreenYet DB";
-const DATASOURCE_NAME = "Transaction";
+const DATASOURCE_NAME = "Transfer";
 
-const TRANSACTION_PROPERTIES = {
+const TRANSFER_PROPERTIES = {
     "Title": { title: {} },
     "Amount": { number: { format: "number" } },
     "Fee": { number: { format: "number" } },
@@ -180,7 +254,7 @@ const TRANSACTION_PROPERTIES = {
 
 // ─── Orchestrator: find/create DB → create data source ───────
 
-export async function createTransactionDataSource(
+export async function createTransferDataSource(
     token: string,
 ): Promise<{ databaseId: string; dataSourceId: string; }> {
     // Try to find existing database first
@@ -196,7 +270,7 @@ export async function createTransactionDataSource(
         token,
         databaseId,
         DATASOURCE_NAME,
-        TRANSACTION_PROPERTIES,
+        TRANSFER_PROPERTIES,
     );
     return { databaseId, dataSourceId };
 }
