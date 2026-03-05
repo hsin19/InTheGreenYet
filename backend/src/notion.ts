@@ -309,18 +309,17 @@ const TRANSFER_PROPERTIES = {
 
 // ─── Orchestrator: find/create DB → create data source ───────
 
+async function findOrCreateDatabase(token: string): Promise<string> {
+    const existingDb = await searchDataSource(token, DATABASE_NAME);
+    if (existingDb) return existingDb.id;
+    const parentPageId = await findParentPage(token, PAGE_NAME);
+    return createDatabase(token, parentPageId, DATABASE_NAME);
+}
+
 export async function createTransferDataSource(
     token: string,
 ): Promise<{ databaseId: string; dataSourceId: string; }> {
-    // Try to find existing database first
-    const existingDb = await searchDataSource(token, DATABASE_NAME);
-    let databaseId = existingDb?.id ?? null;
-
-    if (!databaseId) {
-        const parentPageId = await findParentPage(token, PAGE_NAME);
-        databaseId = await createDatabase(token, parentPageId, DATABASE_NAME);
-    }
-
+    const databaseId = await findOrCreateDatabase(token);
     const dataSourceId = await createDataSourceInternal(
         token,
         databaseId,
@@ -328,4 +327,78 @@ export async function createTransferDataSource(
         TRANSFER_PROPERTIES,
     );
     return { databaseId, dataSourceId };
+}
+
+// ─── Config data source ───────────────────────────────────────
+
+const CONFIG_DATASOURCE_NAME = "Config";
+
+const CONFIG_PROPERTIES = {
+    "Key": { title: {} },
+    "Value": { rich_text: {} },
+} as const;
+
+const CONFIG_DEFAULTS: Record<string, unknown> = {
+    accounts: [],
+};
+
+export interface NotionConfigRow {
+    key: string;
+    value: unknown;
+}
+
+export async function createConfigDataSource(token: string): Promise<string> {
+    const databaseId = await findOrCreateDatabase(token);
+    const dataSourceId = await createDataSourceInternal(
+        token,
+        databaseId,
+        CONFIG_DATASOURCE_NAME,
+        CONFIG_PROPERTIES,
+    );
+    await Promise.all(
+        Object.entries(CONFIG_DEFAULTS).map(([key, value]) =>
+            notionFetch("/pages", token, {
+                method: "POST",
+                body: JSON.stringify({
+                    parent: { type: "data_source_id", data_source_id: dataSourceId },
+                    properties: {
+                        "Key": { title: [{ text: { content: key } }] },
+                        "Value": { rich_text: [{ text: { content: JSON.stringify(value) } }] },
+                    },
+                }),
+            }),
+        ),
+    );
+    return dataSourceId;
+}
+
+export async function queryConfig(
+    token: string,
+    dataSourceId: string,
+    key?: string,
+): Promise<NotionConfigRow[]> {
+    const body: Record<string, unknown> = {};
+    if (key) {
+        body.filter = { property: "Key", title: { equals: key } };
+    }
+
+    const res = await notionFetch(`/data_sources/${dataSourceId}/query`, token, {
+        method: "POST",
+        body: JSON.stringify(body),
+    });
+
+    if (!res.ok) throw new Error(`Config query failed: ${res.status}`);
+
+    const data = (await res.json()) as NotionQueryResponse;
+    return data.results
+        .filter(item => item.object === "page")
+        .map(item => {
+            const rawValue = item.properties["Value"]?.rich_text?.map(t => t.plain_text).join("") ?? "null";
+            let value: unknown;
+            try { value = JSON.parse(rawValue); } catch { value = rawValue; }
+            return {
+                key: item.properties["Key"]?.title?.map(t => t.plain_text).join("") ?? "",
+                value,
+            };
+        });
 }

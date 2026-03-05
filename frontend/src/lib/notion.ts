@@ -1,31 +1,7 @@
-/**
- * Frontend API client — calls proxy endpoints.
- * All domain logic lives in proxy/src/notion.ts.
- */
+import { apiFetch } from "./utils";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
-
-/**
- * Setup: find or create the Transfer data source.
- * Returns the transferDataSourceId and whether it was newly created.
- */
-export async function setup(
-    token: string,
-): Promise<{ transferDataSourceId: string; created: boolean; }> {
-    const res = await fetch(`${API_BASE_URL}/api/setup`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-    });
-    const data = await res.json() as { transferDataSourceId?: string; created?: boolean; error?: string; };
-
-    if (!res.ok) {
-        throw new Error(data.error ?? `Setup failed: ${res.status}`);
-    }
-
-    return { transferDataSourceId: data.transferDataSourceId!, created: data.created! };
+export async function setup(token: string): Promise<{ transferDataSourceId: string; configDataSourceId: string; created: boolean }> {
+    return apiFetch("/api/setup", token, { method: "POST" });
 }
 
 export interface Transfer {
@@ -43,37 +19,30 @@ export interface Transfer {
 
 export type CreateTransferInput = Omit<Transfer, "id">;
 
-export async function createTransfer(
-    token: string,
-    dataSourceId: string,
-    input: CreateTransferInput,
-): Promise<string> {
-    const res = await fetch(`${API_BASE_URL}/api/transfers`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify({ dataSourceId, ...input }),
-    });
-    const data = await res.json() as { id?: string; error?: string };
-    if (!res.ok) {
-        throw new Error(data.error ?? `Create failed: ${res.status}`);
-    }
-    return data.id!;
+export async function fetchTransfers(token: string, dataSourceId: string): Promise<Transfer[]> {
+    const data = await apiFetch<{ transfers: Transfer[] }>(
+        `/api/transfers?dataSourceId=${encodeURIComponent(dataSourceId)}`,
+        token,
+    );
+    return data.transfers;
 }
 
-export async function fetchTransfers(token: string, dataSourceId: string): Promise<Transfer[]> {
-    const res = await fetch(`${API_BASE_URL}/api/transfers?dataSourceId=${encodeURIComponent(dataSourceId)}`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        },
+export async function createTransfer(token: string, dataSourceId: string, input: CreateTransferInput): Promise<string> {
+    const data = await apiFetch<{ id: string }>("/api/transfers", token, {
+        method: "POST",
+        body: JSON.stringify({ dataSourceId, ...input }),
     });
-    const data = await res.json() as { transfers?: Transfer[]; error?: string; };
+    return data.id;
+}
 
-    if (!res.ok) {
-        throw new Error(data.error ?? `Fetch failed: ${res.status}`);
-    }
+export interface ConfigRow {
+    key: string;
+    value: unknown;
+}
 
-    return data.transfers!;
+export async function fetchConfig(token: string, dataSourceId: string, key?: string): Promise<ConfigRow[]> {
+    const params = new URLSearchParams({ dataSourceId });
+    if (key) params.set("key", key);
+    const data = await apiFetch<{ config: ConfigRow[] }>(`/api/config?${params}`, token);
+    return data.config;
 }
