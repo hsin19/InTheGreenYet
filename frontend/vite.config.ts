@@ -19,10 +19,6 @@ export default defineConfig({
             "/api": {
                 target: "http://localhost:8787",
                 changeOrigin: true,
-                headers: {
-                    "X-Forwarded-Proto": "http",
-                    "X-Forwarded-Host": "localhost:5173",
-                },
             },
         },
     },

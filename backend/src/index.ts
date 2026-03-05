@@ -7,30 +7,33 @@ import {
 export default {
     async fetch(request, env, _ctx): Promise<Response> {
         const url = new URL(request.url);
-        const origin = getFrontendOrigin(request, url, env);
 
         // --- CORS preflight ---
         if (request.method === "OPTIONS") {
-            return new Response(null, { status: 204, headers: corsHeaders(origin) });
+            return new Response(null, { status: 204, headers: corsHeaders(env.FRONTEND_URL) });
         }
 
         // --- OAuth callback (redirect, no CORS needed) ---
         if (url.pathname === "/auth/notion/callback") {
-            return handleOAuthCallback(request, url, env, origin);
+            return handleOAuthCallback(request, url, env);
         }
 
         // --- Setup: find or create Transaction data source ---
         if (url.pathname === "/api/setup" && request.method === "POST") {
-            return handleSetup(request, env, origin);
+            return handleSetup(request, env);
         }
 
         // --- Get transfers ---
         if (url.pathname === "/api/transfers" && request.method === "GET") {
-            return handleGetTransfers(request, url, env, origin);
+            return handleGetTransfers(request, url, env);
         }
 
         // --- Health check ---
-        return jsonResponse({ status: "ok", service: "inthegreen-backend" }, 200, origin);
+        if (url.pathname === "/health") {
+            return jsonResponse({ status: "ok", service: "inthegreen-backend" }, 200, env.FRONTEND_URL);
+        }
+
+        return new Response(null, { status: 404 });
     },
 } satisfies ExportedHandler<Env>;
 
@@ -56,75 +59,67 @@ function jsonResponse(data: unknown, status: number, origin: string): Response {
 
 // ─── Helpers ──────────────────────────────────────────────────
 
+class ClientError extends Error {}
+
 function getToken(request: Request): string {
     const auth = request.headers.get("Authorization");
     if (!auth?.startsWith("Bearer ")) {
-        throw new Error("Missing Authorization header");
+        throw new ClientError("Missing Authorization header");
     }
     return auth.slice(7);
 }
 
-/**
- * Determine the frontend origin for CORS and redirects.
- * Priority: FRONTEND_URL env > X-Forwarded-Host header (Vite proxy) > url.origin
- */
-function getFrontendOrigin(request: Request, url: URL, env: Env): string {
-    if (env.FRONTEND_URL) return env.FRONTEND_URL;
-    const fwdHost = request.headers.get("X-Forwarded-Host");
-    if (fwdHost) {
-        const proto = request.headers.get("X-Forwarded-Proto") ?? "https";
-        return `${proto}://${fwdHost}`;
-    }
-    return url.origin;
+function errorResponse(err: unknown, origin: string): Response {
+    const message = err instanceof Error ? err.message : "Unknown error";
+    const status = err instanceof ClientError ? 400 : 500;
+    return jsonResponse({ error: message }, status, origin);
 }
 
 // ─── Setup handler ────────────────────────────────────────────
 
-async function handleSetup(request: Request, env: Env, origin: string): Promise<Response> {
+async function handleSetup(request: Request, env: Env): Promise<Response> {
     try {
         const token = getToken(request);
 
         // 1. Search for existing Transfer data source
         const existing = await searchDataSource(token, "Transfer");
         if (existing) {
-            return jsonResponse({ transferDataSourceId: existing.id, created: false }, 200, origin);
+            return jsonResponse({ transferDataSourceId: existing.id, created: false }, 200, env.FRONTEND_URL);
         }
 
         // 2. Not found → create database + data source
         const result = await createTransferDataSource(token);
-        return jsonResponse({ transferDataSourceId: result.dataSourceId, created: true }, 200, origin);
+        return jsonResponse({ transferDataSourceId: result.dataSourceId, created: true }, 200, env.FRONTEND_URL);
     } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        return jsonResponse({ error: message }, 400, origin);
+        return errorResponse(err, env.FRONTEND_URL);
     }
 }
 
 // ─── Get transfers handler ─────────────────────────────────────
 
-async function handleGetTransfers(request: Request, url: URL, env: Env, origin: string): Promise<Response> {
+async function handleGetTransfers(request: Request, url: URL, env: Env): Promise<Response> {
     try {
         const token = getToken(request);
         const dataSourceId = url.searchParams.get("dataSourceId");
         if (!dataSourceId) {
-            return jsonResponse({ error: "Missing dataSourceId parameter" }, 400, origin);
+            throw new ClientError("Missing dataSourceId parameter");
         }
         const transfers = await queryTransfers(token, dataSourceId);
-        return jsonResponse({ transfers }, 200, origin);
+        return jsonResponse({ transfers }, 200, env.FRONTEND_URL);
     } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        return jsonResponse({ error: message }, 400, origin);
+        return errorResponse(err, env.FRONTEND_URL);
     }
 }
 
 // ─── OAuth callback handler ───────────────────────────────────
 
-async function handleOAuthCallback(request: Request, url: URL, env: Env, origin: string): Promise<Response> {
+async function handleOAuthCallback(request: Request, url: URL, env: Env): Promise<Response> {
     const code = url.searchParams.get("code");
     const error = url.searchParams.get("error");
 
     // User denied access on Notion side
     if (error) {
-        const target = new URL("/", origin);
+        const target = new URL("/", env.FRONTEND_URL);
         target.searchParams.set("error", error);
         return Response.redirect(target.toString(), 302);
     }
@@ -153,7 +148,7 @@ async function handleOAuthCallback(request: Request, url: URL, env: Env, origin:
     if (!tokenRes.ok) {
         const errBody = await tokenRes.text();
         console.error("Token exchange failed:", errBody);
-        const target = new URL("/", origin);
+        const target = new URL("/", env.FRONTEND_URL);
         target.searchParams.set("error", "token_exchange_failed");
         return Response.redirect(target.toString(), 302);
     }
@@ -166,7 +161,7 @@ async function handleOAuthCallback(request: Request, url: URL, env: Env, origin:
     };
 
     // Redirect back to frontend /callback with token info
-    const callbackUrl = new URL("/callback", origin);
+    const callbackUrl = new URL("/callback", env.FRONTEND_URL);
     callbackUrl.searchParams.set("access_token", data.access_token);
     if (data.workspace_name) {
         callbackUrl.searchParams.set("workspace_name", data.workspace_name);
