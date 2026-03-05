@@ -33,9 +33,12 @@ export interface Transfer {
     title: string;
     amount: number | null;
     currency: string | null;
+    fee: number | null;
+    exchangeRate: number | null;
     date: string | null;
     from: string;
     to: string;
+    note: string;
 }
 
 export async function fetchTransfers(token: string, dataSourceId: string): Promise<Transfer[]> {

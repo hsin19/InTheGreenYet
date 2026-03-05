@@ -61,9 +61,12 @@ export interface NotionTransferRow {
     title: string;
     amount: number | null;
     currency: string | null;
+    fee: number | null;
+    exchangeRate: number | null;
     date: string | null;
     from: string;
     to: string;
+    note: string;
 }
 
 type NotionQueryResponse = {
@@ -116,9 +119,12 @@ export async function queryTransfers(
                 title: props["Title"]?.title?.map(t => t.plain_text).join("") ?? "",
                 amount: props["Amount"]?.number ?? null,
                 currency: props["Currency"]?.select?.name ?? null,
+                fee: props["Fee"]?.number ?? null,
+                exchangeRate: props["Exchange Rate"]?.number ?? null,
                 date: props["Date"]?.date?.start ?? null,
                 from: props["From"]?.rich_text?.map(t => t.plain_text).join("") ?? "",
                 to: props["To"]?.rich_text?.map(t => t.plain_text).join("") ?? "",
+                note: props["Note"]?.rich_text?.map(t => t.plain_text).join("") ?? "",
             });
         }
 
