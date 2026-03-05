@@ -41,6 +41,28 @@ export interface Transfer {
     note: string;
 }
 
+export type CreateTransferInput = Omit<Transfer, "id">;
+
+export async function createTransfer(
+    token: string,
+    dataSourceId: string,
+    input: CreateTransferInput,
+): Promise<string> {
+    const res = await fetch(`${API_BASE_URL}/api/transfers`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ dataSourceId, ...input }),
+    });
+    const data = await res.json() as { id?: string; error?: string };
+    if (!res.ok) {
+        throw new Error(data.error ?? `Create failed: ${res.status}`);
+    }
+    return data.id!;
+}
+
 export async function fetchTransfers(token: string, dataSourceId: string): Promise<Transfer[]> {
     const res = await fetch(`${API_BASE_URL}/api/transfers?dataSourceId=${encodeURIComponent(dataSourceId)}`, {
         headers: {

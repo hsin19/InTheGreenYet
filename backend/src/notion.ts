@@ -230,6 +230,55 @@ async function createDataSourceInternal(
     return ds.id;
 }
 
+// ─── Create a transfer page ───────────────────────────────────
+
+export interface CreateTransferInput {
+    title: string;
+    amount: number | null;
+    currency: string | null;
+    fee: number | null;
+    exchangeRate: number | null;
+    date: string | null;
+    from: string;
+    to: string;
+    note: string;
+}
+
+export async function createTransfer(
+    token: string,
+    dataSourceId: string,
+    input: CreateTransferInput,
+): Promise<string> {
+    const properties: Record<string, unknown> = {
+        "Title": { title: [{ text: { content: input.title } }] },
+        "From": { rich_text: [{ text: { content: input.from } }] },
+        "To": { rich_text: [{ text: { content: input.to } }] },
+        "Note": { rich_text: [{ text: { content: input.note } }] },
+    };
+
+    if (input.amount != null) properties["Amount"] = { number: input.amount };
+    if (input.currency) properties["Currency"] = { select: { name: input.currency } };
+    if (input.fee != null) properties["Fee"] = { number: input.fee };
+    if (input.exchangeRate != null) properties["Exchange Rate"] = { number: input.exchangeRate };
+    if (input.date) properties["Date"] = { date: { start: input.date } };
+
+    const res = await notionFetch("/pages", token, {
+        method: "POST",
+        body: JSON.stringify({
+            parent: { type: "data_source_id", data_source_id: dataSourceId },
+            properties,
+        }),
+    });
+
+    if (!res.ok) {
+        const errBody = await res.text();
+        throw new Error(`Failed to create transfer: ${res.status} ${errBody}`);
+    }
+
+    const page = (await res.json()) as { id: string };
+    return page.id;
+}
+
 // ─── Transfer schema ──────────────────────────────────────────
 
 const PAGE_NAME = "InTheGreenYet";

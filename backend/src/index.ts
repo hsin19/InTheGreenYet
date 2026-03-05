@@ -1,4 +1,5 @@
 import {
+    createTransfer,
     createTransferDataSource,
     queryTransfers,
     searchDataSource,
@@ -26,6 +27,11 @@ export default {
         // --- Get transfers ---
         if (url.pathname === "/api/transfers" && request.method === "GET") {
             return handleGetTransfers(request, url, env);
+        }
+
+        // --- Create transfer ---
+        if (url.pathname === "/api/transfers" && request.method === "POST") {
+            return handleCreateTransfer(request, env);
         }
 
         // --- Health check ---
@@ -106,6 +112,32 @@ async function handleGetTransfers(request: Request, url: URL, env: Env): Promise
         }
         const transfers = await queryTransfers(token, dataSourceId);
         return jsonResponse({ transfers }, 200, env.FRONTEND_URL);
+    } catch (err) {
+        return errorResponse(err, env.FRONTEND_URL);
+    }
+}
+
+// ─── Create transfer handler ──────────────────────────────────
+
+async function handleCreateTransfer(request: Request, env: Env): Promise<Response> {
+    try {
+        const token = getToken(request);
+        const body = await request.json() as { dataSourceId?: string } & Record<string, unknown>;
+        if (!body.dataSourceId) {
+            throw new ClientError("Missing dataSourceId");
+        }
+        const id = await createTransfer(token, body.dataSourceId, {
+            title: (body.title as string) ?? "",
+            amount: (body.amount as number | null) ?? null,
+            currency: (body.currency as string | null) ?? null,
+            fee: (body.fee as number | null) ?? null,
+            exchangeRate: (body.exchangeRate as number | null) ?? null,
+            date: (body.date as string | null) ?? null,
+            from: (body.from as string) ?? "",
+            to: (body.to as string) ?? "",
+            note: (body.note as string) ?? "",
+        });
+        return jsonResponse({ id }, 201, env.FRONTEND_URL);
     } catch (err) {
         return errorResponse(err, env.FRONTEND_URL);
     }

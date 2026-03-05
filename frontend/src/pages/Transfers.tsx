@@ -2,6 +2,7 @@ import {
     useEffect,
     useState,
 } from "react";
+import { TransferFormModal } from "../components/TransferFormModal";
 import { useNotion } from "../hooks/useNotion";
 import { fetchTransfers, type Transfer } from "../lib/notion";
 
@@ -14,6 +15,7 @@ function Transfers() {
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
     const toggleExpand = (id: string) =>
         setExpandedIds(prev => {
@@ -53,6 +55,7 @@ function Transfers() {
     }, [auth, transferDataSourceId, retryCount]);
 
     return (
+        <>
         <div className="flex min-h-screen flex-col px-4 py-8 max-w-2xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
@@ -214,6 +217,30 @@ function Transfers() {
                 </ul>
             )}
         </div>
+
+        {/* FAB */}
+        {auth && transferDataSourceId && (
+            <button
+                onClick={() => setIsFormOpen(true)}
+                className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 text-black text-2xl font-light shadow-lg shadow-green-500/30 flex items-center justify-center transition-colors cursor-pointer"
+            >
+                +
+            </button>
+        )}
+
+        {/* Form modal */}
+        {isFormOpen && auth && transferDataSourceId && (
+            <TransferFormModal
+                token={auth.access_token}
+                dataSourceId={transferDataSourceId}
+                onClose={() => setIsFormOpen(false)}
+                onCreated={() => {
+                    setIsFormOpen(false);
+                    setRetryCount(c => c + 1);
+                }}
+            />
+        )}
+        </>
     );
 }
 
