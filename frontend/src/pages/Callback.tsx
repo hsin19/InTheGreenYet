@@ -23,13 +23,16 @@ function Callback() {
             return;
         }
 
-        if (accessToken) {
-            setAuthData({
-                access_token: accessToken,
-                workspace_name: workspaceName ?? undefined,
-                workspace_id: workspaceId ?? undefined,
-            });
+        if (!accessToken) {
+            navigate("/landing", { replace: true });
+            return;
         }
+
+        setAuthData({
+            access_token: accessToken,
+            workspace_name: workspaceName ?? undefined,
+            workspace_id: workspaceId ?? undefined,
+        });
 
         navigate("/", { replace: true });
     }, [searchParams, navigate, setAuthData]);

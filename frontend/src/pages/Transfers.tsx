@@ -1,23 +1,12 @@
-import {
-    useEffect,
-    useState,
-} from "react";
+import { RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { TransferFormModal } from "../components/TransferFormModal";
 import { useNotion } from "../hooks/useNotion";
-import {
-    fetchTransfers,
-    type Transfer,
-} from "../lib/notion";
-import { DataSourceNotFoundError } from "../lib/utils";
-
-type Status = "loading" | "ready" | "error" | "unauthenticated";
+import { useAppData } from "../hooks/useAppData";
 
 function Transfers() {
-    const { auth, config } = useNotion();
-    const [status, setStatus] = useState<Status>("loading");
-    const [transfers, setTransfers] = useState<Transfer[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [retryCount, setRetryCount] = useState(0);
+    const { auth } = useNotion();
+    const { status, transfers, config, error, refresh } = useAppData();
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -30,61 +19,37 @@ function Transfers() {
     const expandAll = () => setExpandedIds(new Set(transfers.map(t => t.id)));
     const collapseAll = () => setExpandedIds(new Set());
 
-    useEffect(() => {
-        if (!auth) {
-            setStatus("unauthenticated");
-            return;
-        }
-
-        let cancelled = false;
-        const load = async () => {
-            setStatus("loading");
-            setError(null);
-            try {
-                const data = await fetchTransfers(auth.access_token);
-                if (cancelled) return;
-                setTransfers(data);
-                setStatus("ready");
-            } catch (err) {
-                if (cancelled) return;
-                if (err instanceof DataSourceNotFoundError) {
-                    setError("Data source not found. Please reconnect to Notion.");
-                    setStatus("error");
-                    return;
-                }
-                setError(err instanceof Error ? err.message : "Unknown error");
-                setStatus("error");
-            }
-        };
-
-        load();
-        return () => {
-            cancelled = true;
-        };
-    }, [auth, retryCount]);
-
     return (
         <>
             <div className="flex min-h-screen flex-col px-4 py-8 max-w-2xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-2xl font-bold text-white">Transfers</h1>
-                    {status === "ready" && transfers.length > 0 && (
-                        <div className="flex items-center gap-1">
-                            <button
-                                onClick={expandAll}
-                                className="px-2.5 py-1 text-xs text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
-                            >
-                                Expand All
-                            </button>
-                            <button
-                                onClick={collapseAll}
-                                className="px-2.5 py-1 text-xs text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
-                            >
-                                Collapse All
-                            </button>
-                        </div>
-                    )}
+                    <div className="flex items-center gap-1">
+                        {status === "ready" && transfers.length > 0 && (
+                            <>
+                                <button
+                                    onClick={expandAll}
+                                    className="px-2.5 py-1 text-xs text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
+                                >
+                                    Expand All
+                                </button>
+                                <button
+                                    onClick={collapseAll}
+                                    className="px-2.5 py-1 text-xs text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
+                                >
+                                    Collapse All
+                                </button>
+                            </>
+                        )}
+                        <button
+                            onClick={refresh}
+                            disabled={status === "loading"}
+                            className="p-1.5 text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
+                        >
+                            <RefreshCw className={`w-3.5 h-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -95,19 +60,13 @@ function Transfers() {
                     </div>
                 )}
 
-                {status === "unauthenticated" && (
-                    <div className="bg-surface-card border border-white/10 rounded-2xl px-8 py-8 flex flex-col items-center gap-4 shadow-lg">
-                        <p className="text-muted text-sm">You need to connect to Notion first.</p>
-                    </div>
-                )}
-
                 {status === "error" && (
                     <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 shadow-lg shadow-red-500/5">
                         <span className="text-2xl">❌</span>
                         <p className="text-red-400 text-sm font-medium">Failed to load transfers</p>
                         <p className="text-muted text-xs">{error}</p>
                         <button
-                            onClick={() => setRetryCount(c => c + 1)}
+                            onClick={refresh}
                             className="mt-2 px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
                         >
                             Retry
@@ -240,7 +199,7 @@ function Transfers() {
                     onClose={() => setIsFormOpen(false)}
                     onCreated={() => {
                         setIsFormOpen(false);
-                        setRetryCount(c => c + 1);
+                        refresh();
                     }}
                 />
             )}

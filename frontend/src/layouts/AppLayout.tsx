@@ -4,6 +4,7 @@ import {
     Outlet,
 } from "react-router-dom";
 import { useNotion } from "../hooks/useNotion";
+import { AppDataProvider } from "../hooks/useAppData";
 
 function AppNav() {
     const { auth, logout } = useNotion();
@@ -53,10 +54,12 @@ function AppLayout() {
     }
 
     return (
-        <div className="pt-14">
-            <AppNav />
-            <Outlet />
-        </div>
+        <AppDataProvider>
+            <div className="pt-14">
+                <AppNav />
+                <Outlet />
+            </div>
+        </AppDataProvider>
     );
 }
 

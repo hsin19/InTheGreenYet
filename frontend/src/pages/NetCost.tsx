@@ -1,15 +1,6 @@
-import {
-    useEffect,
-    useState,
-} from "react";
-import { useNotion } from "../hooks/useNotion";
-import {
-    fetchTransfers,
-    type Transfer,
-} from "../lib/notion";
-import { DataSourceNotFoundError } from "../lib/utils";
-
-type Status = "loading" | "ready" | "error";
+import { RefreshCw } from "lucide-react";
+import { useState } from "react";
+import { useAppData } from "../hooks/useAppData";
 
 interface CurrencyFlow {
     currency: string;
@@ -141,10 +132,7 @@ function formatNet(currencies: CurrencyFlow[]): { parts: { value: string; curren
 }
 
 function NetCost() {
-    const { auth } = useNotion();
-    const [status, setStatus] = useState<Status>("loading");
-    const [transfers, setTransfers] = useState<Transfer[]>([]);
-    const [error, setError] = useState<string | null>(null);
+    const { status, transfers, error, refresh } = useAppData();
     const [mergeUsd, setMergeUsd] = useState(true);
     const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
@@ -157,49 +145,28 @@ function NetCost() {
 
     const flows = status === "ready" ? computeFlows(transfers, mergeUsd) : [];
 
-    useEffect(() => {
-        if (!auth) return;
-
-        let cancelled = false;
-        const load = async () => {
-            setStatus("loading");
-            setError(null);
-            try {
-                const data = await fetchTransfers(auth.access_token);
-                if (cancelled) return;
-                setTransfers(data);
-                setStatus("ready");
-            } catch (err) {
-                if (cancelled) return;
-                if (err instanceof DataSourceNotFoundError) {
-                    setError("Data source not found. Please reconnect to Notion.");
-                    setStatus("error");
-                    return;
-                }
-                setError(err instanceof Error ? err.message : "Unknown error");
-                setStatus("error");
-            }
-        };
-
-        load();
-        return () => {
-            cancelled = true;
-        };
-    }, [auth]);
-
     return (
         <div className="flex min-h-screen flex-col px-4 py-8 max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-white">Net Cost</h1>
-                <label className="flex items-center gap-2 text-sm text-muted cursor-pointer select-none">
-                    <input
-                        type="checkbox"
-                        checked={mergeUsd}
-                        onChange={e => setMergeUsd(e.target.checked)}
-                        className="accent-green-500"
-                    />
-                    USDT/USDC as USD
-                </label>
+                <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 text-sm text-muted cursor-pointer select-none">
+                        <input
+                            type="checkbox"
+                            checked={mergeUsd}
+                            onChange={e => setMergeUsd(e.target.checked)}
+                            className="accent-green-500"
+                        />
+                        USDT/USDC as USD
+                    </label>
+                    <button
+                        onClick={refresh}
+                        disabled={status === "loading"}
+                        className="p-1.5 text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
+                    >
+                        <RefreshCw className={`w-3.5 h-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
+                    </button>
+                </div>
             </div>
 
             {status === "loading" && (
@@ -211,8 +178,15 @@ function NetCost() {
 
             {status === "error" && (
                 <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 shadow-lg shadow-red-500/5">
+                    <span className="text-2xl">❌</span>
                     <p className="text-red-400 text-sm font-medium">Failed to load data</p>
                     <p className="text-muted text-xs">{error}</p>
+                    <button
+                        onClick={refresh}
+                        className="mt-2 px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
+                    >
+                        Retry
+                    </button>
                 </div>
             )}
 
