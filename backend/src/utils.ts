@@ -1,5 +1,12 @@
 export class ClientError extends Error {}
 
+export class DataSourceNotFoundError extends Error {
+    constructor(name: string) {
+        super(`Data source "${name}" not found`);
+        this.name = "DataSourceNotFoundError";
+    }
+}
+
 export function corsHeaders(origin: string): Record<string, string> {
     return {
         "Access-Control-Allow-Origin": origin,
@@ -16,6 +23,9 @@ export function jsonResponse(data: unknown, status: number, origin: string): Res
 }
 
 export function errorResponse(err: unknown, origin: string): Response {
+    if (err instanceof DataSourceNotFoundError) {
+        return jsonResponse({ error: "data_source_not_found" }, 404, origin);
+    }
     const message = err instanceof Error ? err.message : "Unknown error";
     const status = err instanceof ClientError ? 400 : 500;
     return jsonResponse({ error: message }, status, origin);

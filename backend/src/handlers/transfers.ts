@@ -1,12 +1,10 @@
 import { createTransfer, queryTransfers } from "../notion";
-import { ClientError, errorResponse, getToken, jsonResponse } from "../utils";
+import { errorResponse, getToken, jsonResponse } from "../utils";
 
-export async function handleGetTransfers(request: Request, url: URL, env: Env): Promise<Response> {
+export async function handleGetTransfers(request: Request, env: Env): Promise<Response> {
     try {
         const token = getToken(request);
-        const dataSourceId = url.searchParams.get("dataSourceId");
-        if (!dataSourceId) throw new ClientError("Missing dataSourceId parameter");
-        const transfers = await queryTransfers(token, dataSourceId);
+        const transfers = await queryTransfers(token);
         return jsonResponse({ transfers }, 200, env.FRONTEND_URL);
     } catch (err) {
         return errorResponse(err, env.FRONTEND_URL);
@@ -16,9 +14,8 @@ export async function handleGetTransfers(request: Request, url: URL, env: Env): 
 export async function handleCreateTransfer(request: Request, env: Env): Promise<Response> {
     try {
         const token = getToken(request);
-        const body = await request.json() as { dataSourceId?: string } & Record<string, unknown>;
-        if (!body.dataSourceId) throw new ClientError("Missing dataSourceId");
-        const id = await createTransfer(token, body.dataSourceId, {
+        const body = await request.json() as Record<string, unknown>;
+        const id = await createTransfer(token, {
             title: (body.title as string) ?? "",
             amount: (body.amount as number | null) ?? null,
             currency: (body.currency as string | null) ?? null,

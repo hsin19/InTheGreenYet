@@ -19,12 +19,11 @@ const EMPTY_FORM: CreateTransferInput = {
 
 interface Props {
     token: string;
-    dataSourceId: string;
     onClose: () => void;
     onCreated: () => void;
 }
 
-export function TransferFormModal({ token, dataSourceId, onClose, onCreated }: Props) {
+export function TransferFormModal({ token, onClose, onCreated }: Props) {
     const [form, setForm] = useState<CreateTransferInput>(EMPTY_FORM);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -38,7 +37,7 @@ export function TransferFormModal({ token, dataSourceId, onClose, onCreated }: P
         setError(null);
         try {
             const title = form.title.trim() || `${form.from || "?"} to ${form.to || "?"}`;
-            await createTransfer(token, dataSourceId, { ...form, title });
+            await createTransfer(token, { ...form, title });
             onCreated();
         } catch (err) {
             setError(err instanceof Error ? err.message : "Unknown error");

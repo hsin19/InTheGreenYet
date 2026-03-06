@@ -1,4 +1,9 @@
 import { Client } from "@notionhq/client";
+import { DataSourceNotFoundError } from "./utils";
+
+export function createClient(token?: string): Client {
+    return new Client({ ...(token ? { auth: token } : {}), fetch: globalThis.fetch.bind(globalThis) });
+}
 
 // ─── Constants ───────────────────────────────────────────────
 
@@ -73,33 +78,52 @@ export interface NotionConfigRow {
 
 // ─── Functions ───────────────────────────────────────────────
 
-/** Search for a data source by exact title match. */
+/** Resolve a data source ID by name; retries for Notion index delay. */
+async function resolveTransferDataSource(token: string): Promise<string> {
+    const existing = await searchDataSource(token, DATASOURCE_NAME, { retries: 3 });
+    if (existing) return existing.id;
+    throw new DataSourceNotFoundError(DATASOURCE_NAME);
+}
+
+/** Resolve the Config data source ID; retries for Notion index delay. */
+async function resolveConfigDataSource(token: string): Promise<string> {
+    const existing = await searchDataSource(token, CONFIG_DATASOURCE_NAME, { retries: 3 });
+    if (existing) return existing.id;
+    throw new DataSourceNotFoundError(CONFIG_DATASOURCE_NAME);
+}
+
+/** Search for a data source by exact title match, with retry for Notion index delay. */
 export async function searchDataSource(
     token: string,
     title: string,
+    { retries = 0, delay = 2000 }: { retries?: number; delay?: number; } = {},
 ): Promise<{ id: string; title: string; } | null> {
-    const notion = new Client({ auth: token });
+    const notion = createClient(token);
 
-    const response = await notion.search({
-        query: title,
-        filter: { property: "object", value: "data_source" },
-    });
+    for (let attempt = 0; attempt <= retries; attempt++) {
+        if (attempt > 0) await new Promise(r => setTimeout(r, delay));
 
-    const match = response.results.find(item => {
-        if (!("title" in item)) return false;
-        const titles = item.title as Array<{ plain_text: string; }>;
-        return titles?.some(t => t.plain_text === title);
-    });
+        const response = await notion.search({
+            query: title,
+            filter: { property: "object", value: "data_source" },
+        });
 
-    return match ? { id: match.id, title } : null;
+        const match = response.results.find(item => {
+            if (!("title" in item)) return false;
+            const titles = item.title as Array<{ plain_text: string; }>;
+            return titles?.some(t => t.plain_text === title);
+        });
+
+        if (match) return { id: match.id, title };
+    }
+
+    return null;
 }
 
-/** Query all transfer rows from a data source, sorted by date descending. */
-export async function queryTransfers(
-    token: string,
-    dataSourceId: string,
-): Promise<NotionTransferRow[]> {
-    const notion = new Client({ auth: token });
+/** Query all transfer rows, sorted by date descending. */
+export async function queryTransfers(token: string): Promise<NotionTransferRow[]> {
+    const notion = createClient(token);
+    const dataSourceId = await resolveTransferDataSource(token);
     const rows: NotionTransferRow[] = [];
     let cursor: string | undefined;
 
@@ -138,7 +162,7 @@ export async function queryTransfers(
  * Throws if no pages are shared with the integration.
  */
 async function findParentPage(token: string, pageName: string): Promise<string> {
-    const notion = new Client({ auth: token });
+    const notion = createClient(token);
 
     const response = await notion.search({
         filter: { property: "object", value: "page" },
@@ -167,7 +191,7 @@ async function createDatabase(
     parentPageId: string,
     title: string,
 ): Promise<string> {
-    const notion = new Client({ auth: token });
+    const notion = createClient(token);
 
     const response = await notion.databases.create({
         parent: { type: "page_id", page_id: parentPageId },
@@ -184,7 +208,7 @@ async function createDataSourceInternal(
     title: string,
     properties: Record<string, unknown>,
 ): Promise<string> {
-    const notion = new Client({ auth: token });
+    const notion = createClient(token);
 
     const response = await notion.dataSources.create({
         parent: { database_id: databaseId },
@@ -195,13 +219,13 @@ async function createDataSourceInternal(
     return response.id;
 }
 
-/** Create a transfer page in the given data source. */
+/** Create a transfer page in the Transfer data source. */
 export async function createTransfer(
     token: string,
-    dataSourceId: string,
     input: CreateTransferInput,
 ): Promise<string> {
-    const notion = new Client({ auth: token });
+    const notion = createClient(token);
+    const dataSourceId = await resolveTransferDataSource(token);
 
     const properties: Record<string, unknown> = {
         Title: { title: [{ text: { content: input.title } }] },
@@ -225,7 +249,7 @@ export async function createTransfer(
 }
 
 /** Find or create the application database. */
-async function findOrCreateDatabase(token: string): Promise<string> {
+export async function findOrCreateDatabase(token: string): Promise<string> {
     const existingDb = await searchDataSource(token, DATABASE_NAME);
     if (existingDb) return existingDb.id;
     const parentPageId = await findParentPage(token, PARENT_PAGE_NAME);
@@ -235,8 +259,8 @@ async function findOrCreateDatabase(token: string): Promise<string> {
 /** Create the Transfer data source with its schema inside the app database. */
 export async function createTransferDataSource(
     token: string,
+    databaseId: string,
 ): Promise<{ databaseId: string; dataSourceId: string; }> {
-    const databaseId = await findOrCreateDatabase(token);
     const dataSourceId = await createDataSourceInternal(
         token,
         databaseId,
@@ -247,9 +271,8 @@ export async function createTransferDataSource(
 }
 
 /** Create the Config data source and seed it with default key-value pairs. */
-export async function createConfigDataSource(token: string): Promise<string> {
-    const notion = new Client({ auth: token });
-    const databaseId = await findOrCreateDatabase(token);
+export async function createConfigDataSource(token: string, databaseId: string): Promise<string> {
+    const notion = createClient(token);
     const dataSourceId = await createDataSourceInternal(
         token,
         databaseId,
@@ -270,13 +293,13 @@ export async function createConfigDataSource(token: string): Promise<string> {
     return dataSourceId;
 }
 
-/** Query config rows from a data source, optionally filtered by key. */
+/** Query config rows, optionally filtered by key. */
 export async function queryConfig(
     token: string,
-    dataSourceId: string,
     key?: string,
 ): Promise<NotionConfigRow[]> {
-    const notion = new Client({ auth: token });
+    const notion = createClient(token);
+    const dataSourceId = await resolveConfigDataSource(token);
 
     const response = await notion.dataSources.query({
         data_source_id: dataSourceId,

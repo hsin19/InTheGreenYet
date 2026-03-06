@@ -1,14 +1,9 @@
 import {
-    useEffect,
-    useState,
-} from "react";
-import {
     Navigate,
     NavLink,
     Outlet,
 } from "react-router-dom";
 import { useNotion } from "../hooks/useNotion";
-import { setup } from "../lib/notion";
 
 function AppNav() {
     const { auth, logout } = useNotion();
@@ -35,70 +30,26 @@ function AppNav() {
     );
 }
 
-type SetupStatus = "pending" | "running" | "done" | "error";
-
 function AppLayout() {
-    const { auth, transferDataSourceId, setTransferDataSourceId } = useNotion();
-    const [setupStatus, setSetupStatus] = useState<SetupStatus>("pending");
-    const [error, setError] = useState<string | null>(null);
+    const { auth, initStatus } = useNotion();
 
-    useEffect(() => {
-        if (!auth || transferDataSourceId) return;
+    if (!auth || initStatus === "error") return <Navigate to="/landing" replace />;
 
-        let cancelled = false;
-        const init = async () => {
-            setSetupStatus("running");
-            try {
-                const result = await setup(auth.access_token);
-                if (cancelled) return;
-                setTransferDataSourceId(result.transferDataSourceId);
-                setSetupStatus("done");
-            } catch (err) {
-                if (cancelled) return;
-                console.error("Setup failed:", err);
-                setError(err instanceof Error ? err.message : "Unknown error");
-                setSetupStatus("error");
-            }
-        };
-
-        init();
-        return () => {
-            cancelled = true;
-        };
-    }, [auth, transferDataSourceId, setTransferDataSourceId]);
-
-    if (!auth) return <Navigate to="/landing" replace />;
+    if (initStatus !== "done") {
+        return (
+            <div className="flex min-h-screen items-center justify-center">
+                <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
+                    <p className="text-muted text-sm">Setting up workspace...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="pt-14">
             <AppNav />
             <Outlet />
-
-            {!transferDataSourceId && (
-                <div className="fixed inset-0 bg-surface flex items-center justify-center px-4 z-50">
-                    {setupStatus === "error" ? (
-                        <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 shadow-lg shadow-red-500/5">
-                            <span className="text-2xl">❌</span>
-                            <p className="text-red-400 text-sm font-medium">Setup failed</p>
-                            <p className="text-muted text-xs">{error}</p>
-                            <button
-                                onClick={() => {
-                                    setError(null);
-                                    setSetupStatus("pending");
-                                }}
-                                className="mt-2 px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
-                            >
-                                Retry
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="bg-surface-card border border-white/10 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 shadow-lg">
-                            <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                            <p className="text-muted text-sm">Setting up your workspace...</p>
-                        </div>
-                    )}
-                </div>
-            )}
         </div>
     );
 }

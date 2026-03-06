@@ -5,11 +5,12 @@ import {
 import { TransferFormModal } from "../components/TransferFormModal";
 import { useNotion } from "../hooks/useNotion";
 import { fetchTransfers, type Transfer } from "../lib/notion";
+import { DataSourceNotFoundError } from "../lib/utils";
 
 type Status = "loading" | "ready" | "error" | "unauthenticated";
 
 function Transfers() {
-    const { auth, transferDataSourceId } = useNotion();
+    const { auth } = useNotion();
     const [status, setStatus] = useState<Status>("loading");
     const [transfers, setTransfers] = useState<Transfer[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -27,7 +28,7 @@ function Transfers() {
     const collapseAll = () => setExpandedIds(new Set());
 
     useEffect(() => {
-        if (!auth || !transferDataSourceId) {
+        if (!auth) {
             setStatus("unauthenticated");
             return;
         }
@@ -37,12 +38,17 @@ function Transfers() {
             setStatus("loading");
             setError(null);
             try {
-                const data = await fetchTransfers(auth.access_token, transferDataSourceId);
+                const data = await fetchTransfers(auth.access_token);
                 if (cancelled) return;
                 setTransfers(data);
                 setStatus("ready");
             } catch (err) {
                 if (cancelled) return;
+                if (err instanceof DataSourceNotFoundError) {
+                    setError("Data source not found. Please reconnect to Notion.");
+                    setStatus("error");
+                    return;
+                }
                 setError(err instanceof Error ? err.message : "Unknown error");
                 setStatus("error");
             }
@@ -52,7 +58,7 @@ function Transfers() {
         return () => {
             cancelled = true;
         };
-    }, [auth, transferDataSourceId, retryCount]);
+    }, [auth, retryCount]);
 
     return (
         <>
@@ -219,7 +225,7 @@ function Transfers() {
         </div>
 
         {/* FAB */}
-        {auth && transferDataSourceId && (
+        {auth && (
             <button
                 onClick={() => setIsFormOpen(true)}
                 className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 text-black text-2xl font-light shadow-lg shadow-green-500/30 flex items-center justify-center transition-colors cursor-pointer"
@@ -229,10 +235,9 @@ function Transfers() {
         )}
 
         {/* Form modal */}
-        {isFormOpen && auth && transferDataSourceId && (
+        {isFormOpen && auth && (
             <TransferFormModal
                 token={auth.access_token}
-                dataSourceId={transferDataSourceId}
                 onClose={() => setIsFormOpen(false)}
                 onCreated={() => {
                     setIsFormOpen(false);

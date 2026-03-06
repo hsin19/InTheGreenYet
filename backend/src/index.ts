@@ -1,6 +1,6 @@
 import { handleOAuthCallback } from "./handlers/auth";
 import { handleGetConfig } from "./handlers/config";
-import { handleSetup } from "./handlers/setup";
+import { handleInit } from "./handlers/init";
 import { handleCreateTransfer, handleGetTransfers } from "./handlers/transfers";
 import { corsHeaders, jsonResponse } from "./utils";
 
@@ -16,12 +16,12 @@ export default {
             return handleOAuthCallback(request, url, env);
         }
 
-        if (url.pathname === "/api/setup" && request.method === "POST") {
-            return handleSetup(request, env);
+        if (url.pathname === "/api/init" && request.method === "POST") {
+            return handleInit(request, env);
         }
 
         if (url.pathname === "/api/transfers" && request.method === "GET") {
-            return handleGetTransfers(request, url, env);
+            return handleGetTransfers(request, env);
         }
 
         if (url.pathname === "/api/transfers" && request.method === "POST") {

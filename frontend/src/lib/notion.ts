@@ -1,9 +1,5 @@
 import { apiFetch } from "./utils";
 
-export async function setup(token: string): Promise<{ transferDataSourceId: string; configDataSourceId: string; created: boolean }> {
-    return apiFetch("/api/setup", token, { method: "POST" });
-}
-
 export interface Transfer {
     id: string;
     title: string;
@@ -19,18 +15,15 @@ export interface Transfer {
 
 export type CreateTransferInput = Omit<Transfer, "id">;
 
-export async function fetchTransfers(token: string, dataSourceId: string): Promise<Transfer[]> {
-    const data = await apiFetch<{ transfers: Transfer[] }>(
-        `/api/transfers?dataSourceId=${encodeURIComponent(dataSourceId)}`,
-        token,
-    );
+export async function fetchTransfers(token: string): Promise<Transfer[]> {
+    const data = await apiFetch<{ transfers: Transfer[] }>("/api/transfers", token);
     return data.transfers;
 }
 
-export async function createTransfer(token: string, dataSourceId: string, input: CreateTransferInput): Promise<string> {
+export async function createTransfer(token: string, input: CreateTransferInput): Promise<string> {
     const data = await apiFetch<{ id: string }>("/api/transfers", token, {
         method: "POST",
-        body: JSON.stringify({ dataSourceId, ...input }),
+        body: JSON.stringify(input),
     });
     return data.id;
 }
@@ -40,9 +33,14 @@ export interface ConfigRow {
     value: unknown;
 }
 
-export async function fetchConfig(token: string, dataSourceId: string, key?: string): Promise<ConfigRow[]> {
-    const params = new URLSearchParams({ dataSourceId });
+export async function init(token: string): Promise<void> {
+    await apiFetch<{ ok: boolean }>("/api/init", token, { method: "POST" });
+}
+
+export async function fetchConfig(token: string, key?: string): Promise<ConfigRow[]> {
+    const params = new URLSearchParams();
     if (key) params.set("key", key);
-    const data = await apiFetch<{ config: ConfigRow[] }>(`/api/config?${params}`, token);
+    const query = params.toString();
+    const data = await apiFetch<{ config: ConfigRow[] }>(`/api/config${query ? `?${query}` : ""}`, token);
     return data.config;
 }

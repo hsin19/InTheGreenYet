@@ -1,4 +1,4 @@
-import { Client } from "@notionhq/client";
+import { createClient } from "../notion";
 
 export async function handleOAuthCallback(request: Request, url: URL, env: Env): Promise<Response> {
     const code = url.searchParams.get("code");
@@ -14,7 +14,7 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
         return Response.json({ error: "Missing code parameter" }, { status: 400 });
     }
 
-    const notion = new Client();
+    const notion = createClient();
 
     try {
         const data = await notion.oauth.token({
@@ -31,8 +31,8 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
         if (data.workspace_id) callbackUrl.searchParams.set("workspace_id", data.workspace_id);
 
         return Response.redirect(callbackUrl.toString(), 302);
-    } catch {
-        console.error("Token exchange failed");
+    } catch (err) {
+        console.error("Token exchange failed", err);
         const target = new URL("/", env.FRONTEND_URL);
         target.searchParams.set("error", "token_exchange_failed");
         return Response.redirect(target.toString(), 302);

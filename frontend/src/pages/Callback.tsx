@@ -18,7 +18,7 @@ function Callback() {
 
         if (error) {
             console.error("OAuth error:", error);
-            navigate("/", { replace: true });
+            navigate("/landing", { replace: true });
             return;
         }
 
@@ -30,7 +30,6 @@ function Callback() {
             });
         }
 
-        // Navigate to root which will then be handled by AppLayout/Navigate
         navigate("/", { replace: true });
     }, [searchParams, navigate, setAuthData]);
 

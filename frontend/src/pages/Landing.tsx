@@ -4,9 +4,43 @@ import { NotionIcon } from "../components/icons/NotionIcon";
 import { useNotion } from "../hooks/useNotion";
 
 function Landing() {
-    const { auth, login } = useNotion();
+    const { auth, initStatus, initError, login, logout, retryInit } = useNotion();
 
-    if (auth) return <Navigate to="/transfers" replace />;
+    if (auth && initStatus !== "error") return <Navigate to="/" replace />;
+
+    const actionBlock = (() => {
+        if (!auth) {
+            return (
+                <button
+                    onClick={login}
+                    className="mt-4 group relative inline-flex items-center gap-2.5 rounded-xl bg-green-500 px-7 py-3.5 font-semibold text-white shadow-lg shadow-green-500/25 transition-all duration-200 hover:bg-green-400 hover:shadow-green-400/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                >
+                    <NotionIcon className="w-5 h-5" />
+                    Connect to Notion
+                </button>
+            );
+        }
+        return (
+            <div className="mt-4 flex flex-col items-center gap-3">
+                <p className="text-red-400 text-sm font-medium">Failed to set up workspace</p>
+                <p className="text-muted text-xs">{initError}</p>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={retryInit}
+                        className="px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
+                    >
+                        Retry
+                    </button>
+                    <button
+                        onClick={logout}
+                        className="px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-muted hover:text-white hover:bg-surface-hover transition-colors cursor-pointer"
+                    >
+                        Disconnect
+                    </button>
+                </div>
+            </div>
+        );
+    })();
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -33,13 +67,7 @@ function Landing() {
                     </p>
                 </div>
 
-                <button
-                    onClick={login}
-                    className="mt-4 group relative inline-flex items-center gap-2.5 rounded-xl bg-green-500 px-7 py-3.5 font-semibold text-white shadow-lg shadow-green-500/25 transition-all duration-200 hover:bg-green-400 hover:shadow-green-400/30 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                >
-                    <NotionIcon className="w-5 h-5" />
-                    Connect to Notion
-                </button>
+                {actionBlock}
             </div>
 
             {/* Footer */}

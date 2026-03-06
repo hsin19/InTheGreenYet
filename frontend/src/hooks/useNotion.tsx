@@ -3,8 +3,11 @@ import {
     type ReactNode,
     useCallback,
     useContext,
+    useEffect,
+    useRef,
     useState,
 } from "react";
+import { init } from "../lib/notion";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -14,17 +17,19 @@ interface NotionAuth {
     workspace_id?: string;
 }
 
+export type InitStatus = "idle" | "initializing" | "done" | "error";
+
 interface NotionState {
     auth: NotionAuth | null;
-    transferDataSourceId: string | null;
+    initStatus: InitStatus;
+    initError: string | null;
     login: () => void;
     logout: () => void;
+    retryInit: () => void;
     setAuthData: (auth: NotionAuth) => void;
-    setTransferDataSourceId: (id: string) => void;
 }
 
 const STORAGE_AUTH_KEY = "notion_auth";
-const STORAGE_TRANSFER_DS_KEY = "notion_transfer_ds_id";
 
 const NOTION_CLIENT_ID = import.meta.env.VITE_NOTION_CLIENT_ID;
 
@@ -43,9 +48,10 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
             return null;
         }
     });
-    const [transferDataSourceId, setTransferDataSourceIdState] = useState<string | null>(
-        () => localStorage.getItem(STORAGE_TRANSFER_DS_KEY),
-    );
+
+    const [initStatus, setInitStatus] = useState<InitStatus>("idle");
+    const [initError, setInitError] = useState<string | null>(null);
+    const initingRef = useRef(false);
 
     const login = useCallback(() => {
         const apiBase = import.meta.env.VITE_API_BASE_URL || window.location.origin;
@@ -56,9 +62,10 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
 
     const logout = useCallback(() => {
         localStorage.removeItem(STORAGE_AUTH_KEY);
-        localStorage.removeItem(STORAGE_TRANSFER_DS_KEY);
         setAuth(null);
-        setTransferDataSourceIdState(null);
+        setInitStatus("idle");
+        setInitError(null);
+        initingRef.current = false;
     }, []);
 
     const setAuthData = useCallback((newAuth: NotionAuth) => {
@@ -66,13 +73,28 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         setAuth(newAuth);
     }, []);
 
-    const setTransferDataSourceId = useCallback((id: string) => {
-        localStorage.setItem(STORAGE_TRANSFER_DS_KEY, id);
-        setTransferDataSourceIdState(id);
+    useEffect(() => {
+        if (!auth || initStatus !== "idle" || initingRef.current) return;
+        initingRef.current = true;
+        setInitStatus("initializing");
+
+        init(auth.access_token)
+            .then(() => setInitStatus("done"))
+            .catch((err) => {
+                setInitError(err instanceof Error ? err.message : "Unknown error");
+                setInitStatus("error");
+                initingRef.current = false;
+            });
+    }, [auth, initStatus]);
+
+    const retryInit = useCallback(() => {
+        initingRef.current = false;
+        setInitStatus("idle");
+        setInitError(null);
     }, []);
 
     return (
-        <NotionContext value={{ auth, transferDataSourceId, login, logout, setAuthData, setTransferDataSourceId }}>
+        <NotionContext value={{ auth, initStatus, initError, login, logout, retryInit, setAuthData }}>
             {children}
         </NotionContext>
     );
