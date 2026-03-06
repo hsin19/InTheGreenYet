@@ -1,12 +1,12 @@
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { TransferFormModal } from "../components/TransferFormModal";
-import { useNotion } from "../hooks/useNotion";
 import { useAppData } from "../hooks/useAppData";
+import { useNotion } from "../hooks/useNotion";
 
 function Transfers() {
     const { auth } = useNotion();
-    const { status, transfers, config, error, refresh } = useAppData();
+    const { status, transfers, config, error, refresh, getAccountName } = useAppData();
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -124,9 +124,9 @@ function Transfers() {
                                         {/* Row 2: From → To + Date */}
                                         <div className="flex items-center justify-between">
                                             <span className="text-muted text-sm">
-                                                {transfer.from || "—"}
+                                                {transfer.from ? getAccountName(transfer.from) : "—"}
                                                 <span className="mx-1.5 text-white/30">→</span>
-                                                {transfer.to || "—"}
+                                                {transfer.to ? getAccountName(transfer.to) : "—"}
                                             </span>
                                             {transfer.date && <span className="text-muted text-xs tabular-nums shrink-0">{transfer.date}</span>}
                                         </div>

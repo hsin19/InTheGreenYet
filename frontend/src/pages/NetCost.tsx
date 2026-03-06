@@ -133,7 +133,7 @@ function formatNet(currencies: CurrencyFlow[]): { parts: { value: string; curren
 }
 
 function NetCost() {
-    const { status, transfers, error, refresh } = useAppData();
+    const { status, transfers, error, refresh, getAccountName } = useAppData();
     const [mergeUsd, setMergeUsd] = useState(true);
     const [expandedAccounts, setExpandedAccounts] = useState<Set<string>>(new Set());
 
@@ -213,7 +213,7 @@ function NetCost() {
                                     onClick={() => toggleExpand(account)}
                                     className="w-full text-left px-5 py-4 flex items-start gap-3 cursor-pointer"
                                 >
-                                    <h2 className="text-white font-bold text-xl flex-1">{account}</h2>
+                                    <h2 className="text-white font-bold text-xl flex-1">{getAccountName(account)}</h2>
                                     <div className="flex flex-col items-end">
                                         <span className={`text-xl font-bold tabular-nums ${isPositive ? "text-green-400" : "text-red-400"}`}>
                                             {parts.map((p, i) => (
@@ -240,7 +240,7 @@ function NetCost() {
                                                 <div key={i} className="flex items-center justify-between text-xs">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-muted/50 tabular-nums w-20">{r.date ?? "—"}</span>
-                                                        <span className="text-muted">{r.direction === "in" ? `from ${r.counterpart}` : `to ${r.counterpart}`}</span>
+                                                        <span className="text-muted">{r.direction === "in" ? `from ${getAccountName(r.counterpart)}` : `to ${getAccountName(r.counterpart)}`}</span>
                                                     </div>
                                                     <span className={`tabular-nums font-medium ${r.direction === "in" ? "text-green-400/80" : "text-red-400/80"}`}>
                                                         {r.direction === "in" ? "+" : "-"}

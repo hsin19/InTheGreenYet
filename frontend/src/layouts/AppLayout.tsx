@@ -1,10 +1,11 @@
+import { Settings } from "lucide-react";
 import {
     Navigate,
     NavLink,
     Outlet,
 } from "react-router-dom";
-import { useNotion } from "../hooks/useNotion";
 import { AppDataProvider } from "../hooks/useAppData";
+import { useNotion } from "../hooks/useNotion";
 
 function AppNav() {
     const { auth, logout } = useNotion();
@@ -24,6 +25,13 @@ function AppNav() {
                     className={({ isActive }) => `text-sm transition-colors ${isActive ? "text-white font-medium" : "text-muted hover:text-white"}`}
                 >
                     Net Cost
+                </NavLink>
+                <NavLink
+                    to="/config"
+                    className={({ isActive }) => `p-1.5 rounded-lg transition-colors ${isActive ? "text-white bg-surface-hover" : "text-muted hover:text-white"}`}
+                    aria-label="Config"
+                >
+                    <Settings className="w-4 h-4" />
                 </NavLink>
             </nav>
             <button

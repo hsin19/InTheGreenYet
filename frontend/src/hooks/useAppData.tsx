@@ -1,26 +1,31 @@
 import {
     createContext,
     type ReactNode,
+    useCallback,
     useContext,
     useEffect,
     useState,
 } from "react";
-import { useNotion } from "./useNotion";
 import {
     fetchConfig,
     fetchTransfers,
     type Transfer,
 } from "../lib/notion";
 import { DataSourceNotFoundError } from "../lib/utils";
+import { useNotion } from "./useNotion";
 
 type Status = "loading" | "ready" | "error";
 
-export interface AppConfig {
-    currencies: string[];
-    accounts: string[];
+export interface AccountConfig {
+    displayName: string;
 }
 
-const DEFAULT_CONFIG: AppConfig = { currencies: [], accounts: [] };
+export interface AppConfig {
+    currencies: string[];
+    accounts: Record<string, AccountConfig>;
+}
+
+const DEFAULT_CONFIG: AppConfig = { currencies: [], accounts: {} };
 
 interface AppDataState {
     status: Status;
@@ -28,6 +33,7 @@ interface AppDataState {
     config: AppConfig;
     error: string | null;
     refresh: () => void;
+    getAccountName: (key: string) => string;
 }
 
 const AppDataContext = createContext<AppDataState | null>(null);
@@ -62,7 +68,9 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
                 const map = Object.fromEntries(configRows.map(r => [r.key, r.value]));
                 setConfig({
                     currencies: Array.isArray(map.currencies) ? map.currencies : [],
-                    accounts: Array.isArray(map.accounts) ? map.accounts : [],
+                    accounts: (map.accounts && typeof map.accounts === "object" && !Array.isArray(map.accounts))
+                        ? map.accounts as Record<string, AccountConfig>
+                        : {},
                 });
                 setStatus("ready");
             } catch (err) {
@@ -83,8 +91,19 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
         };
     }, [auth, retryCount]);
 
+    const getAccountName = useCallback((key: string) => {
+        if (!key) return key;
+        const exactMatch = config.accounts[key];
+        if (exactMatch) return exactMatch.displayName;
+
+        const lowerKey = key.toLowerCase();
+        const insensitiveMatch = Object.entries(config.accounts).find(([k]) => k.toLowerCase() === lowerKey);
+
+        return insensitiveMatch ? insensitiveMatch[1].displayName : key;
+    }, [config.accounts]);
+
     return (
-        <AppDataContext value={{ status, transfers, config, error, refresh }}>
+        <AppDataContext value={{ status, transfers, config, error, refresh, getAccountName }}>
             {children}
         </AppDataContext>
     );

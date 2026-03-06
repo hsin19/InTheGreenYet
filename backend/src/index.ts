@@ -1,5 +1,8 @@
 import { handleOAuthCallback } from "./handlers/auth";
-import { handleGetConfig } from "./handlers/config";
+import {
+    handleGetConfig,
+    handleUpdateConfig,
+} from "./handlers/config";
 import { handleInit } from "./handlers/init";
 import {
     handleCreateTransfer,
@@ -36,6 +39,10 @@ export default {
 
         if (url.pathname === "/api/config" && request.method === "GET") {
             return handleGetConfig(request, url, env);
+        }
+
+        if (url.pathname === "/api/config" && request.method === "PUT") {
+            return handleUpdateConfig(request, env);
         }
 
         if (url.pathname === "/health") {

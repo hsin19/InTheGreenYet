@@ -31,7 +31,13 @@ const CONFIG_PROPERTIES = {
 } as const;
 
 const CONFIG_DEFAULTS: Record<string, unknown> = {
-    accounts: ["Bank", "Binance", "OKX", "Bitget", "MAX"],
+    accounts: {
+        Bank: { displayName: "Bank" },
+        Binance: { displayName: "Binance" },
+        OKX: { displayName: "OKX" },
+        Bitget: { displayName: "Bitget" },
+        MAX: { displayName: "MAX" },
+    },
     currencies: ["TWD", "USD", "USDT"],
 };
 
@@ -325,4 +331,39 @@ export async function queryConfig(
                 value,
             };
         });
+}
+
+/** Upsert a config row by key. Updates if exists, creates if not. */
+export async function updateConfig(
+    token: string,
+    key: string,
+    value: unknown,
+): Promise<void> {
+    const notion = createClient(token);
+    const dataSourceId = await resolveConfigDataSource(token);
+
+    const response = await notion.dataSources.query({
+        data_source_id: dataSourceId,
+        filter: { property: "Key", title: { equals: key } },
+    });
+
+    const serialized = JSON.stringify(value);
+    const valueProperty = { rich_text: [{ text: { content: serialized } }] } as any;
+
+    const existing = response.results.find(item => item.object === "page" && "properties" in item);
+
+    if (existing) {
+        await notion.pages.update({
+            page_id: existing.id,
+            properties: { Value: valueProperty },
+        });
+    } else {
+        await notion.pages.create({
+            parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
+            properties: {
+                Key: { title: [{ text: { content: key } }] } as any,
+                Value: valueProperty,
+            },
+        });
+    }
 }

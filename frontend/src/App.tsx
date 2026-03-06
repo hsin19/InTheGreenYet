@@ -7,6 +7,7 @@ import {
 import { NotionProvider } from "./hooks/useNotion";
 import AppLayout from "./layouts/AppLayout";
 import Callback from "./pages/Callback";
+import Config from "./pages/Config";
 import Landing from "./pages/Landing";
 import NetCost from "./pages/NetCost";
 import Transfers from "./pages/Transfers";
@@ -19,9 +20,10 @@ function App() {
                     <Route path="/landing" element={<Landing />} />
                     <Route path="/callback" element={<Callback />} />
                     <Route element={<AppLayout />}>
-                        <Route index element={<Navigate to="/transfers" replace />} />
+                        <Route index element={<Navigate to="/net-cost" replace />} />
                         <Route path="/transfers" element={<Transfers />} />
                         <Route path="/net-cost" element={<NetCost />} />
+                        <Route path="/config" element={<Config />} />
                     </Route>
                 </Routes>
             </BrowserRouter>

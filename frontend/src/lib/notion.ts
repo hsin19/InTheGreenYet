@@ -44,3 +44,10 @@ export async function fetchConfig(token: string, key?: string): Promise<ConfigRo
     const data = await apiFetch<{ config: ConfigRow[]; }>(`/api/config${query ? `?${query}` : ""}`, token);
     return data.config;
 }
+
+export async function updateConfig(token: string, key: string, value: unknown): Promise<void> {
+    await apiFetch<{ ok: boolean; }>("/api/config", token, {
+        method: "PUT",
+        body: JSON.stringify({ key, value }),
+    });
+}

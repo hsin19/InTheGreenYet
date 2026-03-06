@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { AccountConfig } from "../hooks/useAppData";
 import {
     createTransfer,
     type CreateTransferInput,
@@ -21,7 +22,7 @@ const emptyForm = (): CreateTransferInput => ({
 interface Props {
     token: string;
     currencies: string[];
-    accounts: string[];
+    accounts: Record<string, AccountConfig>;
     onClose: () => void;
     onCreated: () => void;
 }
@@ -88,7 +89,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                 {/* From / To */}
                 <div className="flex gap-3">
                     <Field label="From" className="flex-1">
-                        {accounts.length > 0 ? (
+                        {Object.keys(accounts).length > 0 ? (
                             <select
                                 required
                                 value={form.from}
@@ -96,7 +97,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                                 className={inputCls}
                             >
                                 <option value="">—</option>
-                                {accounts.map(a => <option key={a} value={a}>{a}</option>)}
+                                {Object.entries(accounts).map(([key, a]) => <option key={key} value={key}>{a.displayName}</option>)}
                             </select>
                         ) : (
                             <input
@@ -109,7 +110,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                         )}
                     </Field>
                     <Field label="To" className="flex-1">
-                        {accounts.length > 0 ? (
+                        {Object.keys(accounts).length > 0 ? (
                             <select
                                 required
                                 value={form.to}
@@ -117,7 +118,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                                 className={inputCls}
                             >
                                 <option value="">—</option>
-                                {accounts.map(a => <option key={a} value={a}>{a}</option>)}
+                                {Object.entries(accounts).map(([key, a]) => <option key={key} value={key}>{a.displayName}</option>)}
                             </select>
                         ) : (
                             <input
