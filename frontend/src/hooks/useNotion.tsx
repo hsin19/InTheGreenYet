@@ -76,17 +76,23 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
     useEffect(() => {
         if (!auth || initStatus !== "idle" || initingRef.current) return;
         initingRef.current = true;
-        setInitStatus("initializing");
 
-        init(auth.access_token)
-            .then(() => {
+        const initialize = async () => {
+            // Wait for next microtask to avoid synchronous setState inside rendering flow
+            await Promise.resolve();
+            setInitStatus("initializing");
+
+            try {
+                await init(auth.access_token);
                 setInitStatus("done");
-            })
-            .catch(err => {
+            } catch (err) {
                 setInitError(err instanceof Error ? err.message : "Unknown error");
                 setInitStatus("error");
                 initingRef.current = false;
-            });
+            }
+        };
+
+        void initialize();
     }, [auth, initStatus]);
 
     const retryInit = useCallback(() => {

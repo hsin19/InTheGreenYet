@@ -46,11 +46,19 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
 
+    const [prevAuth, setPrevAuth] = useState(auth);
+    if (auth !== prevAuth) {
+        setPrevAuth(auth);
+        setStatus("loading");
+        setTransfers([]);
+        setConfig(DEFAULT_CONFIG);
+        setError(null);
+    }
+
     const refresh = () => setRetryCount(c => c + 1);
 
     useEffect(() => {
         if (!auth) {
-            setStatus("loading");
             return;
         }
 

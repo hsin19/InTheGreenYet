@@ -140,7 +140,11 @@ function NetCost() {
     const toggleExpand = (account: string) =>
         setExpandedAccounts(prev => {
             const next = new Set(prev);
-            next.has(account) ? next.delete(account) : next.add(account);
+            if (next.has(account)) {
+                next.delete(account);
+            } else {
+                next.add(account);
+            }
             return next;
         });
 
