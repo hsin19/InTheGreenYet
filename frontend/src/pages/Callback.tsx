@@ -11,7 +11,8 @@ function Callback() {
     const { setAuthData } = useNotion();
 
     useEffect(() => {
-        const accessToken = searchParams.get("access_token");
+        const fragment = new URLSearchParams(window.location.hash.slice(1));
+        const accessToken = fragment.get("access_token");
         const workspaceName = searchParams.get("workspace_name");
         const workspaceId = searchParams.get("workspace_id");
         const error = searchParams.get("error");

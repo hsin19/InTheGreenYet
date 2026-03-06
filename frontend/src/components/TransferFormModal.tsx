@@ -6,7 +6,7 @@ import {
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
-const EMPTY_FORM: CreateTransferInput = {
+const emptyForm = (): CreateTransferInput => ({
     title: "",
     amount: null,
     currency: null,
@@ -16,7 +16,7 @@ const EMPTY_FORM: CreateTransferInput = {
     from: "",
     to: "",
     note: "",
-};
+});
 
 interface Props {
     token: string;
@@ -27,7 +27,7 @@ interface Props {
 }
 
 export function TransferFormModal({ token, currencies, accounts, onClose, onCreated }: Props) {
-    const [form, setForm] = useState<CreateTransferInput>(EMPTY_FORM);
+    const [form, setForm] = useState<CreateTransferInput>(emptyForm);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +55,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
             }}
         >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
             {/* Modal */}
             <form
@@ -137,6 +137,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                         <input
                             required
                             type="number"
+                            step="any"
                             value={form.amount ?? ""}
                             onChange={e => set("amount", e.target.value ? Number(e.target.value) : null)}
                             placeholder="0"
@@ -145,6 +146,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                     </Field>
                     <Field label="Currency" className="w-28">
                         <select
+                            required
                             value={form.currency ?? ""}
                             onChange={e => set("currency", e.target.value || null)}
                             className={inputCls}
@@ -160,6 +162,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                     <Field label="Fee" className="flex-1">
                         <input
                             type="number"
+                            step="any"
                             value={form.fee ?? ""}
                             onChange={e => set("fee", e.target.value ? Number(e.target.value) : null)}
                             placeholder="0"
@@ -169,6 +172,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
                     <Field label="Exchange Rate" className="flex-1">
                         <input
                             type="number"
+                            step="any"
                             value={form.exchangeRate ?? ""}
                             onChange={e => set("exchangeRate", e.target.value ? Number(e.target.value) : null)}
                             placeholder="1"

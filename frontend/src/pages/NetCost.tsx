@@ -3,7 +3,10 @@ import {
     useState,
 } from "react";
 import { useNotion } from "../hooks/useNotion";
-import { fetchTransfers, type Transfer } from "../lib/notion";
+import {
+    fetchTransfers,
+    type Transfer,
+} from "../lib/notion";
 import { DataSourceNotFoundError } from "../lib/utils";
 
 type Status = "loading" | "ready" | "error";
@@ -36,7 +39,7 @@ interface AccountFlow {
 
 const STABLE_USD = new Set(["USD", "USDT", "USDC"]);
 
-type FlowEntry = { inflow: number; outflow: number; twdInflow: number; twdOutflow: number; hasRate: boolean };
+type FlowEntry = { inflow: number; outflow: number; twdInflow: number; twdOutflow: number; hasRate: boolean; };
 
 function computeFlows(transfers: Transfer[], mergeUsd: boolean): AccountFlow[] {
     const raw: Record<string, Record<string, FlowEntry>> = {};
@@ -48,7 +51,7 @@ function computeFlows(transfers: Transfer[], mergeUsd: boolean): AccountFlow[] {
         if (!records[account]) records[account] = [];
     };
 
-    const toTwd = (amount: number, currency: string, exchangeRate: number | null): { twd: number; hasRate: boolean } => {
+    const toTwd = (amount: number, currency: string, exchangeRate: number | null): { twd: number; hasRate: boolean; } => {
         if (currency === "TWD") return { twd: amount, hasRate: true };
         if (exchangeRate != null) return { twd: amount * exchangeRate, hasRate: true };
         return { twd: 0, hasRate: false };
@@ -117,7 +120,7 @@ function computeFlows(transfers: Transfer[], mergeUsd: boolean): AccountFlow[] {
         .sort((a, b) => a.account.localeCompare(b.account));
 }
 
-function formatNet(currencies: CurrencyFlow[]): { parts: { value: string; currency: string }[]; isPositive: boolean } {
+function formatNet(currencies: CurrencyFlow[]): { parts: { value: string; currency: string; }[]; isPositive: boolean; } {
     const nonZero = currencies.filter(c => c.net !== 0);
     if (nonZero.length === 0) return { parts: [{ value: "0", currency: "" }], isPositive: true };
 
@@ -179,7 +182,9 @@ function NetCost() {
         };
 
         load();
-        return () => { cancelled = true; };
+        return () => {
+            cancelled = true;
+        };
     }, [auth]);
 
     return (
@@ -246,8 +251,7 @@ function NetCost() {
                                         <span className="text-muted text-xs tabular-nums">
                                             {hasAllRates
                                                 ? `NT$ ${Math.round(twdNet).toLocaleString()}`
-                                                : "NT$ —"
-                                            }
+                                                : "NT$ —"}
                                         </span>
                                     </div>
                                 </button>
@@ -264,7 +268,8 @@ function NetCost() {
                                                         <span className="text-muted">{r.direction === "in" ? `from ${r.counterpart}` : `to ${r.counterpart}`}</span>
                                                     </div>
                                                     <span className={`tabular-nums font-medium ${r.direction === "in" ? "text-green-400/80" : "text-red-400/80"}`}>
-                                                        {r.direction === "in" ? "+" : "-"}{r.amount.toLocaleString()} {r.currency}
+                                                        {r.direction === "in" ? "+" : "-"}
+                                                        {r.amount.toLocaleString()} {r.currency}
                                                     </span>
                                                 </div>
                                             ))}
@@ -283,7 +288,8 @@ function NetCost() {
                                                             -{outflow.toLocaleString()}
                                                         </span>
                                                         <span className={`font-medium tabular-nums w-24 text-right ${net >= 0 ? "text-green-400/90" : "text-red-400/90"}`}>
-                                                            {net >= 0 ? "+" : ""}{net.toLocaleString()}
+                                                            {net >= 0 ? "+" : ""}
+                                                            {net.toLocaleString()}
                                                         </span>
                                                     </div>
                                                 </div>

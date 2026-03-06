@@ -5,7 +5,7 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
     const error = url.searchParams.get("error");
 
     if (error) {
-        const target = new URL("/", env.FRONTEND_URL);
+        const target = new URL("/landing", env.FRONTEND_URL);
         target.searchParams.set("error", error);
         return Response.redirect(target.toString(), 302);
     }
@@ -26,14 +26,14 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
         });
 
         const callbackUrl = new URL("/callback", env.FRONTEND_URL);
-        callbackUrl.searchParams.set("access_token", data.access_token);
         if (data.workspace_name) callbackUrl.searchParams.set("workspace_name", data.workspace_name);
         if (data.workspace_id) callbackUrl.searchParams.set("workspace_id", data.workspace_id);
+        callbackUrl.hash = `access_token=${encodeURIComponent(data.access_token)}`;
 
         return Response.redirect(callbackUrl.toString(), 302);
     } catch (err) {
         console.error("Token exchange failed", err);
-        const target = new URL("/", env.FRONTEND_URL);
+        const target = new URL("/landing", env.FRONTEND_URL);
         target.searchParams.set("error", "token_exchange_failed");
         return Response.redirect(target.toString(), 302);
     }
