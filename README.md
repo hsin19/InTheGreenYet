@@ -48,34 +48,51 @@ Open [http://localhost:5173](http://localhost:5173) and click **Connect to Notio
 
 ## Deployment
 
-Deployments are handled via GitHub Actions (`.github/workflows/deploy.yml`):
+Deployments are handled via GitHub Actions:
 
-- **Frontend** → Cloudflare Pages
-- **Backend** → Cloudflare Workers
+- **Frontend** → Cloudflare Pages (`build-frontend.yml` → `deploy-frontend.yml`)
+- **Backend** → Cloudflare Workers (`deploy-backend.yml`)
 
-### GitHub Secrets & Variables
+### 1. Cloudflare Setup
 
-Add these in **Settings > Secrets and variables > Actions**:
+1. Sign up / log in at [dash.cloudflare.com](https://dash.cloudflare.com)
+2. Go to the [Workers & Pages dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages) and note down your **Account ID** and **Workers Subdomain** (found in the right sidebar under **Account Details**)
+3. Create an **API Token**:
+   - Go to **My Profile > API Tokens > Create Token**
+   - Use the **Edit Cloudflare Workers** template (or create a custom token with `Workers Scripts:Edit`, `Pages:Edit`, `Account Settings:Read` permissions)
+   - Copy the generated token
+
+### 2. Notion Integration (Production)
+
+> **Tip:** Use a separate integration from your local dev one to avoid accidentally revoking tokens or misconfiguring Redirect URIs.
+
+1. Go to [notion.so/profile/integrations/public](https://www.notion.so/profile/integrations/public)
+2. Create a new **Public** integration for production
+3. Set **Redirect URI** to your Worker URL:
+   `https://inthegreenyet.<your-workers-subdomain>.workers.dev/auth/notion/callback`
+4. Copy the **Client ID** and **Client Secret**
+
+### 3. GitHub Secrets & Variables
+
+Add these in your repo's **Settings > Secrets and variables > Actions**:
 
 #### Repository Secrets (Sensitive)
-
-> **Tip:** Use separate [Notion integrations](https://www.notion.so/profile/integrations/public) for local dev and production to avoid accidentally revoking tokens or misconfiguring Redirect URIs.
 
 | Secret                 | Description                                                                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token ([Guide](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/#api-token)) |
-| `NOTION_CLIENT_SECRET` | Notion integration client secret                                                                                        |
+| `NOTION_CLIENT_SECRET` | Notion integration client secret (production)                                                                           |
 
-#### Repository Variables (Non-sensitive configs)
-
-> **Tip:** You can find both your `Account ID` and `Workers Subdomain` in the **Account Details** section of the [Workers & Pages Dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages).
+#### Repository Variables (Non-sensitive)
 
 | Variable                       | Description                                          |
 | ------------------------------ | ---------------------------------------------------- |
 | `CLOUDFLARE_ACCOUNT_ID`        | Your Cloudflare account ID                           |
 | `CLOUDFLARE_PAGE_NAME`         | Cloudflare Pages project name (e.g. `inthegreenyet`) |
 | `CLOUDFLARE_WORKERS_SUBDOMAIN` | Your Cloudflare Workers subdomain (e.g. `hsin19`)    |
-| `NOTION_CLIENT_ID`             | Notion integration client ID                         |
+| `NOTION_CLIENT_ID`             | Notion integration client ID (production)            |
+
+Once configured, pushing to `main` will automatically deploy the affected services.
 
 ## Tech Stack
 
