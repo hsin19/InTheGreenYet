@@ -1,3 +1,5 @@
+import { Client } from "@notionhq/client";
+
 export async function handleOAuthCallback(request: Request, url: URL, env: Env): Promise<Response> {
     const code = url.searchParams.get("code");
     const error = url.searchParams.get("error");
@@ -12,41 +14,27 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
         return Response.json({ error: "Missing code parameter" }, { status: 400 });
     }
 
-    const encoded = btoa(`${env.NOTION_CLIENT_ID}:${env.NOTION_CLIENT_SECRET}`);
+    const notion = new Client();
 
-    const tokenRes = await fetch("https://api.notion.com/v1/oauth/token", {
-        method: "POST",
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "Authorization": `Basic ${encoded}`,
-        },
-        body: JSON.stringify({
+    try {
+        const data = await notion.oauth.token({
             grant_type: "authorization_code",
             code,
             redirect_uri: `${url.origin}/auth/notion/callback`,
-        }),
-    });
+            client_id: env.NOTION_CLIENT_ID,
+            client_secret: env.NOTION_CLIENT_SECRET,
+        });
 
-    if (!tokenRes.ok) {
-        const errBody = await tokenRes.text();
-        console.error("Token exchange failed:", errBody);
+        const callbackUrl = new URL("/callback", env.FRONTEND_URL);
+        callbackUrl.searchParams.set("access_token", data.access_token);
+        if (data.workspace_name) callbackUrl.searchParams.set("workspace_name", data.workspace_name);
+        if (data.workspace_id) callbackUrl.searchParams.set("workspace_id", data.workspace_id);
+
+        return Response.redirect(callbackUrl.toString(), 302);
+    } catch {
+        console.error("Token exchange failed");
         const target = new URL("/", env.FRONTEND_URL);
         target.searchParams.set("error", "token_exchange_failed");
         return Response.redirect(target.toString(), 302);
     }
-
-    const data = (await tokenRes.json()) as {
-        access_token: string;
-        workspace_name?: string;
-        workspace_id?: string;
-        bot_id?: string;
-    };
-
-    const callbackUrl = new URL("/callback", env.FRONTEND_URL);
-    callbackUrl.searchParams.set("access_token", data.access_token);
-    if (data.workspace_name) callbackUrl.searchParams.set("workspace_name", data.workspace_name);
-    if (data.workspace_id) callbackUrl.searchParams.set("workspace_id", data.workspace_id);
-
-    return Response.redirect(callbackUrl.toString(), 302);
 }
