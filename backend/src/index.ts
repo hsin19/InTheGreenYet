@@ -1,8 +1,14 @@
 import { handleOAuthCallback } from "./handlers/auth";
 import { handleGetConfig } from "./handlers/config";
 import { handleInit } from "./handlers/init";
-import { handleCreateTransfer, handleGetTransfers } from "./handlers/transfers";
-import { corsHeaders, jsonResponse } from "./utils";
+import {
+    handleCreateTransfer,
+    handleGetTransfers,
+} from "./handlers/transfers";
+import {
+    corsHeaders,
+    jsonResponse,
+} from "./utils";
 
 export default {
     async fetch(request, env, _ctx): Promise<Response> {

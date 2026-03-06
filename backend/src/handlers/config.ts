@@ -1,5 +1,9 @@
 import { queryConfig } from "../notion";
-import { errorResponse, getToken, jsonResponse } from "../utils";
+import {
+    errorResponse,
+    getToken,
+    jsonResponse,
+} from "../utils";
 
 export async function handleGetConfig(request: Request, url: URL, env: Env): Promise<Response> {
     try {

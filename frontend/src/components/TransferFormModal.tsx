@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { createTransfer, type CreateTransferInput } from "../lib/notion";
+import {
+    createTransfer,
+    type CreateTransferInput,
+} from "../lib/notion";
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -28,8 +31,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const set = <K extends keyof CreateTransferInput>(key: K, value: CreateTransferInput[K]) =>
-        setForm(prev => ({ ...prev, [key]: value }));
+    const set = <K extends keyof CreateTransferInput>(key: K, value: CreateTransferInput[K]) => setForm(prev => ({ ...prev, [key]: value }));
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,7 +50,9 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
     return (
         <div
             className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
-            onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+            onClick={e => {
+                if (e.target === e.currentTarget) onClose();
+            }}
         >
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
@@ -209,7 +213,7 @@ export function TransferFormModal({ token, currencies, accounts, onClose, onCrea
     );
 }
 
-function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string }) {
+function Field({ label, children, className }: { label: string; children: React.ReactNode; className?: string; }) {
     return (
         <div className={`flex flex-col gap-1.5 ${className ?? ""}`}>
             <label className="text-xs text-muted">{label}</label>

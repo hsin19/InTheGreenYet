@@ -7,7 +7,10 @@ import {
     useRef,
     useState,
 } from "react";
-import { fetchConfig, init } from "../lib/notion";
+import {
+    fetchConfig,
+    init,
+} from "../lib/notion";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -90,7 +93,7 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
 
         init(auth.access_token)
             .then(() => fetchConfig(auth.access_token))
-            .then((rows) => {
+            .then(rows => {
                 const map = Object.fromEntries(rows.map(r => [r.key, r.value]));
                 setConfig({
                     currencies: Array.isArray(map.currencies) ? map.currencies : [],
@@ -98,7 +101,7 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
                 });
                 setInitStatus("done");
             })
-            .catch((err) => {
+            .catch(err => {
                 setInitError(err instanceof Error ? err.message : "Unknown error");
                 setInitStatus("error");
                 initingRef.current = false;

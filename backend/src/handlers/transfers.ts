@@ -1,5 +1,12 @@
-import { createTransfer, queryTransfers } from "../notion";
-import { errorResponse, getToken, jsonResponse } from "../utils";
+import {
+    createTransfer,
+    queryTransfers,
+} from "../notion";
+import {
+    errorResponse,
+    getToken,
+    jsonResponse,
+} from "../utils";
 
 export async function handleGetTransfers(request: Request, env: Env): Promise<Response> {
     try {

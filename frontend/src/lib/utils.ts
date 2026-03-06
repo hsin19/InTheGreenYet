@@ -15,12 +15,12 @@ export async function apiFetch<T>(
     const res = await fetch(`${API_BASE_URL}${path}`, {
         ...options,
         headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             ...(options.body ? { "Content-Type": "application/json" } : {}),
             ...((options.headers as Record<string, string>) ?? {}),
         },
     });
-    const data = await res.json() as T & { error?: string };
+    const data = await res.json() as T & { error?: string; };
     if (!res.ok) {
         if (res.status === 404 && data.error === "data_source_not_found") {
             throw new DataSourceNotFoundError();
