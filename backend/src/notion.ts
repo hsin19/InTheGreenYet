@@ -31,7 +31,7 @@ const CONFIG_PROPERTIES = {
 } as const;
 
 const CONFIG_DEFAULTS: Record<string, unknown> = {
-    accounts: ["bank", "binance", "okx", "bitget"],
+    accounts: ["Bank", "Binance", "OKX", "Bitget", "MAX"],
     currencies: ["TWD", "USD", "USDT"],
 };
 

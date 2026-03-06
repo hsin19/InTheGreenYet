@@ -18,6 +18,12 @@ function AppNav() {
                 >
                     Transfers
                 </NavLink>
+                <NavLink
+                    to="/net-cost"
+                    className={({ isActive }) => `text-sm transition-colors ${isActive ? "text-white font-medium" : "text-muted hover:text-white"}`}
+                >
+                    Net Cost
+                </NavLink>
             </nav>
             <button
                 onClick={logout}
