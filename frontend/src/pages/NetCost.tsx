@@ -1,6 +1,7 @@
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { useAppData } from "../hooks/useAppData";
+import type { Transfer } from "../lib/notion";
 
 interface CurrencyFlow {
     currency: string;
