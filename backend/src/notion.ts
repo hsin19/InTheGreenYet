@@ -88,7 +88,7 @@ export async function searchDataSource(
     token: string,
     title: string,
     { retries = 0, delay = 2000 }: { retries?: number; delay?: number; } = {},
-): Promise<{ id: string; title: string; } | null> {
+): Promise<{ id: string; title: string; parentDatabaseId?: string; } | null> {
     const notion = createClient(token);
 
     for (let attempt = 0; attempt <= retries; attempt++) {
@@ -105,7 +105,12 @@ export async function searchDataSource(
             return titles?.some(t => t.plain_text === title);
         });
 
-        if (match) return { id: match.id, title };
+        if (match) {
+            const parentDatabaseId = (match as any).parent?.type === "database_id"
+                ? (match as any).parent.database_id
+                : undefined;
+            return { id: match.id, title, parentDatabaseId };
+        }
     }
 
     return null;
@@ -202,7 +207,7 @@ async function createDataSourceInternal(
     const notion = createClient(token);
 
     const response = await notion.dataSources.create({
-        parent: { database_id: databaseId },
+        parent: { type: "database_id", database_id: databaseId },
         title: [{ type: "text", text: { content: title } }],
         properties: properties as any,
     });
@@ -239,10 +244,17 @@ export async function createTransfer(
     return response.id;
 }
 
-/** Find or create the application database. */
+/** Find or create the application database. If existing, returns the actual parent database ID. */
 export async function findOrCreateDatabase(token: string): Promise<string> {
     const existingDb = await searchDataSource(token, DATABASE_NAME);
-    if (existingDb) return existingDb.id;
+
+    // In the new Notion API, Data Sources belong to a parent Database.
+    // If we found an existing data source, we must use its parent database ID
+    // for creating other sibling data sources.
+    if (existingDb && existingDb.parentDatabaseId) {
+        return existingDb.parentDatabaseId;
+    }
+
     const parentPageId = await findParentPage(token, PARENT_PAGE_NAME);
     return createDatabase(token, parentPageId, DATABASE_NAME);
 }
