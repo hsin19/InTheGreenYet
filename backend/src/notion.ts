@@ -15,17 +15,7 @@ const TRANSFER_PROPERTIES = {
     "Title": { title: {} },
     "Amount": { number: { format: "number" } },
     "Fee": { number: { format: "number" } },
-    "Currency": {
-        select: {
-            options: [
-                { name: "TWD", color: "green" },
-                { name: "USD", color: "blue" },
-                { name: "JPY", color: "red" },
-                { name: "USDT", color: "yellow" },
-                { name: "USDC", color: "purple" },
-            ],
-        },
-    },
+    "Currency": { rich_text: {} },
     "Exchange Rate": { number: { format: "number" } },
     "From": { rich_text: {} },
     "To": { rich_text: {} },
@@ -41,7 +31,8 @@ const CONFIG_PROPERTIES = {
 } as const;
 
 const CONFIG_DEFAULTS: Record<string, unknown> = {
-    accounts: [],
+    accounts: ["bank", "binance", "okx", "bitget"],
+    currencies: ["TWD", "USD", "USDT"],
 };
 
 // ─── Types ───────────────────────────────────────────────────
@@ -141,7 +132,7 @@ export async function queryTransfers(token: string): Promise<NotionTransferRow[]
                 id: item.id,
                 title: props["Title"]?.title?.map((t: any) => t.plain_text).join("") ?? "",
                 amount: props["Amount"]?.number ?? null,
-                currency: props["Currency"]?.select?.name ?? null,
+                currency: props["Currency"]?.rich_text?.map((t: any) => t.plain_text).join("") || null,
                 fee: props["Fee"]?.number ?? null,
                 exchangeRate: props["Exchange Rate"]?.number ?? null,
                 date: props["Date"]?.date?.start ?? null,
@@ -235,7 +226,7 @@ export async function createTransfer(
     };
 
     if (input.amount != null) properties["Amount"] = { number: input.amount };
-    if (input.currency) properties["Currency"] = { select: { name: input.currency } };
+    if (input.currency) properties["Currency"] = { rich_text: [{ text: { content: input.currency } }] };
     if (input.fee != null) properties["Fee"] = { number: input.fee };
     if (input.exchangeRate != null) properties["Exchange Rate"] = { number: input.exchangeRate };
     if (input.date) properties["Date"] = { date: { start: input.date } };

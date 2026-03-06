@@ -10,7 +10,7 @@ import { DataSourceNotFoundError } from "../lib/utils";
 type Status = "loading" | "ready" | "error" | "unauthenticated";
 
 function Transfers() {
-    const { auth } = useNotion();
+    const { auth, config } = useNotion();
     const [status, setStatus] = useState<Status>("loading");
     const [transfers, setTransfers] = useState<Transfer[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -238,6 +238,8 @@ function Transfers() {
         {isFormOpen && auth && (
             <TransferFormModal
                 token={auth.access_token}
+                currencies={config.currencies}
+                accounts={config.accounts}
                 onClose={() => setIsFormOpen(false)}
                 onCreated={() => {
                     setIsFormOpen(false);

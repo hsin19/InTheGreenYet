@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { createTransfer, type CreateTransferInput } from "../lib/notion";
 
-const CURRENCIES = ["TWD", "USD", "JPY", "USDT", "USDC"] as const;
-
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 const EMPTY_FORM: CreateTransferInput = {
@@ -19,11 +17,13 @@ const EMPTY_FORM: CreateTransferInput = {
 
 interface Props {
     token: string;
+    currencies: string[];
+    accounts: string[];
     onClose: () => void;
     onCreated: () => void;
 }
 
-export function TransferFormModal({ token, onClose, onCreated }: Props) {
+export function TransferFormModal({ token, currencies, accounts, onClose, onCreated }: Props) {
     const [form, setForm] = useState<CreateTransferInput>(EMPTY_FORM);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -84,22 +84,46 @@ export function TransferFormModal({ token, onClose, onCreated }: Props) {
                 {/* From / To */}
                 <div className="flex gap-3">
                     <Field label="From" className="flex-1">
-                        <input
-                            required
-                            value={form.from}
-                            onChange={e => set("from", e.target.value)}
-                            placeholder="Source"
-                            className={inputCls}
-                        />
+                        {accounts.length > 0 ? (
+                            <select
+                                required
+                                value={form.from}
+                                onChange={e => set("from", e.target.value)}
+                                className={inputCls}
+                            >
+                                <option value="">—</option>
+                                {accounts.map(a => <option key={a} value={a}>{a}</option>)}
+                            </select>
+                        ) : (
+                            <input
+                                required
+                                value={form.from}
+                                onChange={e => set("from", e.target.value)}
+                                placeholder="Source"
+                                className={inputCls}
+                            />
+                        )}
                     </Field>
                     <Field label="To" className="flex-1">
-                        <input
-                            required
-                            value={form.to}
-                            onChange={e => set("to", e.target.value)}
-                            placeholder="Destination"
-                            className={inputCls}
-                        />
+                        {accounts.length > 0 ? (
+                            <select
+                                required
+                                value={form.to}
+                                onChange={e => set("to", e.target.value)}
+                                className={inputCls}
+                            >
+                                <option value="">—</option>
+                                {accounts.map(a => <option key={a} value={a}>{a}</option>)}
+                            </select>
+                        ) : (
+                            <input
+                                required
+                                value={form.to}
+                                onChange={e => set("to", e.target.value)}
+                                placeholder="Destination"
+                                className={inputCls}
+                            />
+                        )}
                     </Field>
                 </div>
 
@@ -122,7 +146,7 @@ export function TransferFormModal({ token, onClose, onCreated }: Props) {
                             className={inputCls}
                         >
                             <option value="">—</option>
-                            {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+                            {currencies.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
                     </Field>
                 </div>

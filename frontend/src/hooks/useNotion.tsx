@@ -7,7 +7,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { init } from "../lib/notion";
+import { fetchConfig, init } from "../lib/notion";
 
 // ─── Types ────────────────────────────────────────────────────
 
@@ -19,10 +19,18 @@ interface NotionAuth {
 
 export type InitStatus = "idle" | "initializing" | "done" | "error";
 
+interface AppConfig {
+    currencies: string[];
+    accounts: string[];
+}
+
+const DEFAULT_CONFIG: AppConfig = { currencies: [], accounts: [] };
+
 interface NotionState {
     auth: NotionAuth | null;
     initStatus: InitStatus;
     initError: string | null;
+    config: AppConfig;
     login: () => void;
     logout: () => void;
     retryInit: () => void;
@@ -51,6 +59,7 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
 
     const [initStatus, setInitStatus] = useState<InitStatus>("idle");
     const [initError, setInitError] = useState<string | null>(null);
+    const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
     const initingRef = useRef(false);
 
     const login = useCallback(() => {
@@ -65,6 +74,7 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         setAuth(null);
         setInitStatus("idle");
         setInitError(null);
+        setConfig(DEFAULT_CONFIG);
         initingRef.current = false;
     }, []);
 
@@ -79,7 +89,15 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         setInitStatus("initializing");
 
         init(auth.access_token)
-            .then(() => setInitStatus("done"))
+            .then(() => fetchConfig(auth.access_token))
+            .then((rows) => {
+                const map = Object.fromEntries(rows.map(r => [r.key, r.value]));
+                setConfig({
+                    currencies: Array.isArray(map.currencies) ? map.currencies : [],
+                    accounts: Array.isArray(map.accounts) ? map.accounts : [],
+                });
+                setInitStatus("done");
+            })
             .catch((err) => {
                 setInitError(err instanceof Error ? err.message : "Unknown error");
                 setInitStatus("error");
@@ -94,7 +112,7 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
     }, []);
 
     return (
-        <NotionContext value={{ auth, initStatus, initError, login, logout, retryInit, setAuthData }}>
+        <NotionContext value={{ auth, initStatus, initError, config, login, logout, retryInit, setAuthData }}>
             {children}
         </NotionContext>
     );
