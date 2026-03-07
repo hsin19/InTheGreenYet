@@ -53,6 +53,12 @@ function Transfers() {
                         >
                             <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
                         </Button>
+                        {auth && (
+                            <Button onClick={() => setIsFormOpen(true)}>
+                                <Plus className="w-4 h-4 mr-1.5" />
+                                Add Transfer
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -180,17 +186,6 @@ function Transfers() {
                     </ul>
                 )}
             </div>
-
-            {/* FAB */}
-            {auth && (
-                <Button
-                    size="icon"
-                    onClick={() => setIsFormOpen(true)}
-                    className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg shadow-green-500/30 text-2xl font-light [&_svg]:size-6"
-                >
-                    <Plus />
-                </Button>
-            )}
 
             {/* Form modal */}
             {isFormOpen && auth && (

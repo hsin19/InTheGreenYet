@@ -1,9 +1,20 @@
-import { Settings } from "lucide-react";
+import { LogOut } from "lucide-react";
 import {
     Navigate,
     NavLink,
     Outlet,
 } from "react-router-dom";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "../components/ui/alert-dialog";
 import { AppDataProvider } from "../hooks/useAppData";
 import { useNotion } from "../hooks/useNotion";
 
@@ -11,36 +22,60 @@ function AppNav() {
     const { auth, logout } = useNotion();
 
     return (
-        <header className="fixed top-0 inset-x-0 h-14 flex items-center justify-between px-6 border-b border-white/10 bg-surface/80 backdrop-blur z-50">
-            <span className="font-semibold text-white text-sm">InTheGreenYet</span>
-            <nav className="flex items-center gap-6">
-                <NavLink
-                    to="/transfers"
-                    className={({ isActive }) => `text-sm transition-colors ${isActive ? "text-white font-medium" : "text-muted hover:text-white"}`}
-                >
-                    Transfers
-                </NavLink>
-                <NavLink
-                    to="/accounts"
-                    className={({ isActive }) => `text-sm transition-colors ${isActive ? "text-white font-medium" : "text-muted hover:text-white"}`}
-                >
-                    Accounts
-                </NavLink>
-                <NavLink
-                    to="/config"
-                    className={({ isActive }) => `p-1.5 rounded-lg transition-colors ${isActive ? "text-white bg-surface-hover" : "text-muted hover:text-white"}`}
-                    aria-label="Config"
-                >
-                    <Settings className="w-4 h-4" />
-                </NavLink>
-            </nav>
-            <button
-                onClick={logout}
-                className="text-sm text-muted hover:text-white transition-colors cursor-pointer"
-            >
-                {auth?.workspace_name ?? "Disconnect"}
-                <span className="ml-2 text-muted/50">↩</span>
-            </button>
+        <header className="fixed top-6 inset-x-0 flex justify-center z-50 pointer-events-none px-4">
+            <div className="pointer-events-auto flex items-center justify-between px-2 py-1.5 rounded-full border border-white/10 bg-surface/80 backdrop-blur-xl shadow-2xl shadow-black/40 w-fit gap-8 sm:gap-12">
+                <span className="font-semibold text-white text-sm pl-4 tracking-wide">
+                    InTheGreen<span className="text-green-400">Yet</span>
+                </span>
+                <nav className="flex items-center gap-1">
+                    <NavLink
+                        to="/transfers"
+                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}`}
+                    >
+                        Transfers
+                    </NavLink>
+                    <NavLink
+                        to="/accounts"
+                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}`}
+                    >
+                        Accounts
+                    </NavLink>
+                    <NavLink
+                        to="/config"
+                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}`}
+                        aria-label="Settings"
+                    >
+                        Settings
+                    </NavLink>
+                </nav>
+                <div className="pr-2">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <button className="flex items-center gap-2 pl-3 pr-2.5 py-1.5 rounded-full text-sm font-medium text-muted hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer group">
+                                <span className="max-w-[120px] truncate">{auth?.workspace_name ?? "Disconnect"}</span>
+                                <LogOut className="w-4 h-4 text-muted group-hover:text-rose-400 transition-colors" />
+                            </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent className="w-[90vw] max-w-sm">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Log out of Notion?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This will disconnect your workspace and log you out of the application.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={logout}
+                                    className="bg-rose-500 text-white hover:bg-rose-600 border-none shadow-lg shadow-rose-500/20"
+                                >
+                                    Log out
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </div>
+            </div>
         </header>
     );
 }
@@ -76,7 +111,7 @@ function AppLayout() {
 
                 <AppNav />
                 {/* Main Content */}
-                <main className="flex-1 relative z-10 w-full max-w-7xl mx-auto pt-14">
+                <main className="flex-1 relative z-10 w-full max-w-7xl mx-auto pt-28">
                     <Outlet />
                 </main>
             </div>

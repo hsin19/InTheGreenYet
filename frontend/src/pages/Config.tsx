@@ -139,7 +139,7 @@ function Config() {
     return (
         <div className="flex min-h-screen flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white">Config</h1>
+                <h1 className="text-2xl font-bold text-white">Settings</h1>
                 <p className="text-muted text-sm mt-1">Manage currencies and accounts used across the app</p>
             </div>
 

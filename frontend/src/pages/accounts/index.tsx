@@ -1,4 +1,7 @@
-import { Plus } from "lucide-react";
+import {
+    Plus,
+    RefreshCw,
+} from "lucide-react";
 import {
     useEffect,
     useState,
@@ -103,12 +106,22 @@ export function Accounts() {
                     <h1 className="text-2xl font-bold text-white">Accounts</h1>
                     <p className="text-muted text-sm mt-1">Track balances across your accounts</p>
                 </div>
-                <Button
-                    onClick={() => setAddOpen(true)}
-                >
-                    <Plus className="w-4 h-4 mr-1.5" />
-                    Add Account
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={refresh}
+                        disabled={status === "loading"}
+                    >
+                        <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
+                    </Button>
+                    <Button
+                        onClick={() => setAddOpen(true)}
+                    >
+                        <Plus className="w-4 h-4 mr-1.5" />
+                        Add Account
+                    </Button>
+                </div>
             </div>
 
             {status === "ready" && entries.length > 0 && (
