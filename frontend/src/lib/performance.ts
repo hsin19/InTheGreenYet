@@ -177,11 +177,19 @@ export function calculatePerformance(
     const plTwd = currentTwd !== null ? currentTwd - netCostTwd : null;
 
     // Native calculations
-    // Find the flow component that matches the account's currency
-    // For USD stablecoins, we search for "USD" in the summary if mergeUsd was used
-    const nativeKey = STABLE_USD.has(currency) ? "USD" : currency;
-    const nativeFlow = flow?.summary.find(s => s.currency === nativeKey);
-    const netCostNative = nativeFlow ? nativeFlow.net : 0;
+    // Calculate native net cost by converting the total TWD net cost back to the desired currency
+    let netCostNative = 0;
+    if (currency === "TWD") {
+        netCostNative = netCostTwd;
+    } else if (STABLE_USD.has(currency)) {
+        netCostNative = netCostTwd / HARDCODED_USD_RATE;
+    } else {
+        // Fallback to purely native flow if we don't have a conversion rate
+        const nativeKey = STABLE_USD.has(currency) ? "USD" : currency;
+        const nativeFlow = flow?.summary.find(s => s.currency === nativeKey);
+        netCostNative = nativeFlow ? nativeFlow.net : 0;
+    }
+
     const plNative = amount !== null ? amount - netCostNative : null;
 
     let yieldPercentage: number | null = null;

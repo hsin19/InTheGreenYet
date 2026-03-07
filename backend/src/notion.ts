@@ -38,7 +38,7 @@ const CONFIG_DEFAULTS: Record<string, unknown> = {
         Binance: { displayName: "Binance", currency: "USDT", isInvestment: true, accountType: "binance" },
         OKX: { displayName: "OKX", currency: "USDT", isInvestment: true, accountType: "okx" },
         Bitget: { displayName: "Bitget", currency: "USDT", isInvestment: true, accountType: "bitget" },
-        MAX: { displayName: "MAX", currency: "USDT", isInvestment: true, accountType: "max" },
+        MAX: { displayName: "MAX", currency: "TWD", isInvestment: true, accountType: "max" },
     },
     currencies: ["TWD", "USD", "USDT"],
 };
