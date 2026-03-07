@@ -10,6 +10,7 @@ import Accounts from "./pages/accounts";
 import Callback from "./pages/Callback";
 import Config from "./pages/Config";
 import Landing from "./pages/Landing";
+import NotFound from "./pages/NotFound";
 import Transfers from "./pages/Transfers";
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
                         <Route path="/accounts" element={<Accounts />} />
                         <Route path="/config" element={<Config />} />
                     </Route>
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </BrowserRouter>
         </NotionProvider>
