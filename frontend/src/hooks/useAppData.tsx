@@ -6,12 +6,12 @@ import {
     useEffect,
     useState,
 } from "react";
+import { DataSourceNotFoundError } from "../lib/api";
 import {
     fetchConfig,
     fetchTransfers,
     type Transfer,
 } from "../lib/notion";
-import { DataSourceNotFoundError } from "../lib/utils";
 import { useNotion } from "./useNotion";
 
 type Status = "loading" | "ready" | "error";

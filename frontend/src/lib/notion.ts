@@ -1,4 +1,4 @@
-import { apiFetch } from "./utils";
+import { apiFetch } from "./api";
 
 export interface Transfer {
     id: string;
