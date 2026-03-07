@@ -8,6 +8,9 @@ import {
     useEffect,
     useState,
 } from "react";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
+import { Input } from "../components/ui/input";
 import { useAppData } from "../hooks/useAppData";
 import { useNotion } from "../hooks/useNotion";
 import { updateConfig } from "../lib/notion";
@@ -42,7 +45,7 @@ function CurrenciesSection({
     };
 
     return (
-        <div className="bg-surface-card border border-white/10 rounded-2xl p-6 flex flex-col gap-5">
+        <Card className="p-6 gap-5">
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <h2 className="text-white font-semibold text-base">Currencies</h2>
@@ -64,7 +67,7 @@ function CurrenciesSection({
             </div>
 
             <div className="flex items-center gap-2">
-                <input
+                <Input
                     type="text"
                     value={state.input}
                     onChange={e => onChange({ ...state, input: e.target.value, error: null })}
@@ -75,12 +78,14 @@ function CurrenciesSection({
                         }
                     }}
                     placeholder="Add currency (e.g. ETH)..."
-                    className="flex-1 bg-surface border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted/50 focus:outline-none focus:border-green-500/50 transition-colors"
+                    className="flex-1"
                 />
-                <AddButton onClick={addItem} disabled={!state.input.trim()} />
+                <Button size="icon" onClick={addItem} disabled={!state.input.trim()}>
+                    <Plus className="w-4 h-4" />
+                </Button>
             </div>
             {state.error && <p className="text-red-400 text-xs">{state.error}</p>}
-        </div>
+        </Card>
     );
 }
 
@@ -88,32 +93,15 @@ function CurrenciesSection({
 
 function SaveButton({ saving, saved, onSave }: { saving: boolean; saved: boolean; onSave: () => void; }) {
     return (
-        <button
+        <Button
+            variant={saved ? "default" : "outline"}
+            size="sm"
             onClick={onSave}
             disabled={saving}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default shrink-0
-                ${
-                saved
-                    ? "bg-green-500/15 text-green-400 border border-green-500/30"
-                    : "bg-surface border border-white/10 text-muted hover:text-white hover:bg-surface-hover"
-            }`}
         >
-            {saving ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+            {saving ? <RefreshCw className="w-3 h-3 animate-spin mr-1.5" /> : <Save className="w-3 h-3 mr-1.5" />}
             {saving ? "Saving..." : saved ? "Saved!" : "Save"}
-        </button>
-    );
-}
-
-function AddButton({ onClick, disabled }: { onClick: () => void; disabled: boolean; }) {
-    return (
-        <button
-            onClick={onClick}
-            disabled={disabled}
-            className="p-2 rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 hover:bg-green-500/25 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default"
-            aria-label="Add item"
-        >
-            <Plus className="w-4 h-4" />
-        </button>
+        </Button>
     );
 }
 
@@ -163,16 +151,13 @@ function Config() {
             )}
 
             {status === "error" && (
-                <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3">
+                <Card className="items-center text-center p-8 gap-3 border-red-500/20 shadow-red-500/5">
                     <span className="text-2xl">❌</span>
                     <p className="text-red-400 text-sm font-medium">Failed to load config</p>
-                    <button
-                        onClick={refresh}
-                        className="px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
-                    >
+                    <Button variant="secondary" onClick={refresh} className="mt-2">
                         Retry
-                    </button>
-                </div>
+                    </Button>
+                </Card>
             )}
 
             {status === "ready" && (

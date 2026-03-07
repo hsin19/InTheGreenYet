@@ -3,6 +3,8 @@ import {
     useEffect,
     useState,
 } from "react";
+import { Button } from "../../components/ui/button";
+import { Card } from "../../components/ui/card";
 import {
     type AccountConfig,
     useAppData,
@@ -101,39 +103,38 @@ export function Accounts() {
                     <h1 className="text-2xl font-bold text-white">Accounts</h1>
                     <p className="text-muted text-sm mt-1">Track balances across your accounts</p>
                 </div>
-                <button
+                <Button
                     onClick={() => setAddOpen(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 text-sm hover:bg-green-500/25 transition-colors cursor-pointer"
                 >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 mr-1.5" />
                     Add Account
-                </button>
+                </Button>
             </div>
 
             {status === "ready" && entries.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-                    <div className="bg-surface-card border border-white/5 rounded-xl p-4 flex flex-col gap-1">
+                    <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Cost</span>
                         <span className="text-lg font-bold text-white tabular-nums">NT$ {Math.round(totalNetCost).toLocaleString()}</span>
-                    </div>
-                    <div className="bg-surface-card border border-white/5 rounded-xl p-4 flex flex-col gap-1">
+                    </Card>
+                    <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Assets</span>
                         <span className="text-lg font-bold text-white tabular-nums">NT$ {Math.round(totalCurrentValue).toLocaleString()}</span>
-                    </div>
-                    <div className="bg-surface-card border border-white/5 rounded-xl p-4 flex flex-col gap-1">
+                    </Card>
+                    <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total P&L</span>
-                        <span className={`text-lg font-bold tabular-nums ${totalPL >= 0 ? "text-green-400" : "text-red-400"}`}>
+                        <span className={`text-lg font-bold tabular-nums ${totalPL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                             NT$ {totalPL >= 0 ? "+" : ""}
                             {Math.round(totalPL).toLocaleString()}
                         </span>
-                    </div>
-                    <div className="bg-surface-card border border-white/5 rounded-xl p-4 flex flex-col gap-1">
+                    </Card>
+                    <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Overall Yield</span>
-                        <span className={`text-lg font-bold tabular-nums ${totalYield >= 0 ? "text-green-400" : "text-red-400"}`}>
+                        <span className={`text-lg font-bold tabular-nums ${totalYield >= 0 ? "text-emerald-400" : "text-rose-400/90"}`}>
                             {totalYield >= 0 ? "+" : ""}
                             {totalYield.toFixed(1)}%
                         </span>
-                    </div>
+                    </Card>
                 </div>
             )}
 
@@ -148,12 +149,13 @@ export function Accounts() {
                 <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3">
                     <span className="text-2xl">❌</span>
                     <p className="text-red-400 text-sm font-medium">Failed to load accounts</p>
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={refresh}
-                        className="px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
+                        className="mt-2"
                     >
                         Retry
-                    </button>
+                    </Button>
                 </div>
             )}
 
@@ -162,12 +164,12 @@ export function Accounts() {
                     {entries.length === 0 ? (
                         <div className="flex flex-col items-center gap-3 py-16 text-center">
                             <p className="text-muted text-sm">No accounts yet.</p>
-                            <button
+                            <Button
+                                variant="link"
                                 onClick={() => setAddOpen(true)}
-                                className="text-green-400 text-sm hover:underline cursor-pointer"
                             >
-                                Add your first account →
-                            </button>
+                                Add your first account &rarr;
+                            </Button>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

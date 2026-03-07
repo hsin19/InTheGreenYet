@@ -1,6 +1,11 @@
-import { RefreshCw } from "lucide-react";
+import {
+    Plus,
+    RefreshCw,
+} from "lucide-react";
 import { useState } from "react";
 import { TransferFormModal } from "../components/TransferFormModal";
+import { Button } from "../components/ui/button";
+import { Card } from "../components/ui/card";
 import { useAppData } from "../hooks/useAppData";
 import { useNotion } from "../hooks/useNotion";
 
@@ -29,30 +34,25 @@ function Transfers() {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="text-2xl font-bold text-white">Transfers</h1>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                         {status === "ready" && transfers.length > 0 && (
                             <>
-                                <button
-                                    onClick={expandAll}
-                                    className="px-2.5 py-1 text-xs text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
-                                >
+                                <Button variant="outline" size="sm" onClick={expandAll}>
                                     Expand All
-                                </button>
-                                <button
-                                    onClick={collapseAll}
-                                    className="px-2.5 py-1 text-xs text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer"
-                                >
+                                </Button>
+                                <Button variant="outline" size="sm" onClick={collapseAll}>
                                     Collapse All
-                                </button>
+                                </Button>
                             </>
                         )}
-                        <button
+                        <Button
+                            variant="outline"
+                            size="icon"
                             onClick={refresh}
                             disabled={status === "loading"}
-                            className="p-1.5 text-muted hover:text-white border border-white/10 rounded-lg hover:bg-surface-hover transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-default"
                         >
-                            <RefreshCw className={`w-3.5 h-3.5 ${status === "loading" ? "animate-spin" : ""}`} />
-                        </button>
+                            <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
+                        </Button>
                     </div>
                 </div>
 
@@ -65,24 +65,21 @@ function Transfers() {
                 )}
 
                 {status === "error" && (
-                    <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3 shadow-lg shadow-red-500/5">
+                    <Card className="items-center text-center p-8 gap-3 border-red-500/20 shadow-red-500/5">
                         <span className="text-2xl">❌</span>
                         <p className="text-red-400 text-sm font-medium">Failed to load transfers</p>
                         <p className="text-muted text-xs">{error}</p>
-                        <button
-                            onClick={refresh}
-                            className="mt-2 px-4 py-2 bg-surface border border-white/10 rounded-lg text-sm text-white hover:bg-surface-hover transition-colors cursor-pointer"
-                        >
+                        <Button variant="secondary" onClick={refresh} className="mt-2">
                             Retry
-                        </button>
-                    </div>
+                        </Button>
+                    </Card>
                 )}
 
                 {status === "ready" && transfers.length === 0 && (
-                    <div className="bg-surface-card border border-white/10 rounded-2xl px-8 py-8 flex flex-col items-center gap-2 shadow-lg">
+                    <Card className="items-center text-center p-8 gap-2">
                         <p className="text-white font-medium">No transfers yet</p>
                         <p className="text-muted text-sm">Add transfers in your Notion database to see them here.</p>
-                    </div>
+                    </Card>
                 )}
 
                 {status === "ready" && transfers.length > 0 && (
@@ -102,15 +99,15 @@ function Transfers() {
                             const isExpanded = expandedIds.has(transfer.id);
 
                             return (
-                                <li
+                                <Card
                                     key={transfer.id}
-                                    className="bg-surface-card border border-white/10 rounded-2xl shadow-sm overflow-hidden"
+                                    className="p-0 gap-0"
                                 >
                                     {/* Clickable header */}
                                     <button
                                         onClick={() => toggleExpand(transfer.id)}
                                         disabled={!hasDetails}
-                                        className="w-full text-left px-5 py-4 flex flex-col gap-1 cursor-pointer disabled:cursor-default"
+                                        className="w-full text-left px-5 py-4 flex flex-col gap-1 cursor-pointer disabled:cursor-default bg-transparent border-0 hover:bg-white/5 transition-colors"
                                     >
                                         {/* Row 1: Title + Amount */}
                                         <div className="flex items-center justify-between gap-2">
@@ -177,7 +174,7 @@ function Transfers() {
                                             )}
                                         </div>
                                     )}
-                                </li>
+                                </Card>
                             );
                         })}
                     </ul>
@@ -186,12 +183,13 @@ function Transfers() {
 
             {/* FAB */}
             {auth && (
-                <button
+                <Button
+                    size="icon"
                     onClick={() => setIsFormOpen(true)}
-                    className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 hover:bg-green-400 text-black text-2xl font-light shadow-lg shadow-green-500/30 flex items-center justify-center transition-colors cursor-pointer"
+                    className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg shadow-green-500/30 text-2xl font-light [&_svg]:size-6"
                 >
-                    +
-                </button>
+                    <Plus />
+                </Button>
             )}
 
             {/* Form modal */}

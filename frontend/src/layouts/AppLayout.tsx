@@ -11,7 +11,7 @@ function AppNav() {
     const { auth, logout } = useNotion();
 
     return (
-        <header className="fixed top-0 inset-x-0 h-14 flex items-center justify-between px-6 border-b border-white/10 bg-surface/80 backdrop-blur z-10">
+        <header className="fixed top-0 inset-x-0 h-14 flex items-center justify-between px-6 border-b border-white/10 bg-surface/80 backdrop-blur z-50">
             <span className="font-semibold text-white text-sm">InTheGreenYet</span>
             <nav className="flex items-center gap-6">
                 <NavLink
@@ -63,9 +63,22 @@ function AppLayout() {
 
     return (
         <AppDataProvider>
-            <div className="pt-14">
+            <div className="min-h-screen bg-surface text-white flex flex-col font-sans relative">
+                {/* Background image and elements for Glassmorphism */}
+                <div
+                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-20 pointer-events-none"
+                    style={{ backgroundImage: `url('/images/bull-bg.png')` }}
+                />
+                <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
+                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-900/10 blur-[120px]" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-900/10 blur-[120px]" />
+                </div>
+
                 <AppNav />
-                <Outlet />
+                {/* Main Content */}
+                <main className="flex-1 relative z-10 w-full max-w-7xl mx-auto pt-14">
+                    <Outlet />
+                </main>
             </div>
         </AppDataProvider>
     );

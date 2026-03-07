@@ -49,8 +49,8 @@ export function AccountCard({
 
     return (
         <>
-            <Card className="bg-surface-card border-white/10 text-white relative group">
-                <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-start justify-between gap-2">
+            <Card className="group hover:border-white/20 hover:bg-surface-card/60 transition-all duration-300 p-0 gap-0">
+                <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-start justify-between gap-2 border-b border-white/10">
                     <div className="min-w-0">
                         <p className="text-white font-semibold text-base leading-tight truncate">
                             {config.displayName}
@@ -96,14 +96,14 @@ export function AccountCard({
                     </div>
                 </CardHeader>
 
-                <CardContent className="px-4 pb-4 flex flex-col gap-3">
+                <CardContent className="px-4 pb-4 pt-4 flex flex-col gap-3">
                     <div className="flex flex-col gap-1">
                         <InlineAmount accountKey={accountKey} config={config} onSave={onSaveAccount} />
                         {updatedAt && <p className="text-muted/50 text-xs">Updated {updatedAt}</p>}
                     </div>
 
                     {performance && (
-                        <div className="pt-3 border-t border-white/5 flex flex-col gap-2">
+                        <div className="pt-3 flex flex-col gap-2">
                             <div className="flex justify-between items-end">
                                 <div className="flex flex-col">
                                     <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net Cost</span>
@@ -113,16 +113,16 @@ export function AccountCard({
                                 </div>
                                 <div className="flex flex-col items-end">
                                     <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Yield</span>
-                                    <span className={`text-xs font-bold tabular-nums ${(performance.yieldPercentage ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                    <span className={`text-xs font-bold tabular-nums ${(performance.yieldPercentage ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400/90"}`}>
                                         {performance.yieldPercentage != null
                                             ? `${performance.yieldPercentage >= 0 ? "+" : ""}${performance.yieldPercentage.toFixed(1)}%`
                                             : "—"}
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex justify-between items-center bg-white/5 px-2 py-1 rounded-sm">
+                            <div className="flex justify-between items-center bg-white/5 px-2 py-1.5 rounded-md border border-white/10 shadow-inner">
                                 <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net P&L</span>
-                                <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                                     {performance.pl != null
                                         ? `${config.currency || "TWD"} ${performance.pl >= 0 ? "+" : ""}${Math.round(performance.pl).toLocaleString()}`
                                         : "—"}

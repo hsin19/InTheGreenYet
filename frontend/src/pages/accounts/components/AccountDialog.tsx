@@ -106,9 +106,10 @@ export function AccountDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-surface-card border-white/10 text-white max-w-md">
+            <DialogContent className="bg-surface/80 backdrop-blur-3xl border border-white/20 text-white sm:max-w-lg shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] p-6 gap-6 overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                 <DialogHeader>
-                    <DialogTitle className="text-white">
+                    <DialogTitle className="text-xl font-semibold text-white">
                         {isCreate ? "Add Account" : `Edit "${editingKey}"`}
                     </DialogTitle>
                 </DialogHeader>
@@ -122,7 +123,7 @@ export function AccountDialog({
                                 onChange={e => setKey(e.target.value)}
                                 onKeyDown={e => e.key === "Enter" && handleSave()}
                                 placeholder="e.g. binance"
-                                className="bg-surface border-white/10 text-white placeholder:text-muted/50"
+                                className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
                                 autoFocus
                             />
                             <p className="text-muted/50 text-xs">Identifier used in transfers. Cannot be changed later.</p>
@@ -136,7 +137,7 @@ export function AccountDialog({
                             onChange={e => setDisplayName(e.target.value)}
                             onKeyDown={e => e.key === "Enter" && handleSave()}
                             placeholder={isCreate ? key || "Display name" : editingKey ?? ""}
-                            className="bg-surface border-white/10 text-white placeholder:text-muted/50"
+                            className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
                             autoFocus={!isCreate}
                         />
                     </div>
@@ -147,10 +148,10 @@ export function AccountDialog({
                             value={currency}
                             onValueChange={val => setCurrency(val)}
                         >
-                            <SelectTrigger className="bg-surface border-white/10 text-white">
+                            <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
                                 <SelectValue placeholder="Select currency" />
                             </SelectTrigger>
-                            <SelectContent className="bg-surface-card border-white/10 text-white">
+                            <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
                                 {availableCurrencies.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                             </SelectContent>
                         </Select>
@@ -162,10 +163,10 @@ export function AccountDialog({
                             value={accountType}
                             onValueChange={val => setAccountType(val)}
                         >
-                            <SelectTrigger className="bg-surface border-white/10 text-white">
+                            <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
                                 <SelectValue placeholder="Select type" />
                             </SelectTrigger>
-                            <SelectContent className="bg-surface-card border-white/10 text-white">
+                            <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
                                 <SelectItem value="bank">Bank</SelectItem>
                                 <SelectItem value="binance">Binance</SelectItem>
                                 <SelectItem value="okx">OKX</SelectItem>
@@ -183,7 +184,7 @@ export function AccountDialog({
                             id="isInvestment"
                             checked={isInvestment}
                             onChange={e => setIsInvestment(e.target.checked)}
-                            className="w-4 h-4 rounded appearance-none border border-white/20 bg-surface checked:bg-green-500 checked:border-green-500 cursor-pointer transition-colors relative after:content-['✓'] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:text-[10px] after:text-black after:font-bold after:opacity-0 checked:after:opacity-100"
+                            className="w-4 h-4 rounded appearance-none border border-white/10 bg-surface/50 checked:bg-green-500 checked:border-green-500 cursor-pointer transition-colors relative after:content-['✓'] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:text-[10px] after:text-black after:font-bold after:opacity-0 checked:after:opacity-100"
                         />
                         <label htmlFor="isInvestment" className="text-xs text-muted cursor-pointer select-none">
                             Include in portfolio totals?
@@ -193,11 +194,10 @@ export function AccountDialog({
                     {error && <p className="text-red-400 text-xs">{error}</p>}
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className="pt-2">
                     <Button
                         variant="ghost"
                         onClick={() => onOpenChange(false)}
-                        className="text-muted hover:text-white"
                         disabled={saving}
                     >
                         Cancel
@@ -205,7 +205,6 @@ export function AccountDialog({
                     <Button
                         onClick={handleSave}
                         disabled={saving}
-                        className="bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25"
                     >
                         {saving ? "Saving..." : isCreate ? "Add" : "Save"}
                     </Button>
