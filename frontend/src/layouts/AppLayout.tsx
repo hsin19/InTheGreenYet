@@ -21,10 +21,10 @@ function AppNav() {
                     Transfers
                 </NavLink>
                 <NavLink
-                    to="/net-cost"
+                    to="/accounts"
                     className={({ isActive }) => `text-sm transition-colors ${isActive ? "text-white font-medium" : "text-muted hover:text-white"}`}
                 >
-                    Net Cost
+                    Accounts
                 </NavLink>
                 <NavLink
                     to="/config"

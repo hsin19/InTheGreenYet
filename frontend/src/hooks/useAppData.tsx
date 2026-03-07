@@ -18,6 +18,11 @@ type Status = "loading" | "ready" | "error";
 
 export interface AccountConfig {
     displayName: string;
+    amount?: number | null;
+    currency?: string | null;
+    amountUpdatedAt?: string | null;
+    isInvestment?: boolean;
+    accountType?: string;
 }
 
 export interface AppConfig {

@@ -1,20 +1,14 @@
 import {
-    Check,
-    Edit2,
     Plus,
     RefreshCw,
     Save,
     Trash2,
-    X,
 } from "lucide-react";
 import {
     useEffect,
     useState,
 } from "react";
-import {
-    type AccountConfig,
-    useAppData,
-} from "../hooks/useAppData";
+import { useAppData } from "../hooks/useAppData";
 import { useNotion } from "../hooks/useNotion";
 import { updateConfig } from "../lib/notion";
 
@@ -90,176 +84,6 @@ function CurrenciesSection({
     );
 }
 
-// ─── Accounts section ─────────────────────────────────────────
-
-interface AccountsState {
-    items: Record<string, AccountConfig>;
-    keyInput: string;
-    displayNameInput: string;
-    saving: boolean;
-    saved: boolean;
-    error: string | null;
-}
-
-function AccountsSection({
-    state,
-    onChange,
-    onSave,
-}: {
-    state: AccountsState;
-    onChange: (s: AccountsState) => void;
-    onSave: () => void;
-}) {
-    const [editingKey, setEditingKey] = useState<string | null>(null);
-    const [editName, setEditName] = useState("");
-
-    const addItem = () => {
-        const key = state.keyInput.trim();
-        const displayName = state.displayNameInput.trim() || key;
-        if (!key || key in state.items) return;
-        onChange({
-            ...state,
-            items: { ...state.items, [key]: { displayName } },
-            keyInput: "",
-            displayNameInput: "",
-            saved: false,
-            error: null,
-        });
-    };
-
-    const removeItem = (key: string) => {
-        const next = { ...state.items };
-        delete next[key];
-        onChange({ ...state, items: next, saved: false, error: null });
-    };
-
-    const startEdit = (key: string, currentName: string) => {
-        setEditingKey(key);
-        setEditName(currentName);
-    };
-
-    const cancelEdit = () => {
-        setEditingKey(null);
-        setEditName("");
-    };
-
-    const saveEdit = (key: string) => {
-        const displayName = editName.trim() || key;
-        onChange({
-            ...state,
-            items: { ...state.items, [key]: { displayName } },
-            saved: false,
-            error: null,
-        });
-        setEditingKey(null);
-    };
-
-    const entries = Object.entries(state.items);
-
-    return (
-        <div className="bg-surface-card border border-white/10 rounded-2xl p-6 flex flex-col gap-5">
-            <div className="flex items-start justify-between gap-4">
-                <div>
-                    <h2 className="text-white font-semibold text-base">Accounts</h2>
-                    <p className="text-muted text-xs mt-0.5">Available From / To accounts in transfers</p>
-                </div>
-                <SaveButton saving={state.saving} saved={state.saved} onSave={onSave} />
-            </div>
-
-            {/* Account list */}
-            <div className="flex flex-col gap-2">
-                {entries.length === 0 && <span className="text-muted/50 text-xs italic">No accounts yet</span>}
-                {entries.map(([key, acc]) => (
-                    editingKey === key ? (
-                        <div key={key} className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-surface border border-green-500/50">
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                                <span className="text-white text-sm font-medium shrink-0 max-w-[6rem] truncate" title={key}>{key}</span>
-                                <div className="h-4 w-[1px] bg-white/10 shrink-0 mx-1" />
-                                <input
-                                    type="text"
-                                    value={editName}
-                                    onChange={e => setEditName(e.target.value)}
-                                    onKeyDown={e => {
-                                        if (e.key === "Enter") saveEdit(key);
-                                        if (e.key === "Escape") cancelEdit();
-                                    }}
-                                    autoFocus
-                                    className="flex-1 bg-transparent border-none text-sm text-white focus:outline-none placeholder:text-muted/50 min-w-0"
-                                    placeholder="Display name"
-                                />
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0">
-                                <button onClick={() => saveEdit(key)} className="p-1.5 text-green-400 hover:bg-green-500/20 rounded transition-colors cursor-pointer" aria-label="Save edit">
-                                    <Check className="w-3.5 h-3.5" />
-                                </button>
-                                <button onClick={cancelEdit} className="p-1.5 text-muted hover:bg-white/10 hover:text-white rounded transition-colors cursor-pointer" aria-label="Cancel edit">
-                                    <X className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div key={key} className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-surface border border-white/10 group">
-                            <div className="flex items-center gap-3 min-w-0">
-                                <span className="text-white text-sm font-medium shrink-0">{key}</span>
-                                {acc.displayName !== key && <span className="text-muted text-xs truncate">{acc.displayName}</span>}
-                            </div>
-                            <div className="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                                <button
-                                    onClick={() => startEdit(key, acc.displayName)}
-                                    className="p-1.5 text-muted hover:bg-blue-500/20 hover:text-blue-400 focus:bg-blue-500/20 focus:text-blue-400 rounded transition-colors cursor-pointer"
-                                    aria-label={`Edit ${key}`}
-                                >
-                                    <Edit2 className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                    onClick={() => removeItem(key)}
-                                    className="p-1.5 text-muted hover:bg-red-500/20 hover:text-red-400 focus:bg-red-500/20 focus:text-red-400 rounded transition-colors cursor-pointer"
-                                    aria-label={`Remove ${key}`}
-                                >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        </div>
-                    )
-                ))}
-            </div>
-
-            {/* Add row */}
-            <div className="flex items-center gap-2">
-                <input
-                    type="text"
-                    value={state.keyInput}
-                    onChange={e => onChange({ ...state, keyInput: e.target.value, error: null })}
-                    onKeyDown={e => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            addItem();
-                        }
-                    }}
-                    placeholder="Key (e.g. binance)"
-                    className="w-36 bg-surface border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted/50 focus:outline-none focus:border-green-500/50 transition-colors"
-                />
-                <input
-                    type="text"
-                    value={state.displayNameInput}
-                    onChange={e => onChange({ ...state, displayNameInput: e.target.value, error: null })}
-                    onKeyDown={e => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            addItem();
-                        }
-                    }}
-                    placeholder="Display name (optional)"
-                    className="flex-1 bg-surface border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-muted/50 focus:outline-none focus:border-green-500/50 transition-colors"
-                />
-                <AddButton onClick={addItem} disabled={!state.keyInput.trim()} />
-            </div>
-            <p className="text-muted/50 text-xs -mt-3">Key is the identifier stored in transfers. Display name is shown in the UI.</p>
-            {state.error && <p className="text-red-400 text-xs">{state.error}</p>}
-        </div>
-    );
-}
-
 // ─── Shared UI ────────────────────────────────────────────────
 
 function SaveButton({ saving, saved, onSave }: { saving: boolean; saved: boolean; onSave: () => void; }) {
@@ -307,19 +131,9 @@ function Config() {
         error: null,
     });
 
-    const [accounts, setAccounts] = useState<AccountsState>({
-        items: {},
-        keyInput: "",
-        displayNameInput: "",
-        saving: false,
-        saved: false,
-        error: null,
-    });
-
     useEffect(() => {
         if (status !== "ready") return;
         setCurrencies(s => ({ ...s, items: config.currencies }));
-        setAccounts(s => ({ ...s, items: config.accounts }));
     }, [status, config]);
 
     const saveCurrencies = async () => {
@@ -334,20 +148,8 @@ function Config() {
         }
     };
 
-    const saveAccounts = async () => {
-        if (!auth) return;
-        setAccounts(s => ({ ...s, saving: true, error: null, saved: false }));
-        try {
-            await updateConfig(auth.access_token, "accounts", accounts.items);
-            setAccounts(s => ({ ...s, saving: false, saved: true }));
-            refresh();
-        } catch (err) {
-            setAccounts(s => ({ ...s, saving: false, error: err instanceof Error ? err.message : "Failed to save" }));
-        }
-    };
-
     return (
-        <div className="flex min-h-screen flex-col px-4 py-8 max-w-2xl mx-auto">
+        <div className="flex min-h-screen flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-white">Config</h1>
                 <p className="text-muted text-sm mt-1">Manage currencies and accounts used across the app</p>
@@ -379,11 +181,6 @@ function Config() {
                         state={currencies}
                         onChange={setCurrencies}
                         onSave={saveCurrencies}
-                    />
-                    <AccountsSection
-                        state={accounts}
-                        onChange={setAccounts}
-                        onSave={saveAccounts}
                     />
                 </div>
             )}

@@ -34,11 +34,11 @@ const CONFIG_PROPERTIES = {
 
 const CONFIG_DEFAULTS: Record<string, unknown> = {
     accounts: {
-        Bank: { displayName: "Bank" },
-        Binance: { displayName: "Binance" },
-        OKX: { displayName: "OKX" },
-        Bitget: { displayName: "Bitget" },
-        MAX: { displayName: "MAX" },
+        Bank: { displayName: "Bank", currency: "TWD", isInvestment: false, accountType: "bank" },
+        Binance: { displayName: "Binance", currency: "USDT", isInvestment: true, accountType: "binance" },
+        OKX: { displayName: "OKX", currency: "USDT", isInvestment: true, accountType: "okx" },
+        Bitget: { displayName: "Bitget", currency: "USDT", isInvestment: true, accountType: "bitget" },
+        MAX: { displayName: "MAX", currency: "USDT", isInvestment: true, accountType: "max" },
     },
     currencies: ["TWD", "USD", "USDT"],
 };

@@ -51,3 +51,17 @@ export async function updateConfig(token: string, key: string, value: unknown): 
         body: JSON.stringify({ key, value }),
     });
 }
+
+export interface CreateSnapshotInput {
+    account: string;
+    date: string;
+    amount: number;
+    currency: string;
+}
+
+export async function createSnapshots(token: string, snapshots: CreateSnapshotInput[]): Promise<void> {
+    await apiFetch<{ success: boolean; }>("/api/snapshots", token, {
+        method: "POST",
+        body: JSON.stringify({ snapshots }),
+    });
+}
