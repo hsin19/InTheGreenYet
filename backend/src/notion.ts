@@ -43,6 +43,15 @@ const CONFIG_DEFAULTS: Record<string, unknown> = {
     currencies: ["TWD", "USD", "USDT"],
 };
 
+const SNAPSHOTS_DATASOURCE_NAME = "Snapshots";
+
+const SNAPSHOTS_PROPERTIES = {
+    Account: { title: {} },
+    Date: { date: {} },
+    Amount: { number: { format: "number" } },
+    Currency: { rich_text: {} },
+} as const;
+
 // ─── Types ───────────────────────────────────────────────────
 
 export interface NotionTransferRow {
@@ -75,6 +84,21 @@ export interface NotionConfigRow {
     value: unknown;
 }
 
+export interface NotionSnapshotRow {
+    id: string;
+    account: string;
+    date: string | null;
+    amount: number | null;
+    currency: string | null;
+}
+
+export interface CreateSnapshotInput {
+    account: string;
+    date: string;
+    amount: number;
+    currency: string;
+}
+
 // ─── Functions ───────────────────────────────────────────────
 
 /** Resolve a data source ID by name; retries for Notion index delay. */
@@ -89,6 +113,13 @@ async function resolveConfigDataSource(token: string): Promise<string> {
     const existing = await searchDataSource(token, CONFIG_DATASOURCE_NAME, { retries: 3 });
     if (existing) return existing.id;
     throw new DataSourceNotFoundError(CONFIG_DATASOURCE_NAME);
+}
+
+/** Resolve the Snapshots data source ID; retries for Notion index delay. */
+async function resolveSnapshotsDataSource(token: string): Promise<string> {
+    const existing = await searchDataSource(token, SNAPSHOTS_DATASOURCE_NAME, { retries: 3 });
+    if (existing) return existing.id;
+    throw new DataSourceNotFoundError(SNAPSHOTS_DATASOURCE_NAME);
 }
 
 /** Search for a data source by exact title match, with retry for Notion index delay. */
@@ -281,27 +312,33 @@ export async function createTransferDataSource(
     return { databaseId, dataSourceId };
 }
 
-/** Create the Config data source and seed it with default key-value pairs. */
-export async function createConfigDataSource(token: string, databaseId: string): Promise<string> {
-    const notion = createClient(token);
-    const dataSourceId = await createDataSourceInternal(
+/** Create the Config data source. */
+export async function createConfigDataSource(
+    token: string,
+    databaseId: string,
+): Promise<string> {
+    const id = await createDataSourceInternal(
         token,
         databaseId,
         CONFIG_DATASOURCE_NAME,
         CONFIG_PROPERTIES,
     );
-    await Promise.all(
-        Object.entries(CONFIG_DEFAULTS).map(([key, value]) =>
-            notion.pages.create({
-                parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
-                properties: {
-                    Key: { title: [{ text: { content: key } }] } as any,
-                    Value: { rich_text: [{ text: { content: JSON.stringify(value) } }] } as any,
-                },
-            })
-        ),
+    await updateConfig(token, "currencies", CONFIG_DEFAULTS.currencies);
+    await updateConfig(token, "accounts", CONFIG_DEFAULTS.accounts);
+    return id;
+}
+
+/** Create the Snapshots data source. */
+export async function createSnapshotsDataSource(
+    token: string,
+    databaseId: string,
+): Promise<string> {
+    return createDataSourceInternal(
+        token,
+        databaseId,
+        SNAPSHOTS_DATASOURCE_NAME,
+        SNAPSHOTS_PROPERTIES,
     );
-    return dataSourceId;
 }
 
 /** Query config rows, optionally filtered by key. */
@@ -368,4 +405,64 @@ export async function updateConfig(
             },
         });
     }
+}
+
+/** Query all snapshot rows, sorted by date descending. */
+export async function querySnapshots(token: string): Promise<NotionSnapshotRow[]> {
+    const notion = createClient(token);
+    const dataSourceId = await resolveSnapshotsDataSource(token);
+    const rows: NotionSnapshotRow[] = [];
+    let cursor: string | undefined;
+
+    do {
+        const response = await notion.dataSources.query({
+            data_source_id: dataSourceId,
+            sorts: [{ property: "Date", direction: "descending" }],
+            ...(cursor ? { start_cursor: cursor } : {}),
+        });
+
+        for (const item of response.results) {
+            if (item.object !== "page" || !("properties" in item)) continue;
+            const props = item.properties as Record<string, any>;
+            rows.push({
+                id: item.id,
+                account: props["Account"]?.title?.map((t: any) => t.plain_text).join("") ?? "",
+                amount: props["Amount"]?.number ?? null,
+                currency: props["Currency"]?.rich_text?.map((t: any) => t.plain_text).join("") || null,
+                date: props["Date"]?.date?.start ?? null,
+            });
+        }
+
+        cursor = response.has_more && response.next_cursor ? response.next_cursor : undefined;
+    } while (cursor);
+
+    return rows;
+}
+
+/** Create snapshot pages in the Snapshots data source. */
+export async function createSnapshots(
+    token: string,
+    inputs: CreateSnapshotInput[],
+): Promise<string[]> {
+    const notion = createClient(token);
+    const dataSourceId = await resolveSnapshotsDataSource(token);
+    const createdIds: string[] = [];
+
+    for (const input of inputs) {
+        const properties: Record<string, unknown> = {
+            Account: { title: [{ text: { content: input.account } }] },
+            Date: { date: { start: input.date } },
+            Amount: { number: input.amount },
+            Currency: { rich_text: [{ text: { content: input.currency } }] },
+        };
+
+        const response = await notion.pages.create({
+            parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
+            properties: properties as any,
+        });
+
+        createdIds.push(response.id);
+    }
+
+    return createdIds;
 }

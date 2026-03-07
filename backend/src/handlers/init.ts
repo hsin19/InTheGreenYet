@@ -1,5 +1,6 @@
 import {
     createConfigDataSource,
+    createSnapshotsDataSource,
     createTransferDataSource,
     findOrCreateDatabase,
     searchDataSource,
@@ -14,16 +15,18 @@ export async function handleInit(request: Request, env: Env): Promise<Response> 
     try {
         const token = getToken(request);
 
-        const [transferDs, configDs] = await Promise.all([
+        const [transferDs, configDs, snapshotsDs] = await Promise.all([
             searchDataSource(token, "Transfer"),
             searchDataSource(token, "Config"),
+            searchDataSource(token, "Snapshots"),
         ]);
 
-        if (!transferDs || !configDs) {
+        if (!transferDs || !configDs || !snapshotsDs) {
             const databaseId = await findOrCreateDatabase(token);
             await Promise.all([
                 transferDs ? Promise.resolve() : createTransferDataSource(token, databaseId),
                 configDs ? Promise.resolve() : createConfigDataSource(token, databaseId),
+                snapshotsDs ? Promise.resolve() : createSnapshotsDataSource(token, databaseId),
             ]);
         }
 

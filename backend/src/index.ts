@@ -5,6 +5,10 @@ import {
 } from "./handlers/config";
 import { handleInit } from "./handlers/init";
 import {
+    handleCreateSnapshots,
+    handleGetSnapshots,
+} from "./handlers/snapshots";
+import {
     handleCreateTransfer,
     handleGetTransfers,
 } from "./handlers/transfers";
@@ -43,6 +47,14 @@ export default {
 
         if (url.pathname === "/api/config" && request.method === "PUT") {
             return handleUpdateConfig(request, env);
+        }
+
+        if (url.pathname === "/api/snapshots" && request.method === "GET") {
+            return handleGetSnapshots(request, url, env);
+        }
+
+        if (url.pathname === "/api/snapshots" && request.method === "POST") {
+            return handleCreateSnapshots(request, url, env);
         }
 
         if (url.pathname === "/health") {
