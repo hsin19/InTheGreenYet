@@ -27,6 +27,7 @@ import { InlineAmount } from "./InlineAmount";
 interface AccountCardProps {
     accountKey: string;
     config: AccountConfig;
+    baseCurrency: string;
     availableCurrencies: string[];
     performance?: AccountPerformance;
     onSaveAccount: (key: string, config: AccountConfig) => Promise<void>;
@@ -36,6 +37,7 @@ interface AccountCardProps {
 export function AccountCard({
     accountKey,
     config,
+    baseCurrency,
     availableCurrencies,
     performance,
     onSaveAccount,
@@ -108,7 +110,7 @@ export function AccountCard({
                                 <div className="flex flex-col">
                                     <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net Cost</span>
                                     <span className="text-xs text-white/80 tabular-nums">
-                                        {config.currency || "TWD"} {Math.round(performance.netCost).toLocaleString()}
+                                        {config.currency || baseCurrency} {Math.round(performance.netCost).toLocaleString()}
                                     </span>
                                 </div>
                                 <div className="flex flex-col items-end">
@@ -124,7 +126,7 @@ export function AccountCard({
                                 <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net P&L</span>
                                 <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                                     {performance.pl != null
-                                        ? `${config.currency || "TWD"} ${performance.pl >= 0 ? "+" : ""}${Math.round(performance.pl).toLocaleString()}`
+                                        ? `${config.currency || baseCurrency} ${performance.pl >= 0 ? "+" : ""}${Math.round(performance.pl).toLocaleString()}`
                                         : "—"}
                                 </span>
                             </div>

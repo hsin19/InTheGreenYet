@@ -5,8 +5,8 @@ export interface CurrencyFlow {
     inflow: number;
     outflow: number;
     net: number;
-    twdInflow: number;
-    twdOutflow: number;
+    baseInflow: number;
+    baseOutflow: number;
 }
 
 export interface AccountRecord {
@@ -22,7 +22,7 @@ export interface AccountFlow {
     summary: CurrencyFlow[];
     details: CurrencyFlow[];
     records: AccountRecord[];
-    twdNet: number;
+    baseNet: number;
     hasAllRates: boolean;
 }
 
@@ -33,8 +33,8 @@ export interface AccountPerformance {
     netCost: number; // in Account Currency
     pl: number | null; // in Account Currency
     yieldPercentage: number | null;
-    netCostTwd: number;
-    plTwd: number | null;
+    netCostBase: number;
+    plBase: number | null;
 }
 
 const STABLE_USD = new Set(["USD", "USDT", "USDC"]);
@@ -42,12 +42,12 @@ const STABLE_USD = new Set(["USD", "USDT", "USDC"]);
 type FlowEntry = {
     inflow: number;
     outflow: number;
-    twdInflow: number;
-    twdOutflow: number;
+    baseInflow: number;
+    baseOutflow: number;
     hasRate: boolean;
 };
 
-export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, getFiatToTwdRate: (currency: string) => number | null): AccountFlow[] {
+export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, getFiatToBaseRate: (currency: string) => number | null): AccountFlow[] {
     const raw: Record<string, Record<string, FlowEntry>> = {};
     const records: Record<string, AccountRecord[]> = {};
 
@@ -57,27 +57,26 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, ge
             map[account][currency] = {
                 inflow: 0,
                 outflow: 0,
-                twdInflow: 0,
-                twdOutflow: 0,
+                baseInflow: 0,
+                baseOutflow: 0,
                 hasRate: true,
             };
         }
         if (!records[account]) records[account] = [];
     };
 
-    const toTwd = (amount: number, currency: string, explicitExchangeRate: number | null): { twd: number; hasRate: boolean; } => {
-        if (currency === "TWD") return { twd: amount, hasRate: true };
+    const toBase = (amount: number, currency: string, explicitExchangeRate: number | null): { baseValue: number; hasRate: boolean; } => {
+        // 1. Fallback to live centralized pricing (returns 1 if currency is already the base currency)
+        const liveRate = getFiatToBaseRate(currency);
 
-        // 1. Prefer explicitly recorded rate from the Notion transfer
-        if (explicitExchangeRate != null) return { twd: amount * explicitExchangeRate, hasRate: true };
+        // 2. Prefer explicitly recorded rate from the Notion transfer if exist
+        const rateToUse = explicitExchangeRate != null ? explicitExchangeRate : liveRate;
 
-        // 2. Fallback to live centralized pricing
-        const liveRate = getFiatToTwdRate(currency);
-        if (liveRate != null) {
-            return { twd: amount * liveRate, hasRate: true };
+        if (rateToUse != null) {
+            return { baseValue: amount * rateToUse, hasRate: true };
         }
 
-        return { twd: 0, hasRate: false };
+        return { baseValue: 0, hasRate: false };
     };
 
     for (const t of transfers) {
@@ -89,8 +88,8 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, ge
             ensure(raw, t.from, currency);
             const entry = raw[t.from][currency];
             entry.outflow += amount + fee;
-            const { twd, hasRate } = toTwd(amount + fee, currency, t.exchangeRate);
-            entry.twdOutflow += twd;
+            const { baseValue, hasRate } = toBase(amount + fee, currency, t.exchangeRate);
+            entry.baseOutflow += baseValue;
             if (!hasRate) entry.hasRate = false;
             records[t.from].push({
                 date: t.date,
@@ -104,8 +103,8 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, ge
             ensure(raw, t.to, currency);
             const entry = raw[t.to][currency];
             entry.inflow += amount;
-            const { twd, hasRate } = toTwd(amount, currency, t.exchangeRate);
-            entry.twdInflow += twd;
+            const { baseValue, hasRate } = toBase(amount, currency, t.exchangeRate);
+            entry.baseInflow += baseValue;
             if (!hasRate) entry.hasRate = false;
             records[t.to].push({
                 date: t.date,
@@ -123,8 +122,8 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, ge
             inflow: v.inflow,
             outflow: v.outflow,
             net: v.inflow - v.outflow,
-            twdInflow: v.twdInflow,
-            twdOutflow: v.twdOutflow,
+            baseInflow: v.baseInflow,
+            baseOutflow: v.baseOutflow,
         }));
 
     const mergeCurrencies = (entries: Record<string, FlowEntry>): Record<string, FlowEntry> => {
@@ -132,11 +131,11 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, ge
         const merged: Record<string, FlowEntry> = {};
         for (const [currency, v] of Object.entries(entries)) {
             const key = STABLE_USD.has(currency) ? "USD" : currency;
-            if (!merged[key]) merged[key] = { inflow: 0, outflow: 0, twdInflow: 0, twdOutflow: 0, hasRate: true };
+            if (!merged[key]) merged[key] = { inflow: 0, outflow: 0, baseInflow: 0, baseOutflow: 0, hasRate: true };
             merged[key].inflow += v.inflow;
             merged[key].outflow += v.outflow;
-            merged[key].twdInflow += v.twdInflow;
-            merged[key].twdOutflow += v.twdOutflow;
+            merged[key].baseInflow += v.baseInflow;
+            merged[key].baseOutflow += v.baseOutflow;
             if (!v.hasRate) merged[key].hasRate = false;
         }
         return merged;
@@ -148,9 +147,9 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, ge
             const mergedMap = mergeCurrencies(byCurrency);
             const summary = toFlows(mergedMap);
             const hasAllRates = Object.values(byCurrency).every(v => v.hasRate);
-            const twdNet = details.reduce((sum, c) => sum + (c.twdInflow - c.twdOutflow), 0);
+            const baseNet = details.reduce((sum, c) => sum + (c.baseInflow - c.baseOutflow), 0);
             const sortedRecords = (records[account] || []).sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
-            return { account, summary, details, records: sortedRecords, twdNet, hasAllRates };
+            return { account, summary, details, records: sortedRecords, baseNet, hasAllRates };
         })
         .sort((a, b) => a.account.localeCompare(b.account));
 }
@@ -160,51 +159,43 @@ export function calculatePerformance(
     amount: number | null,
     currency: string,
     flows: AccountFlow[],
-    getFiatToTwdRate: (currency: string) => number | null,
+    getFiatToBaseRate: (currency: string) => number | null,
 ): AccountPerformance {
     const flow = flows.find(f => f.account === accountKey);
 
-    // Net Cost = (Inflow - Outflow) in TWD
-    const netCostTwd = flow ? flow.twdNet : 0;
+    // Net Cost = (Inflow - Outflow) in Base Currency
+    const netCostBase = flow ? flow.baseNet : 0;
 
-    let currentTwd: number | null = null;
+    let currentBase: number | null = null;
     if (amount != null) {
-        if (currency === "TWD") {
-            currentTwd = amount;
-        } else {
-            const liveRate = getFiatToTwdRate(currency);
-            if (liveRate != null) {
-                currentTwd = amount * liveRate;
-            }
+        const liveRate = getFiatToBaseRate(currency);
+        if (liveRate != null) {
+            currentBase = amount * liveRate;
         }
     }
 
-    const plTwd = currentTwd !== null ? currentTwd - netCostTwd : null;
+    const plBase = currentBase !== null ? currentBase - netCostBase : null;
 
     // Native calculations
-    // Calculate native net cost by converting the total TWD net cost back to the desired currency
     let netCostNative = 0;
-    if (currency === "TWD") {
-        netCostNative = netCostTwd;
+    const liveRate = getFiatToBaseRate(currency);
+
+    if (liveRate != null && liveRate > 0) {
+        netCostNative = netCostBase / liveRate;
     } else {
-        const liveRate = getFiatToTwdRate(currency);
-        if (liveRate != null && liveRate > 0) {
-            netCostNative = netCostTwd / liveRate;
-        } else {
-            // Fallback to purely native flow if we don't have a conversion rate
-            const nativeKey = STABLE_USD.has(currency) ? "USD" : currency;
-            const nativeFlow = flow?.summary.find(s => s.currency === nativeKey);
-            netCostNative = nativeFlow ? nativeFlow.net : 0;
-        }
+        // Fallback to purely native flow if we don't have a conversion rate
+        const nativeKey = STABLE_USD.has(currency) ? "USD" : currency;
+        const nativeFlow = flow?.summary.find(s => s.currency === nativeKey);
+        netCostNative = nativeFlow ? nativeFlow.net : 0;
     }
 
     const plNative = amount !== null ? amount - netCostNative : null;
 
     let yieldPercentage: number | null = null;
-    // Use TWD basis for yield as it's more stable across multi-currency infusions
-    if (plTwd !== null && netCostTwd > 0) {
-        yieldPercentage = (plTwd / netCostTwd) * 100;
-    } else if (plTwd !== null && netCostTwd === 0 && currentTwd !== null && currentTwd > 0) {
+    // Use Base basis for yield as it's more stable across multi-currency infusions
+    if (plBase !== null && netCostBase > 0) {
+        yieldPercentage = (plBase / netCostBase) * 100;
+    } else if (plBase !== null && netCostBase === 0 && currentBase !== null && currentBase > 0) {
         yieldPercentage = 100;
     }
 
@@ -215,7 +206,7 @@ export function calculatePerformance(
         netCost: netCostNative,
         pl: plNative,
         yieldPercentage,
-        netCostTwd,
-        plTwd,
+        netCostBase,
+        plBase,
     };
 }

@@ -11,7 +11,7 @@ import { useNotion } from "../hooks/useNotion";
 
 function Transfers() {
     const { auth } = useNotion();
-    const { status, transfers, config, error, refresh, getAccountName, getFiatToTwdRate } = useAppData();
+    const { status, transfers, config, error, refresh, getAccountName, getFiatToBaseRate } = useAppData();
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -91,22 +91,23 @@ function Transfers() {
                 {status === "ready" && transfers.length > 0 && (
                     <ul className="flex flex-col gap-3">
                         {transfers.map(transfer => {
-                            const twdCost = (() => {
+                            const baseCost = (() => {
                                 const amount = transfer.amount ?? 0;
                                 const fee = transfer.fee ?? 0;
-                                if (transfer.currency === "TWD") return amount + fee;
+                                const base = config.baseCurrency.toUpperCase();
+                                if (transfer.currency === base) return amount + fee;
                                 if (transfer.exchangeRate != null) return (amount + fee) * transfer.exchangeRate;
 
-                                const liveRate = getFiatToTwdRate(transfer.currency ?? "");
+                                const liveRate = getFiatToBaseRate(transfer.currency ?? "");
                                 if (liveRate != null) {
                                     return (amount + fee) * liveRate;
                                 }
                                 return null;
                             })();
-                            const effectiveRate = (twdCost != null && transfer.amount != null && transfer.amount > 0)
-                                ? twdCost / transfer.amount
+                            const effectiveRate = (baseCost != null && transfer.amount != null && transfer.amount > 0)
+                                ? baseCost / transfer.amount
                                 : null;
-                            const hasDetails = transfer.fee != null || transfer.exchangeRate != null || twdCost != null;
+                            const hasDetails = transfer.fee != null || transfer.exchangeRate != null || baseCost != null;
                             const isExpanded = expandedIds.has(transfer.id);
 
                             return (
@@ -144,7 +145,7 @@ function Transfers() {
                                         </div>
                                     </button>
 
-                                    {/* Row 3: Fee / Rate / TWD Cost — expandable */}
+                                    {/* Row 3: Fee / Rate / Base Cost — expandable */}
                                     {hasDetails && isExpanded && (
                                         <div className="flex items-center justify-between px-5 pb-4 pt-1 border-t border-white/5">
                                             <div className="flex items-center gap-3">
@@ -165,7 +166,7 @@ function Transfers() {
                                                         </span>
                                                     </span>
                                                 )}
-                                                {effectiveRate != null && transfer.currency !== "TWD" && (
+                                                {effectiveRate != null && transfer.currency !== config.baseCurrency && (
                                                     <span className="flex items-center gap-1 text-xs">
                                                         <span className="text-white/30">Eff. Rate</span>
                                                         <span className="text-purple-400/80 tabular-nums">
@@ -174,13 +175,13 @@ function Transfers() {
                                                     </span>
                                                 )}
                                             </div>
-                                            {twdCost != null && transfer.currency !== "TWD" && (
+                                            {baseCost != null && transfer.currency !== config.baseCurrency && (
                                                 <span className="flex items-baseline gap-1">
                                                     <span className="text-white/30 text-xs">≈</span>
                                                     <span className="text-white font-semibold tabular-nums">
-                                                        {Math.round(twdCost).toLocaleString()}
+                                                        {Math.round(baseCost).toLocaleString()}
                                                     </span>
-                                                    <span className="text-muted text-xs">TWD</span>
+                                                    <span className="text-muted text-xs uppercase">{config.baseCurrency}</span>
                                                 </span>
                                             )}
                                         </div>

@@ -26,7 +26,7 @@ import { AccountCard } from "./components/AccountCard";
 import { AccountDialog } from "./components/AccountDialog";
 
 export function Accounts() {
-    const { config, status, transfers, getFiatToTwdRate, refresh } = useAppData();
+    const { config, status, transfers, getFiatToBaseRate, refresh } = useAppData();
     const { auth } = useNotion();
 
     const [accounts, setAccounts] = useState<Record<string, AccountConfig>>({});
@@ -39,22 +39,22 @@ export function Accounts() {
     }, [status, config.accounts]);
 
     // Compute performance
-    const flows = status === "ready" ? computeAccountFlows(transfers, true, getFiatToTwdRate) : [];
+    const flows = status === "ready" ? computeAccountFlows(transfers, true, getFiatToBaseRate) : [];
     const accountPerformances: Record<string, AccountPerformance> = {};
     let totalNetCost = 0;
     let totalPL = 0;
     let totalCurrentValue = 0;
 
     Object.entries(accounts).forEach(([key, acc]) => {
-        const perf = calculatePerformance(key, acc.amount ?? null, acc.currency || "USD", flows, getFiatToTwdRate);
+        const perf = calculatePerformance(key, acc.amount ?? null, acc.currency || "USD", flows, getFiatToBaseRate);
         accountPerformances[key] = perf;
 
         // Only include in totals if it's marked as an investment account
         if (acc.isInvestment !== false) {
-            totalNetCost += perf.netCostTwd;
-            if (perf.plTwd != null) totalPL += perf.plTwd;
-            // Current value in TWD for summary
-            const currentValue = perf.netCostTwd + (perf.plTwd ?? 0);
+            totalNetCost += perf.netCostBase;
+            if (perf.plBase != null) totalPL += perf.plBase;
+            // Current value in base currency for summary
+            const currentValue = perf.netCostBase + (perf.plBase ?? 0);
             totalCurrentValue += currentValue;
         }
     });
@@ -128,16 +128,16 @@ export function Accounts() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
                     <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Cost</span>
-                        <span className="text-lg font-bold text-white tabular-nums">NT$ {Math.round(totalNetCost).toLocaleString()}</span>
+                        <span className="text-lg font-bold text-white tabular-nums">{config.baseCurrency} {Math.round(totalNetCost).toLocaleString()}</span>
                     </Card>
                     <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Assets</span>
-                        <span className="text-lg font-bold text-white tabular-nums">NT$ {Math.round(totalCurrentValue).toLocaleString()}</span>
+                        <span className="text-lg font-bold text-white tabular-nums">{config.baseCurrency} {Math.round(totalCurrentValue).toLocaleString()}</span>
                     </Card>
                     <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total P&L</span>
                         <span className={`text-lg font-bold tabular-nums ${totalPL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                            NT$ {totalPL >= 0 ? "+" : ""}
+                            {config.baseCurrency} {totalPL >= 0 ? "+" : ""}
                             {Math.round(totalPL).toLocaleString()}
                         </span>
                     </Card>
@@ -191,6 +191,7 @@ export function Accounts() {
                                     key={key}
                                     accountKey={key}
                                     config={acc}
+                                    baseCurrency={config.baseCurrency}
                                     availableCurrencies={config.currencies}
                                     performance={accountPerformances[key]}
                                     onSaveAccount={handleSaveAccount}

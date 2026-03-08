@@ -15,6 +15,48 @@ import { useAppData } from "../hooks/useAppData";
 import { useNotion } from "../hooks/useNotion";
 import { updateConfig } from "../lib/notion";
 
+// ─── Base Currency section ────────────────────────────────────
+
+interface BaseCurrencyState {
+    value: string;
+    saving: boolean;
+    saved: boolean;
+    error: string | null;
+}
+
+function BaseCurrencySection({
+    state,
+    onChange,
+    onSave,
+}: {
+    state: BaseCurrencyState;
+    onChange: (s: BaseCurrencyState) => void;
+    onSave: () => void;
+}) {
+    return (
+        <Card className="p-6 gap-5">
+            <div className="flex items-start justify-between gap-4">
+                <div>
+                    <h2 className="text-white font-semibold text-base">Base Currency</h2>
+                    <p className="text-muted text-xs mt-0.5">The primary currency total assets are calculated in</p>
+                </div>
+                <SaveButton saving={state.saving} saved={state.saved} onSave={onSave} />
+            </div>
+
+            <div className="flex items-center gap-2">
+                <Input
+                    type="text"
+                    value={state.value}
+                    onChange={e => onChange({ ...state, value: e.target.value.toUpperCase(), error: null, saved: false })}
+                    placeholder="e.g. USD, EUR, JPY..."
+                    className="max-w-[200px]"
+                />
+            </div>
+            {state.error && <p className="text-red-400 text-xs">{state.error}</p>}
+        </Card>
+    );
+}
+
 // ─── Currencies section ───────────────────────────────────────
 
 interface CurrenciesState {
@@ -119,9 +161,17 @@ function Config() {
         error: null,
     });
 
+    const [baseCurrency, setBaseCurrency] = useState<BaseCurrencyState>({
+        value: "",
+        saving: false,
+        saved: false,
+        error: null,
+    });
+
     useEffect(() => {
         if (status !== "ready") return;
         setCurrencies(s => ({ ...s, items: config.currencies }));
+        setBaseCurrency(s => ({ ...s, value: config.baseCurrency }));
     }, [status, config]);
 
     const saveCurrencies = async () => {
@@ -133,6 +183,23 @@ function Config() {
             refresh();
         } catch (err) {
             setCurrencies(s => ({ ...s, saving: false, error: err instanceof Error ? err.message : "Failed to save" }));
+        }
+    };
+
+    const saveBaseCurrency = async () => {
+        if (!auth) return;
+        const val = baseCurrency.value.trim().toUpperCase();
+        if (!val) {
+            setBaseCurrency(s => ({ ...s, error: "Base currency cannot be empty" }));
+            return;
+        }
+        setBaseCurrency(s => ({ ...s, saving: true, error: null, saved: false }));
+        try {
+            await updateConfig(auth.access_token, "baseCurrency", val);
+            setBaseCurrency(s => ({ ...s, saving: false, saved: true, value: val }));
+            refresh();
+        } catch (err) {
+            setBaseCurrency(s => ({ ...s, saving: false, error: err instanceof Error ? err.message : "Failed to save" }));
         }
     };
 
@@ -162,6 +229,11 @@ function Config() {
 
             {status === "ready" && (
                 <div className="flex flex-col gap-4">
+                    <BaseCurrencySection
+                        state={baseCurrency}
+                        onChange={setBaseCurrency}
+                        onSave={saveBaseCurrency}
+                    />
                     <CurrenciesSection
                         state={currencies}
                         onChange={setCurrencies}

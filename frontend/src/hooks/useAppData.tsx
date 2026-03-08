@@ -30,11 +30,12 @@ export interface AccountConfig {
 }
 
 export interface AppConfig {
+    baseCurrency: string;
     currencies: string[];
     accounts: Record<string, AccountConfig>;
 }
 
-const DEFAULT_CONFIG: AppConfig = { currencies: [], accounts: {} };
+const DEFAULT_CONFIG: AppConfig = { baseCurrency: "TWD", currencies: [], accounts: {} };
 
 interface AppDataState {
     status: Status;
@@ -44,7 +45,7 @@ interface AppDataState {
     error: string | null;
     refresh: () => void;
     getAccountName: (key: string) => string;
-    getFiatToTwdRate: (currency: string) => number | null;
+    getFiatToBaseRate: (currency: string) => number | null;
 }
 
 const AppDataContext = createContext<AppDataState | null>(null);
@@ -79,16 +80,22 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
             setStatus("loading");
             setError(null);
             try {
-                const [data, configRows, rates] = await Promise.all([
+                const [data, configRows] = await Promise.all([
                     fetchTransfers(auth.access_token),
                     fetchConfig(auth.access_token),
-                    fetchExchangeRates("twd"),
                 ]);
                 if (cancelled) return;
+
+                const map = Object.fromEntries(configRows.map(r => [r.key, r.value]));
+                const baseCurrency = typeof map.baseCurrency === "string" ? map.baseCurrency : "TWD";
+
+                const rates = await fetchExchangeRates(baseCurrency);
+                if (cancelled) return;
+
                 setTransfers(data);
                 setExchangeRates(rates);
-                const map = Object.fromEntries(configRows.map(r => [r.key, r.value]));
                 setConfig({
+                    baseCurrency,
                     currencies: Array.isArray(map.currencies) ? map.currencies : [],
                     accounts: (map.accounts && typeof map.accounts === "object" && !Array.isArray(map.accounts))
                         ? map.accounts as Record<string, AccountConfig>
@@ -124,30 +131,32 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
         return insensitiveMatch ? insensitiveMatch[1].displayName : key;
     }, [config.accounts]);
 
-    const getFiatToTwdRate = useCallback((currency: string) => {
+    const getFiatToBaseRate = useCallback((currency: string) => {
         if (!currency) return null;
         const upper = currency.toUpperCase();
-        if (upper === "TWD") return 1;
+        const base = config.baseCurrency.toUpperCase();
+        if (upper === base) return 1;
 
         const normalized = upper.toLowerCase();
+        const baseLower = base.toLowerCase();
 
-        if (exchangeRates && typeof exchangeRates.twd === "object") {
-            const twdDict = exchangeRates.twd as Record<string, number>;
-            const rate = twdDict[normalized];
+        if (exchangeRates && typeof exchangeRates[baseLower] === "object") {
+            const rateDict = exchangeRates[baseLower] as Record<string, number>;
+            const rate = rateDict[normalized];
             if (rate && typeof rate === "number") {
-                // If the API says 1 TWD = 0.0314 USD, then 1 USD = 1 / 0.0314 TWD
+                // If API says 1 TWD = 0.0314 USD, then 1 USD = 1 / 0.0314 TWD
                 return 1 / rate;
             }
         }
 
-        // Hard fallback if the fiat rate is totally disconnected for USD
-        if (normalized === "usd") return 31.5;
+        // Hard fallback if the fiat rate is totally disconnected for USD -> TWD specifically, just as a safety net
+        if (normalized === "usd" && base === "TWD") return 31.5;
 
         return null;
-    }, [exchangeRates]);
+    }, [exchangeRates, config.baseCurrency]);
 
     return (
-        <AppDataContext value={{ status, transfers, config, exchangeRates, error, refresh, getAccountName, getFiatToTwdRate }}>
+        <AppDataContext value={{ status, transfers, config, exchangeRates, error, refresh, getAccountName, getFiatToBaseRate }}>
             {children}
         </AppDataContext>
     );
