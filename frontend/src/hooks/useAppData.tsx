@@ -8,6 +8,10 @@ import {
 } from "react";
 import { DataSourceNotFoundError } from "../lib/api";
 import {
+    type ExchangeRates,
+    fetchExchangeRates,
+} from "../lib/exchange";
+import {
     fetchConfig,
     fetchTransfers,
     type Transfer,
@@ -36,9 +40,11 @@ interface AppDataState {
     status: Status;
     transfers: Transfer[];
     config: AppConfig;
+    exchangeRates: ExchangeRates | null;
     error: string | null;
     refresh: () => void;
     getAccountName: (key: string) => string;
+    getFiatToTwdRate: (currency: string) => number | null;
 }
 
 const AppDataContext = createContext<AppDataState | null>(null);
@@ -48,6 +54,7 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
     const [status, setStatus] = useState<Status>("loading");
     const [transfers, setTransfers] = useState<Transfer[]>([]);
     const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
+    const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [retryCount, setRetryCount] = useState(0);
 
@@ -72,12 +79,14 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
             setStatus("loading");
             setError(null);
             try {
-                const [data, configRows] = await Promise.all([
+                const [data, configRows, rates] = await Promise.all([
                     fetchTransfers(auth.access_token),
                     fetchConfig(auth.access_token),
+                    fetchExchangeRates("twd"),
                 ]);
                 if (cancelled) return;
                 setTransfers(data);
+                setExchangeRates(rates);
                 const map = Object.fromEntries(configRows.map(r => [r.key, r.value]));
                 setConfig({
                     currencies: Array.isArray(map.currencies) ? map.currencies : [],
@@ -115,8 +124,30 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
         return insensitiveMatch ? insensitiveMatch[1].displayName : key;
     }, [config.accounts]);
 
+    const getFiatToTwdRate = useCallback((currency: string) => {
+        if (!currency) return null;
+        const upper = currency.toUpperCase();
+        if (upper === "TWD") return 1;
+
+        const normalized = upper.toLowerCase();
+
+        if (exchangeRates && typeof exchangeRates.twd === "object") {
+            const twdDict = exchangeRates.twd as Record<string, number>;
+            const rate = twdDict[normalized];
+            if (rate && typeof rate === "number") {
+                // If the API says 1 TWD = 0.0314 USD, then 1 USD = 1 / 0.0314 TWD
+                return 1 / rate;
+            }
+        }
+
+        // Hard fallback if the fiat rate is totally disconnected for USD
+        if (normalized === "usd") return 31.5;
+
+        return null;
+    }, [exchangeRates]);
+
     return (
-        <AppDataContext value={{ status, transfers, config, error, refresh, getAccountName }}>
+        <AppDataContext value={{ status, transfers, config, exchangeRates, error, refresh, getAccountName, getFiatToTwdRate }}>
             {children}
         </AppDataContext>
     );

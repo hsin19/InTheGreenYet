@@ -38,7 +38,6 @@ export interface AccountPerformance {
 }
 
 const STABLE_USD = new Set(["USD", "USDT", "USDC"]);
-const HARDCODED_USD_RATE = 31.5;
 
 type FlowEntry = {
     inflow: number;
@@ -48,7 +47,7 @@ type FlowEntry = {
     hasRate: boolean;
 };
 
-export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean): AccountFlow[] {
+export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean, getFiatToTwdRate: (currency: string) => number | null): AccountFlow[] {
     const raw: Record<string, Record<string, FlowEntry>> = {};
     const records: Record<string, AccountRecord[]> = {};
 
@@ -66,15 +65,17 @@ export function computeAccountFlows(transfers: Transfer[], mergeUsd: boolean): A
         if (!records[account]) records[account] = [];
     };
 
-    const toTwd = (amount: number, currency: string, exchangeRate: number | null): { twd: number; hasRate: boolean; } => {
+    const toTwd = (amount: number, currency: string, explicitExchangeRate: number | null): { twd: number; hasRate: boolean; } => {
         if (currency === "TWD") return { twd: amount, hasRate: true };
 
-        // Use user-provided hardcoded rate for USD/USDT/USDC for now
-        if (STABLE_USD.has(currency)) {
-            return { twd: amount * HARDCODED_USD_RATE, hasRate: true };
-        }
+        // 1. Prefer explicitly recorded rate from the Notion transfer
+        if (explicitExchangeRate != null) return { twd: amount * explicitExchangeRate, hasRate: true };
 
-        if (exchangeRate != null) return { twd: amount * exchangeRate, hasRate: true };
+        // 2. Fallback to live centralized pricing
+        const liveRate = getFiatToTwdRate(currency);
+        if (liveRate != null) {
+            return { twd: amount * liveRate, hasRate: true };
+        }
 
         return { twd: 0, hasRate: false };
     };
@@ -159,6 +160,7 @@ export function calculatePerformance(
     amount: number | null,
     currency: string,
     flows: AccountFlow[],
+    getFiatToTwdRate: (currency: string) => number | null,
 ): AccountPerformance {
     const flow = flows.find(f => f.account === accountKey);
 
@@ -169,8 +171,11 @@ export function calculatePerformance(
     if (amount != null) {
         if (currency === "TWD") {
             currentTwd = amount;
-        } else if (STABLE_USD.has(currency)) {
-            currentTwd = amount * HARDCODED_USD_RATE;
+        } else {
+            const liveRate = getFiatToTwdRate(currency);
+            if (liveRate != null) {
+                currentTwd = amount * liveRate;
+            }
         }
     }
 
@@ -181,13 +186,16 @@ export function calculatePerformance(
     let netCostNative = 0;
     if (currency === "TWD") {
         netCostNative = netCostTwd;
-    } else if (STABLE_USD.has(currency)) {
-        netCostNative = netCostTwd / HARDCODED_USD_RATE;
     } else {
-        // Fallback to purely native flow if we don't have a conversion rate
-        const nativeKey = STABLE_USD.has(currency) ? "USD" : currency;
-        const nativeFlow = flow?.summary.find(s => s.currency === nativeKey);
-        netCostNative = nativeFlow ? nativeFlow.net : 0;
+        const liveRate = getFiatToTwdRate(currency);
+        if (liveRate != null && liveRate > 0) {
+            netCostNative = netCostTwd / liveRate;
+        } else {
+            // Fallback to purely native flow if we don't have a conversion rate
+            const nativeKey = STABLE_USD.has(currency) ? "USD" : currency;
+            const nativeFlow = flow?.summary.find(s => s.currency === nativeKey);
+            netCostNative = nativeFlow ? nativeFlow.net : 0;
+        }
     }
 
     const plNative = amount !== null ? amount - netCostNative : null;

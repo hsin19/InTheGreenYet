@@ -26,7 +26,7 @@ import { AccountCard } from "./components/AccountCard";
 import { AccountDialog } from "./components/AccountDialog";
 
 export function Accounts() {
-    const { config, status, transfers, refresh } = useAppData();
+    const { config, status, transfers, getFiatToTwdRate, refresh } = useAppData();
     const { auth } = useNotion();
 
     const [accounts, setAccounts] = useState<Record<string, AccountConfig>>({});
@@ -39,14 +39,14 @@ export function Accounts() {
     }, [status, config.accounts]);
 
     // Compute performance
-    const flows = status === "ready" ? computeAccountFlows(transfers, true) : [];
+    const flows = status === "ready" ? computeAccountFlows(transfers, true, getFiatToTwdRate) : [];
     const accountPerformances: Record<string, AccountPerformance> = {};
     let totalNetCost = 0;
     let totalPL = 0;
     let totalCurrentValue = 0;
 
     Object.entries(accounts).forEach(([key, acc]) => {
-        const perf = calculatePerformance(key, acc.amount ?? null, acc.currency || "USD", flows);
+        const perf = calculatePerformance(key, acc.amount ?? null, acc.currency || "USD", flows, getFiatToTwdRate);
         accountPerformances[key] = perf;
 
         // Only include in totals if it's marked as an investment account

@@ -11,7 +11,7 @@ import { useNotion } from "../hooks/useNotion";
 
 function Transfers() {
     const { auth } = useNotion();
-    const { status, transfers, config, error, refresh, getAccountName } = useAppData();
+    const { status, transfers, config, error, refresh, getAccountName, getFiatToTwdRate } = useAppData();
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [isFormOpen, setIsFormOpen] = useState(false);
 
@@ -96,6 +96,11 @@ function Transfers() {
                                 const fee = transfer.fee ?? 0;
                                 if (transfer.currency === "TWD") return amount + fee;
                                 if (transfer.exchangeRate != null) return (amount + fee) * transfer.exchangeRate;
+
+                                const liveRate = getFiatToTwdRate(transfer.currency ?? "");
+                                if (liveRate != null) {
+                                    return (amount + fee) * liveRate;
+                                }
                                 return null;
                             })();
                             const effectiveRate = (twdCost != null && transfer.amount != null && transfer.amount > 0)
