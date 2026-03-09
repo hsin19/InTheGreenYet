@@ -98,7 +98,7 @@ export function Accounts() {
     });
 
     return (
-        <div className="flex min-h-screen flex-col px-4 py-8 max-w-6xl mx-auto">
+        <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8 flex items-start justify-between">
                 <h1 className="text-2xl font-bold text-white">Accounts</h1>
                 <div className="flex items-center gap-2">

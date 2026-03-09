@@ -37,7 +37,7 @@ function Transfers() {
     const collapseAll = () => setExpandedIds(new Set());
 
     return (
-        <div className="flex min-h-screen flex-col px-4 py-8 max-w-6xl mx-auto">
+        <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-white">Transfers</h1>

@@ -117,7 +117,9 @@ export function AccountDialog({
                 <div className="flex flex-col gap-3 py-2">
                     {isCreate && (
                         <div className="flex flex-col gap-1">
-                            <label className="text-xs text-muted">Key <span className="text-red-400">*</span></label>
+                            <label className="text-xs text-muted">
+                                Key <span className="text-red-400">*</span>
+                            </label>
                             <Input
                                 value={key}
                                 onChange={e => setKey(e.target.value)}
@@ -143,7 +145,9 @@ export function AccountDialog({
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Currency <span className="text-red-400">*</span></label>
+                        <label className="text-xs text-muted">
+                            Currency <span className="text-red-400">*</span>
+                        </label>
                         <Select
                             value={currency}
                             onValueChange={val => setCurrency(val)}
@@ -158,7 +162,9 @@ export function AccountDialog({
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Account Type <span className="text-red-400">*</span></label>
+                        <label className="text-xs text-muted">
+                            Account Type <span className="text-red-400">*</span>
+                        </label>
                         <Select
                             value={accountType}
                             onValueChange={val => setAccountType(val)}
@@ -186,9 +192,7 @@ export function AccountDialog({
                                 onChange={e => setIsInvestment(e.target.checked)}
                                 className="w-4 h-4 rounded appearance-none border border-white/15 bg-white/8 checked:bg-green-500 checked:border-green-500 cursor-pointer transition-colors"
                             />
-                            {isInvestment && (
-                                <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">✓</span>
-                            )}
+                            {isInvestment && <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">✓</span>}
                         </span>
                         <label htmlFor="isInvestment" className="text-xs text-muted cursor-pointer select-none">
                             Include in portfolio totals?

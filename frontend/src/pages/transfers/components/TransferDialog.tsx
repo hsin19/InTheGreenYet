@@ -130,7 +130,9 @@ export function TransferDialog({
 
                     {/* Date */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Date <span className="text-red-400">*</span></label>
+                        <label className="text-xs text-muted">
+                            Date <span className="text-red-400">*</span>
+                        </label>
                         <Input
                             type="date"
                             value={form.date ?? ""}
@@ -142,7 +144,9 @@ export function TransferDialog({
                     {/* From / To */}
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">From <span className="text-red-400">*</span></label>
+                            <label className="text-xs text-muted">
+                                From <span className="text-red-400">*</span>
+                            </label>
                             {hasAccounts ? (
                                 <Select value={form.from} onValueChange={val => set("from", val)}>
                                     <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
@@ -162,7 +166,9 @@ export function TransferDialog({
                             )}
                         </div>
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">To <span className="text-red-400">*</span></label>
+                            <label className="text-xs text-muted">
+                                To <span className="text-red-400">*</span>
+                            </label>
                             {hasAccounts ? (
                                 <Select value={form.to} onValueChange={val => set("to", val)}>
                                     <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
@@ -186,7 +192,9 @@ export function TransferDialog({
                     {/* Amount / Currency */}
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">Amount <span className="text-red-400">*</span></label>
+                            <label className="text-xs text-muted">
+                                Amount <span className="text-red-400">*</span>
+                            </label>
                             <Input
                                 type="number"
                                 step="any"
@@ -197,7 +205,9 @@ export function TransferDialog({
                             />
                         </div>
                         <div className="flex flex-col gap-1 w-28">
-                            <label className="text-xs text-muted">Currency <span className="text-red-400">*</span></label>
+                            <label className="text-xs text-muted">
+                                Currency <span className="text-red-400">*</span>
+                            </label>
                             <Select
                                 value={form.currency ?? ""}
                                 onValueChange={val => set("currency", val || null)}

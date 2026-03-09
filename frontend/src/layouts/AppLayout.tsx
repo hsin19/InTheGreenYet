@@ -1,81 +1,47 @@
 import { AppDataProvider } from "@/hooks/useAppData";
-import { LogOut } from "lucide-react";
+import {
+    ArrowLeftRight,
+    Settings,
+    Wallet,
+} from "lucide-react";
 import {
     Navigate,
     NavLink,
     Outlet,
 } from "react-router-dom";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "../components/ui/alert-dialog";
 import { useNotion } from "../hooks/useNotion";
 
 function AppNav() {
-    const { auth, logout } = useNotion();
-
     return (
-        <header className="fixed top-6 inset-x-0 flex justify-center z-50 pointer-events-none px-4">
+        <header className="fixed bottom-6 sm:bottom-auto sm:top-6 inset-x-0 flex justify-center z-50 pointer-events-none px-4">
             <div className="pointer-events-auto flex items-center justify-between px-2 py-1.5 rounded-full border border-white/[0.15] bg-white/[0.07] backdrop-blur-xl shadow-2xl shadow-black/40 ring-1 ring-white/[0.05] w-fit gap-8 sm:gap-12 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
-                <span className="font-semibold text-white text-sm pl-4 tracking-wide">
-                    InTheGreen<span className="text-green-400">Yet</span>
-                </span>
-                <nav className="flex items-center gap-1">
+                <nav className="flex items-center gap-1 px-1">
                     <NavLink
                         to="/transfers"
-                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
+                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
+                        aria-label="Transfers"
                     >
-                        Transfers
+                        <ArrowLeftRight className="w-4 h-4 shrink-0" />
+                        <span className="hidden sm:inline">Transfers</span>
                     </NavLink>
                     <NavLink
                         to="/accounts"
-                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
+                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
+                        aria-label="Accounts"
                     >
-                        Accounts
+                        <Wallet className="w-4 h-4 shrink-0" />
+                        <span className="hidden sm:inline">Accounts</span>
                     </NavLink>
                     <NavLink
                         to="/config"
-                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
+                        className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
                         aria-label="Settings"
                     >
-                        Settings
+                        <Settings className="w-4 h-4 shrink-0" />
+                        <span className="hidden sm:inline">Settings</span>
                     </NavLink>
                 </nav>
-                <div className="pr-2">
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <button className="flex items-center gap-2 pl-3 pr-2.5 py-1.5 rounded-full text-sm font-medium text-muted hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer group">
-                                <span className="max-w-[120px] truncate">{auth?.workspace_name ?? "Disconnect"}</span>
-                                <LogOut className="w-4 h-4 text-muted group-hover:text-rose-400 transition-colors" />
-                            </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="w-[90vw] max-w-sm">
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Log out of Notion?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    This will disconnect your workspace and log you out of the application.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                    onClick={logout}
-                                    className="bg-rose-500 text-white hover:bg-rose-600 border-none shadow-lg shadow-rose-500/20"
-                                >
-                                    Log out
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </div>
             </div>
         </header>
     );
@@ -112,7 +78,7 @@ function AppLayout() {
 
                 <AppNav />
                 {/* Main Content */}
-                <main className="flex-1 relative z-10 w-full max-w-7xl mx-auto pt-28">
+                <main className="flex-1 relative z-10 w-full max-w-7xl mx-auto pb-28 sm:pb-0 sm:pt-28">
                     <Outlet />
                 </main>
             </div>

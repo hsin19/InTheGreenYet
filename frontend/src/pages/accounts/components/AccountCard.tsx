@@ -115,19 +115,20 @@ export function AccountCard({
                                     <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net Cost</span>
                                     <span className={`text-xs tabular-nums transition-colors ${flow ? "hover:text-white" : ""}`}>
                                         {costExpanded && flow
-                                            ? <span className="flex flex-wrap gap-x-2">
-                                                {flow.summary
-                                                    .filter(c => Math.round(c.net) !== 0)
-                                                    .sort((a, b) => Math.abs(b.net) - Math.abs(a.net))
-                                                    .map(c => (
-                                                        <span key={c.currency} className={c.net >= 0 ? "text-white/80" : "text-rose-400/70"}>
-                                                            {c.net >= 0 ? "+" : ""}{Math.round(c.net).toLocaleString()} {c.currency}
-                                                        </span>
-                                                    ))
-                                                }
-                                            </span>
-                                            : <span className="text-white/80">{config.currency || baseCurrency} {Math.round(performance.netCost).toLocaleString()}</span>
-                                        }
+                                            ? (
+                                                <span className="flex flex-wrap gap-x-2">
+                                                    {flow.summary
+                                                        .filter(c => Math.round(c.net) !== 0)
+                                                        .sort((a, b) => Math.abs(b.net) - Math.abs(a.net))
+                                                        .map(c => (
+                                                            <span key={c.currency} className={c.net >= 0 ? "text-white/80" : "text-rose-400/70"}>
+                                                                {c.net >= 0 ? "+" : ""}
+                                                                {Math.round(c.net).toLocaleString()} {c.currency}
+                                                            </span>
+                                                        ))}
+                                                </span>
+                                            )
+                                            : <span className="text-white/80">{config.currency || baseCurrency} {Math.round(performance.netCost).toLocaleString()}</span>}
                                     </span>
                                 </button>
                                 {config.isInvestment !== false && (
@@ -144,14 +145,18 @@ export function AccountCard({
                                     <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net P&L</span>
                                     <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                                         {performance.pl != null
-                                            ? <>
-                                                {config.currency || baseCurrency} {performance.pl >= 0 ? "+" : ""}{Math.round(performance.pl).toLocaleString()}
-                                                {performance.yieldPercentage != null && (
-                                                    <span className="ml-1 opacity-70">
-                                                        ({performance.yieldPercentage >= 0 ? "+" : ""}{performance.yieldPercentage.toFixed(1)}%)
-                                                    </span>
-                                                )}
-                                            </>
+                                            ? (
+                                                <>
+                                                    {config.currency || baseCurrency} {performance.pl >= 0 ? "+" : ""}
+                                                    {Math.round(performance.pl).toLocaleString()}
+                                                    {performance.yieldPercentage != null && (
+                                                        <span className="ml-1 opacity-70">
+                                                            ({performance.yieldPercentage >= 0 ? "+" : ""}
+                                                            {performance.yieldPercentage.toFixed(1)}%)
+                                                        </span>
+                                                    )}
+                                                </>
+                                            )
                                             : "—"}
                                     </span>
                                 </div>
