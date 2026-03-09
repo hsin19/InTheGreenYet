@@ -23,26 +23,27 @@ function AppNav() {
 
     return (
         <header className="fixed top-6 inset-x-0 flex justify-center z-50 pointer-events-none px-4">
-            <div className="pointer-events-auto flex items-center justify-between px-2 py-1.5 rounded-full border border-white/10 bg-surface/80 backdrop-blur-xl shadow-2xl shadow-black/40 w-fit gap-8 sm:gap-12">
+            <div className="pointer-events-auto flex items-center justify-between px-2 py-1.5 rounded-full border border-white/[0.15] bg-white/[0.07] backdrop-blur-xl shadow-2xl shadow-black/40 ring-1 ring-white/[0.05] w-fit gap-8 sm:gap-12 relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
                 <span className="font-semibold text-white text-sm pl-4 tracking-wide">
                     InTheGreen<span className="text-green-400">Yet</span>
                 </span>
                 <nav className="flex items-center gap-1">
                     <NavLink
                         to="/transfers"
-                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}`}
+                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
                     >
                         Transfers
                     </NavLink>
                     <NavLink
                         to="/accounts"
-                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}`}
+                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
                     >
                         Accounts
                     </NavLink>
                     <NavLink
                         to="/config"
-                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/10 text-white shadow-sm" : "text-muted hover:text-white hover:bg-white/5"}`}
+                        className={({ isActive }) => `px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
                         aria-label="Settings"
                     >
                         Settings

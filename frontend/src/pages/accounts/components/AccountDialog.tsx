@@ -110,20 +110,20 @@ export function AccountDialog({
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold text-white">
-                        {isCreate ? "Add Account" : `Edit "${editingKey}"`}
+                        {isCreate ? "New Account" : `Edit "${editingKey}"`}
                     </DialogTitle>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-3 py-2">
                     {isCreate && (
                         <div className="flex flex-col gap-1">
-                            <label className="text-xs text-muted">Key</label>
+                            <label className="text-xs text-muted">Key <span className="text-red-400">*</span></label>
                             <Input
                                 value={key}
                                 onChange={e => setKey(e.target.value)}
                                 onKeyDown={e => e.key === "Enter" && handleSave()}
                                 placeholder="e.g. binance"
-                                className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
+                                className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
                                 autoFocus
                             />
                             <p className="text-muted/50 text-xs">Identifier used in transfers. Cannot be changed later.</p>
@@ -137,18 +137,18 @@ export function AccountDialog({
                             onChange={e => setDisplayName(e.target.value)}
                             onKeyDown={e => e.key === "Enter" && handleSave()}
                             placeholder={isCreate ? key || "Display name" : editingKey ?? ""}
-                            className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
+                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
                             autoFocus={!isCreate}
                         />
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Currency</label>
+                        <label className="text-xs text-muted">Currency <span className="text-red-400">*</span></label>
                         <Select
                             value={currency}
                             onValueChange={val => setCurrency(val)}
                         >
-                            <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
+                            <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
                                 <SelectValue placeholder="Select currency" />
                             </SelectTrigger>
                             <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -158,12 +158,12 @@ export function AccountDialog({
                     </div>
 
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Account Type</label>
+                        <label className="text-xs text-muted">Account Type <span className="text-red-400">*</span></label>
                         <Select
                             value={accountType}
                             onValueChange={val => setAccountType(val)}
                         >
-                            <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
+                            <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
                                 <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                             <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -178,14 +178,18 @@ export function AccountDialog({
                     </div>
 
                     <div className="flex items-center gap-2 pt-1">
-                        <input
-                            type="checkbox"
-                            role="checkbox"
-                            id="isInvestment"
-                            checked={isInvestment}
-                            onChange={e => setIsInvestment(e.target.checked)}
-                            className="w-4 h-4 rounded appearance-none border border-white/10 bg-surface/50 checked:bg-green-500 checked:border-green-500 cursor-pointer transition-colors relative after:content-['✓'] after:absolute after:inset-0 after:flex after:items-center after:justify-center after:text-[10px] after:text-black after:font-bold after:opacity-0 checked:after:opacity-100"
-                        />
+                        <span className="relative flex-shrink-0 w-4 h-4">
+                            <input
+                                type="checkbox"
+                                id="isInvestment"
+                                checked={isInvestment}
+                                onChange={e => setIsInvestment(e.target.checked)}
+                                className="w-4 h-4 rounded appearance-none border border-white/15 bg-white/8 checked:bg-green-500 checked:border-green-500 cursor-pointer transition-colors"
+                            />
+                            {isInvestment && (
+                                <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">✓</span>
+                            )}
+                        </span>
                         <label htmlFor="isInvestment" className="text-xs text-muted cursor-pointer select-none">
                             Include in portfolio totals?
                         </label>
@@ -206,7 +210,7 @@ export function AccountDialog({
                         onClick={handleSave}
                         disabled={saving}
                     >
-                        {saving ? "Saving..." : isCreate ? "Add" : "Save"}
+                        {saving ? "Saving..." : "Save"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

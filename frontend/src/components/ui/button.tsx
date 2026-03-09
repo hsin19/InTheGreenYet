@@ -12,9 +12,9 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                default: "bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/25",
-                outline: "border border-white/10 bg-surface-card/40 backdrop-blur-md text-white hover:bg-white/10 hover:text-white transition-colors",
-                secondary: "bg-white/5 text-white hover:bg-white/10 border border-white/5",
+                default: "bg-green-500/30 text-green-300 border border-green-500/50 hover:bg-green-500/40",
+                outline: "border border-white/[0.15] bg-white/[0.07] backdrop-blur-xl text-white ring-1 ring-white/[0.05] hover:bg-white/[0.12] hover:border-white/[0.2] hover:text-white transition-colors",
+                secondary: "bg-white/[0.07] text-white hover:bg-white/[0.12] border border-white/[0.1]",
                 ghost: "text-muted hover:text-white hover:bg-white/10 transition-colors",
                 destructive: "bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25",
                 link: "text-green-400 underline-offset-4 hover:underline",

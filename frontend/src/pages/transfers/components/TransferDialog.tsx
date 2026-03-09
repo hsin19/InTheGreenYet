@@ -42,6 +42,8 @@ interface TransferDialogProps {
     currencies: string[];
     accounts: Record<string, AccountConfig>;
     onCreated: () => void;
+    baseCurrency: string;
+    getFiatToBaseRate: (currency: string) => number | null;
 }
 
 export function TransferDialog({
@@ -51,6 +53,8 @@ export function TransferDialog({
     currencies,
     accounts,
     onCreated,
+    baseCurrency,
+    getFiatToBaseRate,
 }: TransferDialogProps) {
     const [form, setForm] = useState<CreateTransferInput>(emptyForm);
     const [saving, setSaving] = useState(false);
@@ -120,28 +124,28 @@ export function TransferDialog({
                             value={form.title}
                             onChange={e => set("title", e.target.value)}
                             placeholder={`${form.from || "?"} to ${form.to || "?"}`}
-                            className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
+                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
                         />
                     </div>
 
                     {/* Date */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Date</label>
+                        <label className="text-xs text-muted">Date <span className="text-red-400">*</span></label>
                         <Input
                             type="date"
                             value={form.date ?? ""}
                             onChange={e => set("date", e.target.value || null)}
-                            className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20 [color-scheme:dark]"
+                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30 [color-scheme:dark]"
                         />
                     </div>
 
                     {/* From / To */}
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">From</label>
+                            <label className="text-xs text-muted">From <span className="text-red-400">*</span></label>
                             {hasAccounts ? (
                                 <Select value={form.from} onValueChange={val => set("from", val)}>
-                                    <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
+                                    <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -153,15 +157,15 @@ export function TransferDialog({
                                     value={form.from}
                                     onChange={e => set("from", e.target.value)}
                                     placeholder="Source"
-                                    className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
+                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
                                 />
                             )}
                         </div>
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">To</label>
+                            <label className="text-xs text-muted">To <span className="text-red-400">*</span></label>
                             {hasAccounts ? (
                                 <Select value={form.to} onValueChange={val => set("to", val)}>
-                                    <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
+                                    <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -173,7 +177,7 @@ export function TransferDialog({
                                     value={form.to}
                                     onChange={e => set("to", e.target.value)}
                                     placeholder="Destination"
-                                    className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
+                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
                                 />
                             )}
                         </div>
@@ -182,23 +186,23 @@ export function TransferDialog({
                     {/* Amount / Currency */}
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">Amount</label>
+                            <label className="text-xs text-muted">Amount <span className="text-red-400">*</span></label>
                             <Input
                                 type="number"
                                 step="any"
                                 value={form.amount ?? ""}
                                 onChange={e => set("amount", e.target.value ? Number(e.target.value) : null)}
                                 placeholder="0"
-                                className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
+                                className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
                             />
                         </div>
                         <div className="flex flex-col gap-1 w-28">
-                            <label className="text-xs text-muted">Currency</label>
+                            <label className="text-xs text-muted">Currency <span className="text-red-400">*</span></label>
                             <Select
                                 value={form.currency ?? ""}
                                 onValueChange={val => set("currency", val || null)}
                             >
-                                <SelectTrigger className="bg-surface/50 border-white/5 text-white focus:ring-1 focus:ring-white/20">
+                                <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
                                     <SelectValue placeholder="—" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -209,30 +213,44 @@ export function TransferDialog({
                     </div>
 
                     {/* Fee / Exchange Rate */}
-                    <div className="flex gap-3">
-                        <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">Fee</label>
-                            <Input
-                                type="number"
-                                step="any"
-                                value={form.fee ?? ""}
-                                onChange={e => set("fee", e.target.value ? Number(e.target.value) : null)}
-                                placeholder="0"
-                                className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">Exchange Rate</label>
-                            <Input
-                                type="number"
-                                step="any"
-                                value={form.exchangeRate ?? ""}
-                                onChange={e => set("exchangeRate", e.target.value ? Number(e.target.value) : null)}
-                                placeholder="1"
-                                className="bg-surface/50 border-white/5 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/20"
-                            />
-                        </div>
-                    </div>
+                    {(() => {
+                        const refRate = form.currency && form.currency !== baseCurrency
+                            ? getFiatToBaseRate(form.currency)
+                            : null;
+                        return (
+                            <div className="flex gap-3">
+                                <div className="flex flex-col gap-1 flex-1">
+                                    <label className="text-xs text-muted">Fee</label>
+                                    <Input
+                                        type="number"
+                                        step="any"
+                                        value={form.fee ?? ""}
+                                        onChange={e => set("fee", e.target.value ? Number(e.target.value) : null)}
+                                        placeholder="0"
+                                        className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-1 flex-1">
+                                    <div className="flex items-baseline justify-between gap-1">
+                                        <label className="text-xs text-muted">Exchange Rate</label>
+                                        {refRate != null && (
+                                            <span className="text-xs text-blue-400/70 tabular-nums">
+                                                ref {refRate.toFixed(4)}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <Input
+                                        type="number"
+                                        step="any"
+                                        value={form.exchangeRate ?? ""}
+                                        onChange={e => set("exchangeRate", e.target.value ? Number(e.target.value) : null)}
+                                        placeholder={refRate != null ? refRate.toFixed(4) : "1"}
+                                        className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                    />
+                                </div>
+                            </div>
+                        );
+                    })()}
 
                     {/* Note */}
                     <div className="flex flex-col gap-1">
@@ -242,7 +260,7 @@ export function TransferDialog({
                             onChange={e => set("note", e.target.value)}
                             placeholder="Optional note"
                             rows={2}
-                            className="w-full bg-surface/50 border border-white/5 rounded-md px-3 py-2 text-sm text-white placeholder:text-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20 resize-none"
+                            className="w-full bg-white/8 border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 resize-none"
                         />
                     </div>
 

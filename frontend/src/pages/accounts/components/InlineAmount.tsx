@@ -9,12 +9,14 @@ interface InlineAmountProps {
     accountKey: string;
     config: AccountConfig;
     onSave: (key: string, config: AccountConfig) => Promise<void>;
+    large?: boolean;
 }
 
 export function InlineAmount({
     accountKey,
     config,
     onSave,
+    large = false,
 }: InlineAmountProps) {
     const [editing, setEditing] = useState(false);
     const [value, setValue] = useState("");
@@ -79,11 +81,11 @@ export function InlineAmount({
         >
             {config.amount != null ? (
                 <>
-                    <span className="text-muted text-xs">{currency}</span>
-                    <span className="text-white font-medium text-sm tabular-nums">
+                    <span className={`text-muted ${large ? "text-sm" : "text-xs"}`}>{currency}</span>
+                    <span className={`text-white tabular-nums ${large ? "font-semibold text-2xl" : "font-medium text-sm"}`}>
                         {config.amount.toLocaleString()}
                     </span>
-                    <Pencil className="w-3 h-3 text-muted/0 group-hover/amount:text-muted transition-colors" />
+                    <Pencil className="w-3 h-3 text-muted hidden group-hover/amount:inline-block" />
                 </>
             ) : (
                 <span className="text-muted/40 text-xs italic group-hover/amount:text-muted transition-colors">

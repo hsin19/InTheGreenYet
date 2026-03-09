@@ -20,7 +20,10 @@ import {
     Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { type AccountPerformance } from "../../../lib/performance";
+import {
+    type AccountFlow,
+    type AccountPerformance,
+} from "../../../lib/performance";
 import { AccountDialog } from "./AccountDialog";
 import { InlineAmount } from "./InlineAmount";
 
@@ -30,6 +33,7 @@ interface AccountCardProps {
     baseCurrency: string;
     availableCurrencies: string[];
     performance?: AccountPerformance;
+    flow?: AccountFlow;
     onSaveAccount: (key: string, config: AccountConfig) => Promise<void>;
     onDelete: (key: string) => Promise<void>;
 }
@@ -40,10 +44,12 @@ export function AccountCard({
     baseCurrency,
     availableCurrencies,
     performance,
+    flow,
     onSaveAccount,
     onDelete,
 }: AccountCardProps) {
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [costExpanded, setCostExpanded] = useState(false);
 
     const updatedAt = config.amountUpdatedAt
         ? new Date(config.amountUpdatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })
@@ -51,7 +57,7 @@ export function AccountCard({
 
     return (
         <>
-            <Card className="group hover:border-white/20 hover:bg-surface-card/60 transition-all duration-300 p-0 gap-0">
+            <Card className="group hover:border-white/20 hover:bg-surface-card/60 transition-all duration-300 p-0 gap-0 flex flex-col">
                 <CardHeader className="pb-2 pt-4 px-4 flex flex-row items-start justify-between gap-2 border-b border-white/10">
                     <div className="min-w-0">
                         <p className="text-white font-semibold text-base leading-tight truncate">
@@ -98,38 +104,62 @@ export function AccountCard({
                     </div>
                 </CardHeader>
 
-                <CardContent className="px-4 pb-4 pt-4 flex flex-col gap-3">
-                    <div className="flex flex-col gap-1">
-                        <InlineAmount accountKey={accountKey} config={config} onSave={onSaveAccount} />
-                        {updatedAt && <p className="text-muted/50 text-xs">Updated {updatedAt}</p>}
-                    </div>
-
+                <CardContent className="px-4 pb-5 pt-5 flex flex-col gap-5 justify-end flex-1">
                     {performance && (
-                        <div className="pt-3 flex flex-col gap-2">
+                        <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-end">
-                                <div className="flex flex-col">
+                                <button
+                                    onClick={() => flow && setCostExpanded(v => !v)}
+                                    className={`flex flex-col gap-0.5 text-left ${flow ? "cursor-pointer" : "cursor-default"}`}
+                                >
                                     <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net Cost</span>
-                                    <span className="text-xs text-white/80 tabular-nums">
-                                        {config.currency || baseCurrency} {Math.round(performance.netCost).toLocaleString()}
+                                    <span className={`text-xs tabular-nums transition-colors ${flow ? "hover:text-white" : ""}`}>
+                                        {costExpanded && flow
+                                            ? <span className="flex flex-wrap gap-x-2">
+                                                {flow.summary
+                                                    .filter(c => Math.round(c.net) !== 0)
+                                                    .sort((a, b) => Math.abs(b.net) - Math.abs(a.net))
+                                                    .map(c => (
+                                                        <span key={c.currency} className={c.net >= 0 ? "text-white/80" : "text-rose-400/70"}>
+                                                            {c.net >= 0 ? "+" : ""}{Math.round(c.net).toLocaleString()} {c.currency}
+                                                        </span>
+                                                    ))
+                                                }
+                                            </span>
+                                            : <span className="text-white/80">{config.currency || baseCurrency} {Math.round(performance.netCost).toLocaleString()}</span>
+                                        }
                                     </span>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Yield</span>
-                                    <span className={`text-xs font-bold tabular-nums ${(performance.yieldPercentage ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400/90"}`}>
-                                        {performance.yieldPercentage != null
-                                            ? `${performance.yieldPercentage >= 0 ? "+" : ""}${performance.yieldPercentage.toFixed(1)}%`
+                                </button>
+                                {config.isInvestment !== false && (
+                                    <div className="flex flex-col items-end gap-0.5">
+                                        <div className="flex items-baseline gap-1.5">
+                                            {updatedAt && <span className="text-muted/40 text-[10px]">{updatedAt}</span>}
+                                            <InlineAmount accountKey={accountKey} config={config} onSave={onSaveAccount} large />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            {config.isInvestment !== false ? (
+                                <div className="flex justify-between items-center bg-white/5 px-2 py-1.5 rounded-md border border-white/10 shadow-inner">
+                                    <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net P&L</span>
+                                    <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                                        {performance.pl != null
+                                            ? <>
+                                                {config.currency || baseCurrency} {performance.pl >= 0 ? "+" : ""}{Math.round(performance.pl).toLocaleString()}
+                                                {performance.yieldPercentage != null && (
+                                                    <span className="ml-1 opacity-70">
+                                                        ({performance.yieldPercentage >= 0 ? "+" : ""}{performance.yieldPercentage.toFixed(1)}%)
+                                                    </span>
+                                                )}
+                                            </>
                                             : "—"}
                                     </span>
                                 </div>
-                            </div>
-                            <div className="flex justify-between items-center bg-white/5 px-2 py-1.5 rounded-md border border-white/10 shadow-inner">
-                                <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net P&L</span>
-                                <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                                    {performance.pl != null
-                                        ? `${config.currency || baseCurrency} ${performance.pl >= 0 ? "+" : ""}${Math.round(performance.pl).toLocaleString()}`
-                                        : "—"}
-                                </span>
-                            </div>
+                            ) : (
+                                <div className="flex items-center bg-white/5 px-2 py-1.5 rounded-md border border-white/10">
+                                    <span className="text-[10px] text-muted/60 uppercase tracking-wider font-semibold">Cash Account</span>
+                                </div>
+                            )}
                         </div>
                     )}
                 </CardContent>

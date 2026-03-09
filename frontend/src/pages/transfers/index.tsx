@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import { useAppData } from "@/hooks/useAppData";
 import { useNotion } from "@/hooks/useNotion";
 import {
+    ChevronsDown,
+    ChevronsUp,
     Plus,
     RefreshCw,
 } from "lucide-react";
@@ -14,6 +16,12 @@ function Transfers() {
     const { status, transfers, config, error, refresh, getAccountName, getFiatToBaseRate } = useAppData();
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [addOpen, setAddOpen] = useState(false);
+    const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+
+    const accountKeys = [...new Set(transfers.flatMap(t => [t.from, t.to].filter(Boolean)))];
+    const filteredTransfers = selectedAccount
+        ? transfers.filter(t => t.from === selectedAccount || t.to === selectedAccount)
+        : transfers;
 
     const toggleExpand = (id: string) =>
         setExpandedIds(prev => {
@@ -25,7 +33,7 @@ function Transfers() {
             }
             return next;
         });
-    const expandAll = () => setExpandedIds(new Set(transfers.map(t => t.id)));
+    const expandAll = () => setExpandedIds(new Set(filteredTransfers.map(t => t.id)));
     const collapseAll = () => setExpandedIds(new Set());
 
     return (
@@ -34,13 +42,13 @@ function Transfers() {
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-2xl font-bold text-white">Transfers</h1>
                 <div className="flex items-center gap-2">
-                    {status === "ready" && transfers.length > 0 && (
+                    {status === "ready" && filteredTransfers.length > 0 && (
                         <>
-                            <Button variant="outline" size="sm" onClick={expandAll}>
-                                Expand All
+                            <Button variant="outline" size="icon" onClick={expandAll} title="Expand All">
+                                <ChevronsDown className="w-4 h-4" />
                             </Button>
-                            <Button variant="outline" size="sm" onClick={collapseAll}>
-                                Collapse All
+                            <Button variant="outline" size="icon" onClick={collapseAll} title="Collapse All">
+                                <ChevronsUp className="w-4 h-4" />
                             </Button>
                         </>
                     )}
@@ -53,9 +61,8 @@ function Transfers() {
                         <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
                     </Button>
                     {auth && (
-                        <Button onClick={() => setAddOpen(true)}>
-                            <Plus className="w-4 h-4 mr-1.5" />
-                            Add Transfer
+                        <Button size="icon" onClick={() => setAddOpen(true)} title="Add Transfer">
+                            <Plus className="w-4 h-4" />
                         </Button>
                     )}
                 </div>
@@ -87,9 +94,37 @@ function Transfers() {
                 </Card>
             )}
 
-            {status === "ready" && transfers.length > 0 && (
+            {status === "ready" && transfers.length > 0 && accountKeys.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                    <Button
+                        variant={selectedAccount === null ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedAccount(null)}
+                    >
+                        All
+                    </Button>
+                    {accountKeys.map(key => (
+                        <Button
+                            key={key}
+                            variant={selectedAccount === key ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setSelectedAccount(prev => prev === key ? null : key)}
+                        >
+                            {getAccountName(key)}
+                        </Button>
+                    ))}
+                </div>
+            )}
+
+            {status === "ready" && transfers.length > 0 && filteredTransfers.length === 0 && (
+                <Card className="items-center text-center p-8 gap-2">
+                    <p className="text-white font-medium">No transfers for this account</p>
+                </Card>
+            )}
+
+            {status === "ready" && filteredTransfers.length > 0 && (
                 <ul className="flex flex-col gap-3">
-                    {transfers.map(transfer => {
+                    {filteredTransfers.map(transfer => {
                         const baseCost = (() => {
                             const amount = transfer.amount ?? 0;
                             const fee = transfer.fee ?? 0;
@@ -200,6 +235,8 @@ function Transfers() {
                     currencies={config.currencies}
                     accounts={config.accounts}
                     onCreated={refresh}
+                    baseCurrency={config.baseCurrency}
+                    getFiatToBaseRate={getFiatToBaseRate}
                 />
             )}
         </div>

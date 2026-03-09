@@ -88,7 +88,14 @@ export function Accounts() {
         await persistAccounts(next);
     };
 
-    const entries = Object.entries(accounts);
+    const entries = Object.entries(accounts).sort(([keyA, accA], [keyB, accB]) => {
+        const amountA = accA.amount ?? -Infinity;
+        const amountB = accB.amount ?? -Infinity;
+        if (amountB !== amountA) return amountB - amountA;
+        const netCostA = Math.abs(accountPerformances[keyA]?.netCostBase ?? 0);
+        const netCostB = Math.abs(accountPerformances[keyB]?.netCostBase ?? 0);
+        return netCostB - netCostA;
+    });
 
     return (
         <div className="flex min-h-screen flex-col px-4 py-8 max-w-6xl mx-auto">
@@ -104,10 +111,11 @@ export function Accounts() {
                         <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
                     </Button>
                     <Button
+                        size="icon"
                         onClick={() => setAddOpen(true)}
+                        title="Add Account"
                     >
-                        <Plus className="w-4 h-4 mr-1.5" />
-                        Add Account
+                        <Plus className="w-4 h-4" />
                     </Button>
                 </div>
             </div>
@@ -182,6 +190,7 @@ export function Accounts() {
                                     baseCurrency={config.baseCurrency}
                                     availableCurrencies={config.currencies}
                                     performance={accountPerformances[key]}
+                                    flow={flows.find(f => f.account === key)}
                                     onSaveAccount={handleSaveAccount}
                                     onDelete={handleDelete}
                                 />
