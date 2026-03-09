@@ -58,8 +58,8 @@ function Landing() {
         <div className="flex min-h-screen flex-col items-center justify-center px-4 bg-surface relative overflow-hidden">
             {/* Background image and elements for Glassmorphism */}
             <div
-                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none"
-                style={{ backgroundImage: `url('/images/bull-bg.png')` }}
+                className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-70 pointer-events-none"
+                style={{ backgroundImage: `url('/images/bg-main-dark.png')` }}
             />
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-900/20 blur-[120px]" />
