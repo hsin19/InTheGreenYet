@@ -14,12 +14,12 @@ import {
     CardContent,
     CardHeader,
 } from "@/components/ui/card";
+import { type AccountConfig } from "@/hooks/useAppData";
 import {
     Settings2,
     Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { type AccountConfig } from "../../../hooks/useAppData";
 import { type AccountPerformance } from "../../../lib/performance";
 import { AccountDialog } from "./AccountDialog";
 import { InlineAmount } from "./InlineAmount";

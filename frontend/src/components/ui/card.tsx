@@ -13,12 +13,12 @@ function Card({
             data-slot="card"
             data-size={size}
             className={cn(
-                "group/card flex flex-col gap-4 overflow-hidden rounded-xl border border-white/10 bg-surface-card/40 backdrop-blur-xl text-white shadow-lg shadow-black/20 relative py-4 text-sm has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+                "group/card flex flex-col gap-4 overflow-hidden rounded-xl border border-white/[0.15] bg-white/[0.07] backdrop-blur-xl text-white shadow-lg shadow-black/20 ring-1 ring-white/[0.05] relative py-4 text-sm has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
                 className,
             )}
             {...props}
         >
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none" />
             {children}
         </div>
     );

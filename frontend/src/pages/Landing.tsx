@@ -12,14 +12,21 @@ function Landing() {
     const actionBlock = (() => {
         if (!auth) {
             return (
-                <Button
-                    size="lg"
-                    onClick={login}
-                    className="mt-6 rounded-xl bg-green-500/20 backdrop-blur-md border border-green-500/30 px-8 h-14 font-semibold text-green-400 shadow-lg shadow-green-900/40 transition-all duration-200 hover:bg-green-500/30 hover:border-green-400/50 hover:shadow-green-500/20 hover:text-green-300 hover:scale-[1.02] active:scale-[0.98]"
-                >
-                    <NotionIcon className="w-5 h-5 mr-2" />
-                    Connect to Notion
-                </Button>
+                <div className="relative mt-6 group">
+                    <div className="relative p-[2px] rounded-xl overflow-hidden group-hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
+                        <div className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_25%,rgba(255,255,255,0.8)_95%,rgba(255,255,255,1)_100%)] opacity-100" />
+                        <div className="relative rounded-[10px] bg-green-700">
+                            <Button
+                                size="lg"
+                                onClick={login}
+                                className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
+                            >
+                                <NotionIcon className="w-5 h-5 mr-2" />
+                                Connect to Notion
+                            </Button>
+                        </div>
+                    </div>
+                </div>
             );
         }
         return (

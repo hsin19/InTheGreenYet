@@ -14,6 +14,7 @@ export async function handleGetTransfers(request: Request, env: Env): Promise<Re
         const transfers = await queryTransfers(token);
         return jsonResponse({ transfers }, 200, env.FRONTEND_URL);
     } catch (err) {
+        console.error("handleGetTransfers error", err);
         return errorResponse(err, env.FRONTEND_URL);
     }
 }
@@ -35,6 +36,7 @@ export async function handleCreateTransfer(request: Request, env: Env): Promise<
         });
         return jsonResponse({ id }, 201, env.FRONTEND_URL);
     } catch (err) {
+        console.error("handleCreateTransfer error", err);
         return errorResponse(err, env.FRONTEND_URL);
     }
 }

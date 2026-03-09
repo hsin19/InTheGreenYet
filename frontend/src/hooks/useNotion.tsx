@@ -1,3 +1,4 @@
+import { setOnDataSourceNotFound } from "@/lib/api";
 import {
     createContext,
     type ReactNode,
@@ -99,6 +100,14 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         initingRef.current = false;
         setInitStatus("idle");
         setInitError(null);
+    }, []);
+
+    useEffect(() => {
+        setOnDataSourceNotFound(() => {
+            setInitError("Data source not found. Please reconnect to Notion.");
+            setInitStatus("error");
+        });
+        return () => setOnDataSourceNotFound(null);
     }, []);
 
     return (

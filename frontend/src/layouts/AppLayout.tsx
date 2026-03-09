@@ -1,3 +1,4 @@
+import { AppDataProvider } from "@/hooks/useAppData";
 import { LogOut } from "lucide-react";
 import {
     Navigate,
@@ -15,7 +16,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "../components/ui/alert-dialog";
-import { AppDataProvider } from "../hooks/useAppData";
 import { useNotion } from "../hooks/useNotion";
 
 function AppNav() {

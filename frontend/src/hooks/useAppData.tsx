@@ -1,3 +1,4 @@
+import { setOnDataSourceNotFound } from "@/lib/api";
 import {
     createContext,
     type ReactNode,
@@ -6,7 +7,6 @@ import {
     useEffect,
     useState,
 } from "react";
-import { DataSourceNotFoundError } from "../lib/api";
 import {
     type ExchangeRates,
     fetchExchangeRates,
@@ -104,11 +104,6 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
                 setStatus("ready");
             } catch (err) {
                 if (cancelled) return;
-                if (err instanceof DataSourceNotFoundError) {
-                    setError("Data source not found. Please reconnect to Notion.");
-                    setStatus("error");
-                    return;
-                }
                 setError(err instanceof Error ? err.message : "Unknown error");
                 setStatus("error");
             }

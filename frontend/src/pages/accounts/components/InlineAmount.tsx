@@ -1,9 +1,9 @@
+import { type AccountConfig } from "@/hooks/useAppData";
 import { Pencil } from "lucide-react";
 import {
     useRef,
     useState,
 } from "react";
-import { type AccountConfig } from "../../../hooks/useAppData";
 
 interface InlineAmountProps {
     accountKey: string;

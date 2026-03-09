@@ -1,10 +1,8 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
-export class DataSourceNotFoundError extends Error {
-    constructor() {
-        super("Data source not found");
-        this.name = "DataSourceNotFoundError";
-    }
+let onDataSourceNotFound: (() => void) | null = null;
+export function setOnDataSourceNotFound(cb: (() => void) | null) {
+    onDataSourceNotFound = cb;
 }
 
 export async function apiFetch<T>(
@@ -23,7 +21,7 @@ export async function apiFetch<T>(
     const data = await res.json() as T & { error?: string; };
     if (!res.ok) {
         if (res.status === 404 && data.error === "data_source_not_found") {
-            throw new DataSourceNotFoundError();
+            onDataSourceNotFound?.();
         }
         throw new Error(data.error ?? `Request failed: ${res.status}`);
     }

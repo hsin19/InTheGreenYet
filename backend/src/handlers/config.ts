@@ -16,6 +16,7 @@ export async function handleGetConfig(request: Request, url: URL, env: Env): Pro
         const rows = await queryConfig(token, key);
         return jsonResponse({ config: rows }, 200, env.FRONTEND_URL);
     } catch (err) {
+        console.error("handleGetConfig error", err);
         return errorResponse(err, env.FRONTEND_URL);
     }
 }
@@ -33,6 +34,7 @@ export async function handleUpdateConfig(request: Request, env: Env): Promise<Re
         await updateConfig(token, body.key, body.value);
         return jsonResponse({ ok: true }, 200, env.FRONTEND_URL);
     } catch (err) {
+        console.error("handleUpdateConfig error", err);
         return errorResponse(err, env.FRONTEND_URL);
     }
 }

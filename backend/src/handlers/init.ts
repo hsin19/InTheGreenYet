@@ -32,7 +32,7 @@ export async function handleInit(request: Request, env: Env): Promise<Response> 
 
         return jsonResponse({ ok: true }, 200, env.FRONTEND_URL);
     } catch (err) {
-        console.error("Init failed", err);
+        console.error("handleInit error", err);
         return errorResponse(err, env.FRONTEND_URL);
     }
 }

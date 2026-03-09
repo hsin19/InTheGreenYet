@@ -11,7 +11,7 @@ import Callback from "./pages/Callback";
 import Config from "./pages/Config";
 import Landing from "./pages/Landing";
 import NotFound from "./pages/NotFound";
-import Transfers from "./pages/Transfers";
+import Transfers from "./pages/transfers";
 
 function App() {
     return (

@@ -1,17 +1,14 @@
 import {
+    type AccountConfig,
+    useAppData,
+} from "@/hooks/useAppData";
+import {
     Plus,
     RefreshCw,
 } from "lucide-react";
-import {
-    useEffect,
-    useState,
-} from "react";
+import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import {
-    type AccountConfig,
-    useAppData,
-} from "../../hooks/useAppData";
 import { useNotion } from "../../hooks/useNotion";
 import {
     createSnapshots,
@@ -29,14 +26,9 @@ export function Accounts() {
     const { config, status, transfers, getFiatToBaseRate, refresh } = useAppData();
     const { auth } = useNotion();
 
-    const [accounts, setAccounts] = useState<Record<string, AccountConfig>>({});
     const [addOpen, setAddOpen] = useState(false);
 
-    useEffect(() => {
-        if (status === "ready") {
-            setAccounts(config.accounts);
-        }
-    }, [status, config.accounts]);
+    const accounts = status === "ready" ? config.accounts : {};
 
     // Compute performance
     const flows = status === "ready" ? computeAccountFlows(transfers, true, getFiatToBaseRate) : [];
@@ -64,7 +56,6 @@ export function Accounts() {
     const persistAccounts = async (next: Record<string, AccountConfig>) => {
         if (!auth) return;
         await updateConfig(auth.access_token, "accounts", next);
-        setAccounts(next);
         refresh();
     };
 
@@ -102,10 +93,7 @@ export function Accounts() {
     return (
         <div className="flex min-h-screen flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8 flex items-start justify-between">
-                <div>
-                    <h1 className="text-2xl font-bold text-white">Accounts</h1>
-                    <p className="text-muted text-sm mt-1">Track balances across your accounts</p>
-                </div>
+                <h1 className="text-2xl font-bold text-white">Accounts</h1>
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"

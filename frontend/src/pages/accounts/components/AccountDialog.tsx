@@ -14,11 +14,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { type AccountConfig } from "@/hooks/useAppData";
 import {
     useEffect,
     useState,
 } from "react";
-import { type AccountConfig } from "../../../hooks/useAppData";
 
 interface AccountDialogProps {
     open: boolean;

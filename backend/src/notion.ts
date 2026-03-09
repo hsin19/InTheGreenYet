@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Client } from "@notionhq/client";
+import {
+    APIResponseError,
+    isNotionClientError,
+} from "@notionhq/client";
 import { DataSourceNotFoundError } from "./utils";
 
 export function createClient(token?: string): Client {
@@ -102,24 +106,24 @@ export interface CreateSnapshotInput {
 // ─── Functions ───────────────────────────────────────────────
 
 /** Resolve a data source ID by name; retries for Notion index delay. */
-async function resolveTransferDataSource(token: string): Promise<string> {
-    const existing = await searchDataSource(token, DATASOURCE_NAME, { retries: 3 });
+async function resolveDataSource(token: string, name: string): Promise<string> {
+    const existing = await searchDataSource(token, name, { retries: 3 });
     if (existing) return existing.id;
-    throw new DataSourceNotFoundError(DATASOURCE_NAME);
+    throw new DataSourceNotFoundError(name);
 }
 
-/** Resolve the Config data source ID; retries for Notion index delay. */
-async function resolveConfigDataSource(token: string): Promise<string> {
-    const existing = await searchDataSource(token, CONFIG_DATASOURCE_NAME, { retries: 3 });
-    if (existing) return existing.id;
-    throw new DataSourceNotFoundError(CONFIG_DATASOURCE_NAME);
-}
+/** Wrap a Notion API call; convert 404 object_not_found to DataSourceNotFoundError. */
+async function notionCall<T>(name: string, fn: () => Promise<T>): Promise<T> {
+    try {
+        return await fn();
+    } catch (err) {
+        if (isNotionClientError(err) && err instanceof APIResponseError && err.status === 404) {
+            console.error(`Notion API returned 404 for data source "${name}". This may be due to Notion's eventual consistency after creating a data source. Retries should be attempted.`, err);
 
-/** Resolve the Snapshots data source ID; retries for Notion index delay. */
-async function resolveSnapshotsDataSource(token: string): Promise<string> {
-    const existing = await searchDataSource(token, SNAPSHOTS_DATASOURCE_NAME, { retries: 3 });
-    if (existing) return existing.id;
-    throw new DataSourceNotFoundError(SNAPSHOTS_DATASOURCE_NAME);
+            throw new DataSourceNotFoundError(name);
+        }
+        throw err;
+    }
 }
 
 /** Search for a data source by exact title match, with retry for Notion index delay. */
@@ -158,16 +162,17 @@ export async function searchDataSource(
 /** Query all transfer rows, sorted by date descending. */
 export async function queryTransfers(token: string): Promise<NotionTransferRow[]> {
     const notion = createClient(token);
-    const dataSourceId = await resolveTransferDataSource(token);
+    const dataSourceId = await resolveDataSource(token, DATASOURCE_NAME);
     const rows: NotionTransferRow[] = [];
     let cursor: string | undefined;
 
     do {
-        const response = await notion.dataSources.query({
-            data_source_id: dataSourceId,
-            sorts: [{ property: "Date", direction: "descending" }],
-            ...(cursor ? { start_cursor: cursor } : {}),
-        });
+        const response = await notionCall(DATASOURCE_NAME, () =>
+            notion.dataSources.query({
+                data_source_id: dataSourceId,
+                sorts: [{ property: "Date", direction: "descending" }],
+                ...(cursor ? { start_cursor: cursor } : {}),
+            }));
 
         for (const item of response.results) {
             if (item.object !== "page" || !("properties" in item)) continue;
@@ -260,7 +265,7 @@ export async function createTransfer(
     input: CreateTransferInput,
 ): Promise<string> {
     const notion = createClient(token);
-    const dataSourceId = await resolveTransferDataSource(token);
+    const dataSourceId = await resolveDataSource(token, DATASOURCE_NAME);
 
     const properties: Record<string, unknown> = {
         Title: { title: [{ text: { content: input.title } }] },
@@ -275,10 +280,11 @@ export async function createTransfer(
     if (input.exchangeRate != null) properties["Exchange Rate"] = { number: input.exchangeRate };
     if (input.date) properties["Date"] = { date: { start: input.date } };
 
-    const response = await notion.pages.create({
-        parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
-        properties: properties as any,
-    });
+    const response = await notionCall(DATASOURCE_NAME, () =>
+        notion.pages.create({
+            parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
+            properties: properties as any,
+        }));
 
     return response.id;
 }
@@ -317,15 +323,16 @@ export async function createConfigDataSource(
     token: string,
     databaseId: string,
 ): Promise<string> {
-    const id = await createDataSourceInternal(
+    const dataSourceId = await createDataSourceInternal(
         token,
         databaseId,
         CONFIG_DATASOURCE_NAME,
         CONFIG_PROPERTIES,
     );
-    await updateConfig(token, "currencies", CONFIG_DEFAULTS.currencies);
-    await updateConfig(token, "accounts", CONFIG_DEFAULTS.accounts);
-    return id;
+
+    await updateConfig(token, "currencies", CONFIG_DEFAULTS.currencies, { dataSourceId });
+    await updateConfig(token, "accounts", CONFIG_DEFAULTS.accounts, { dataSourceId });
+    return dataSourceId;
 }
 
 /** Create the Snapshots data source. */
@@ -347,12 +354,13 @@ export async function queryConfig(
     key?: string,
 ): Promise<NotionConfigRow[]> {
     const notion = createClient(token);
-    const dataSourceId = await resolveConfigDataSource(token);
+    const dataSourceId = await resolveDataSource(token, CONFIG_DATASOURCE_NAME);
 
-    const response = await notion.dataSources.query({
-        data_source_id: dataSourceId,
-        ...(key ? { filter: { property: "Key", title: { equals: key } } } : {}),
-    });
+    const response = await notionCall(CONFIG_DATASOURCE_NAME, () =>
+        notion.dataSources.query({
+            data_source_id: dataSourceId,
+            ...(key ? { filter: { property: "Key", title: { equals: key } } } : {}),
+        }));
 
     return response.results
         .filter(item => item.object === "page" && "properties" in item)
@@ -377,49 +385,53 @@ export async function updateConfig(
     token: string,
     key: string,
     value: unknown,
+    { dataSourceId: explicitId }: { dataSourceId?: string; } = {},
 ): Promise<void> {
     const notion = createClient(token);
-    const dataSourceId = await resolveConfigDataSource(token);
-
-    const response = await notion.dataSources.query({
-        data_source_id: dataSourceId,
-        filter: { property: "Key", title: { equals: key } },
-    });
-
+    const dataSourceId = explicitId ?? await resolveDataSource(token, CONFIG_DATASOURCE_NAME);
     const serialized = JSON.stringify(value);
     const valueProperty = { rich_text: [{ text: { content: serialized } }] } as any;
+
+    const response = await notionCall(CONFIG_DATASOURCE_NAME, () =>
+        notion.dataSources.query({
+            data_source_id: dataSourceId,
+            filter: { property: "Key", title: { equals: key } },
+        }));
 
     const existing = response.results.find(item => item.object === "page" && "properties" in item);
 
     if (existing) {
-        await notion.pages.update({
-            page_id: existing.id,
-            properties: { Value: valueProperty },
-        });
+        await notionCall(CONFIG_DATASOURCE_NAME, () =>
+            notion.pages.update({
+                page_id: existing.id,
+                properties: { Value: valueProperty },
+            }));
     } else {
-        await notion.pages.create({
-            parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
-            properties: {
-                Key: { title: [{ text: { content: key } }] } as any,
-                Value: valueProperty,
-            },
-        });
+        await notionCall(CONFIG_DATASOURCE_NAME, () =>
+            notion.pages.create({
+                parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
+                properties: {
+                    Key: { title: [{ text: { content: key } }] } as any,
+                    Value: valueProperty,
+                },
+            }));
     }
 }
 
 /** Query all snapshot rows, sorted by date descending. */
 export async function querySnapshots(token: string): Promise<NotionSnapshotRow[]> {
     const notion = createClient(token);
-    const dataSourceId = await resolveSnapshotsDataSource(token);
+    const dataSourceId = await resolveDataSource(token, SNAPSHOTS_DATASOURCE_NAME);
     const rows: NotionSnapshotRow[] = [];
     let cursor: string | undefined;
 
     do {
-        const response = await notion.dataSources.query({
-            data_source_id: dataSourceId,
-            sorts: [{ property: "Date", direction: "descending" }],
-            ...(cursor ? { start_cursor: cursor } : {}),
-        });
+        const response = await notionCall(SNAPSHOTS_DATASOURCE_NAME, () =>
+            notion.dataSources.query({
+                data_source_id: dataSourceId,
+                sorts: [{ property: "Date", direction: "descending" }],
+                ...(cursor ? { start_cursor: cursor } : {}),
+            }));
 
         for (const item of response.results) {
             if (item.object !== "page" || !("properties" in item)) continue;
@@ -445,7 +457,7 @@ export async function createSnapshots(
     inputs: CreateSnapshotInput[],
 ): Promise<string[]> {
     const notion = createClient(token);
-    const dataSourceId = await resolveSnapshotsDataSource(token);
+    const dataSourceId = await resolveDataSource(token, SNAPSHOTS_DATASOURCE_NAME);
     const createdIds: string[] = [];
 
     for (const input of inputs) {
@@ -456,10 +468,11 @@ export async function createSnapshots(
             Currency: { rich_text: [{ text: { content: input.currency } }] },
         };
 
-        const response = await notion.pages.create({
-            parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
-            properties: properties as any,
-        });
+        const response = await notionCall(SNAPSHOTS_DATASOURCE_NAME, () =>
+            notion.pages.create({
+                parent: { type: "data_source_id", data_source_id: dataSourceId } as any,
+                properties: properties as any,
+            }));
 
         createdIds.push(response.id);
     }
