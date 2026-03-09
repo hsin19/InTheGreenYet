@@ -57,7 +57,7 @@ export async function fetchExchangeRates(baseCurrency: string = "twd"): Promise<
                 const parsed: CacheData = JSON.parse(cached);
                 console.log("Using stale cached exchange rates as fallback");
                 return parsed.rates;
-            } catch (e) {
+            } catch {
                 // Ignore parsing errors on fallback
             }
         }
