@@ -2,10 +2,40 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig } from "vite";
+import { imagetools } from "vite-imagetools";
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+    plugins: [
+        react(),
+        tailwindcss(),
+        imagetools(),
+        VitePWA({
+            registerType: "autoUpdate",
+            pwaAssets: {
+                disabled: false,
+                config: true,
+            },
+            manifest: {
+                name: "InTheGreenYet",
+                short_name: "InTheGreenYet",
+                background_color: "#0a0a0a",
+                theme_color: "#0a0a0a",
+            },
+            workbox: {
+                globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+                cleanupOutdatedCaches: true,
+                clientsClaim: true,
+            },
+            devOptions: {
+                enabled: false,
+                navigateFallback: "index.html",
+                suppressWarnings: true,
+                type: "module",
+            },
+        }),
+    ],
     server: {
         proxy: {
             // Forward /auth/* and /api/* to the CF Worker backend during dev
