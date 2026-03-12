@@ -1,3 +1,4 @@
+import bgMainDark from "@/assets/images/bg-main-dark.png?format=webp&quality=80&imagetools";
 import { Navigate } from "react-router-dom";
 import { GitHubIcon } from "../components/icons/GitHubIcon";
 import { NotionIcon } from "../components/icons/NotionIcon";
@@ -59,7 +60,7 @@ function Landing() {
             {/* Background image and elements for Glassmorphism */}
             <div
                 className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-70 pointer-events-none"
-                style={{ backgroundImage: `url('/images/bg-main-dark.png')` }}
+                style={{ backgroundImage: `url(${bgMainDark})` }}
             />
             <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-900/20 blur-[120px]" />
