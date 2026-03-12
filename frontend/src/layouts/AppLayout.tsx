@@ -1,3 +1,4 @@
+import bgMainDark from "@/assets/images/bg-main-dark.png?format=webp&quality=80&imagetools";
 import { AppDataProvider } from "@/hooks/useAppData";
 import {
     ArrowLeftRight,
@@ -69,7 +70,7 @@ function AppLayout() {
                 {/* Background image and elements for Glassmorphism */}
                 <div
                     className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-50 pointer-events-none"
-                    style={{ backgroundImage: `url('/images/bg-main-dark.png')` }}
+                    style={{ backgroundImage: `url(${bgMainDark})` }}
                 />
                 <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
                     <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-900/10 blur-[120px]" />
