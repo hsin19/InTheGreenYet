@@ -73,7 +73,7 @@ function Landing() {
                 <div className="relative">
                     <div className="absolute inset-0 blur-3xl opacity-20 bg-green-500 rounded-full scale-150" />
                     <img
-                        src="/icon.png"
+                        src="/icon.svg"
                         alt="InTheGreenYet"
                         className="relative w-24 h-24 drop-shadow-lg"
                     />
