@@ -16,63 +16,36 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
 };
 
 function Landing() {
-    const { auth, initStatus, initError, login, logout, retryInit } = useNotion();
+    const { auth, login } = useNotion();
     const [searchParams] = useSearchParams();
     const oauthError = searchParams.get("error");
 
-    if (auth && initStatus !== "error") return <Navigate to="/" replace />;
+    if (auth) return <Navigate to="/" replace />;
 
-    const actionBlock = (() => {
-        if (!auth) {
-            return (
-                <div className="mt-6 flex flex-col items-center gap-4">
-                    {oauthError && (
-                        <p className="text-red-400 text-sm font-medium max-w-[280px] text-center">
-                            {OAUTH_ERROR_MESSAGES[oauthError] ?? "Authorization failed."}
-                        </p>
-                    )}
-                    <div className="relative group">
-                        <div className="relative p-[2px] rounded-xl overflow-hidden group-hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
-                            <div className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_25%,rgba(255,255,255,0.8)_95%,rgba(255,255,255,1)_100%)] opacity-100" />
-                            <div className="relative rounded-[10px] bg-green-700">
-                                <Button
-                                    size="lg"
-                                    onClick={login}
-                                    className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
-                                >
-                                    <NotionIcon className="w-5 h-5 mr-2" />
-                                    Connect to Notion
-                                </Button>
-                            </div>
-                        </div>
+    const actionBlock = (
+        <div className="mt-6 flex flex-col items-center gap-4">
+            {oauthError && (
+                <p className="text-red-400 text-sm font-medium max-w-[280px] text-center">
+                    {OAUTH_ERROR_MESSAGES[oauthError] ?? "Authorization failed."}
+                </p>
+            )}
+            <div className="relative group">
+                <div className="relative p-[2px] rounded-xl overflow-hidden group-hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
+                    <div className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_25%,rgba(255,255,255,0.8)_95%,rgba(255,255,255,1)_100%)] opacity-100" />
+                    <div className="relative rounded-[10px] bg-green-700">
+                        <Button
+                            size="lg"
+                            onClick={login}
+                            className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
+                        >
+                            <NotionIcon className="w-5 h-5 mr-2" />
+                            Connect to Notion
+                        </Button>
                     </div>
                 </div>
-            );
-        }
-        return (
-            <div className="mt-6 flex flex-col items-center gap-4 bg-surface-card/40 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl">
-                <div className="text-center">
-                    <p className="text-red-400 text-sm font-semibold">Failed to set up workspace</p>
-                    <p className="text-muted text-xs mt-1 max-w-[250px] break-words">{initError}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="default"
-                        onClick={retryInit}
-                    >
-                        Retry Connection
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        onClick={logout}
-                        className="text-muted hover:text-white"
-                    >
-                        Disconnect
-                    </Button>
-                </div>
             </div>
-        );
-    })();
+        </div>
+    );
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center px-4 bg-surface relative overflow-hidden">

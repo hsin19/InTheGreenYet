@@ -37,7 +37,6 @@ import {
     PopoverContent,
 } from "../components/ui/popover";
 import { useNotion } from "../hooks/useNotion";
-import { updateConfig } from "../lib/notion";
 
 // ─── Shared CurrencyInput ─────────────────────────────────────
 
@@ -252,7 +251,7 @@ function SaveButton({ saving, saved, onSave }: { saving: boolean; saved: boolean
 // ─── Page ─────────────────────────────────────────────────────
 
 function Config() {
-    const { config, status, refresh, exchangeRates } = useAppData();
+    const { config, status, refresh, exchangeRates, saveConfig } = useAppData();
     const { auth, logout } = useNotion();
 
     const isSupported = (currency: string): boolean => {
@@ -287,19 +286,16 @@ function Config() {
     }, [status, config]);
 
     const saveCurrencies = async () => {
-        if (!auth) return;
         setCurrencies(s => ({ ...s, saving: true, error: null, saved: false }));
         try {
-            await updateConfig(auth.access_token, "currencies", currencies.items);
+            await saveConfig("currencies", currencies.items);
             setCurrencies(s => ({ ...s, saving: false, saved: true }));
-            refresh();
         } catch (err) {
             setCurrencies(s => ({ ...s, saving: false, error: err instanceof Error ? err.message : "Failed to save" }));
         }
     };
 
     const saveBaseCurrency = async () => {
-        if (!auth) return;
         const val = baseCurrency.value.trim().toUpperCase();
         if (!val) {
             setBaseCurrency(s => ({ ...s, error: "Base currency cannot be empty" }));
@@ -311,9 +307,8 @@ function Config() {
         }
         setBaseCurrency(s => ({ ...s, saving: true, error: null, saved: false }));
         try {
-            await updateConfig(auth.access_token, "baseCurrency", val);
+            await saveConfig("baseCurrency", val);
             setBaseCurrency(s => ({ ...s, saving: false, saved: true, value: val }));
-            refresh();
         } catch (err) {
             setBaseCurrency(s => ({ ...s, saving: false, error: err instanceof Error ? err.message : "Failed to save" }));
         }

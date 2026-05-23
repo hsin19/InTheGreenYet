@@ -9,11 +9,6 @@ import {
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
-import { useNotion } from "../../hooks/useNotion";
-import {
-    createSnapshots,
-    updateConfig,
-} from "../../lib/notion";
 import {
     type AccountPerformance,
     calculatePerformance,
@@ -23,8 +18,7 @@ import { AccountCard } from "./components/AccountCard";
 import { AccountDialog } from "./components/AccountDialog";
 
 export function Accounts() {
-    const { config, status, transfers, getFiatToBaseRate, refresh } = useAppData();
-    const { auth } = useNotion();
+    const { config, status, transfers, getFiatToBaseRate, refresh, saveConfig, addSnapshots } = useAppData();
 
     const [addOpen, setAddOpen] = useState(false);
 
@@ -54,9 +48,7 @@ export function Accounts() {
     const totalYield = totalNetCost > 0 ? (totalPL / totalNetCost) * 100 : 0;
 
     const persistAccounts = async (next: Record<string, AccountConfig>) => {
-        if (!auth) return;
-        await updateConfig(auth.access_token, "accounts", next);
-        refresh();
+        await saveConfig("accounts", next);
     };
 
     const handleSaveAccount = async (key: string, cfg: AccountConfig) => {
@@ -67,9 +59,9 @@ export function Accounts() {
         await persistAccounts({ ...accounts, [key]: cfg });
 
         // If amount changed, record a snapshot
-        if (amountChanged && cfg.amount != null && auth) {
+        if (amountChanged && cfg.amount != null) {
             try {
-                await createSnapshots(auth.access_token, [{
+                await addSnapshots([{
                     account: key,
                     date: new Date().toLocaleDateString("sv-SE"),
                     amount: cfg.amount,

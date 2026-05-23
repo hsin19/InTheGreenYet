@@ -50,20 +50,9 @@ function AppNav() {
 }
 
 function AppLayout() {
-    const { auth, initStatus } = useNotion();
+    const { auth } = useNotion();
 
-    if (!auth || initStatus === "error") return <Navigate to="/landing" replace />;
-
-    if (initStatus !== "done") {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                    <p className="text-muted text-sm">Setting up workspace...</p>
-                </div>
-            </div>
-        );
-    }
+    if (!auth) return <Navigate to="/landing" replace />;
 
     return (
         <AppDataProvider>

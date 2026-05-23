@@ -231,10 +231,8 @@ function Transfers() {
                 <TransferDialog
                     open={addOpen}
                     onOpenChange={setAddOpen}
-                    token={auth.access_token}
                     currencies={config.currencies}
                     accounts={config.accounts}
-                    onCreated={refresh}
                     baseCurrency={config.baseCurrency}
                     getFiatToBaseRate={getFiatToBaseRate}
                 />

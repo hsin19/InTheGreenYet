@@ -112,6 +112,13 @@ async function resolveDataSource(token: string, name: string): Promise<string> {
     throw new DataSourceNotFoundError(name);
 }
 
+/** Wait until a data source becomes searchable (used after create to mask Notion's eventual consistency). */
+export async function waitForDataSource(token: string, name: string): Promise<string> {
+    const existing = await searchDataSource(token, name, { retries: 10, delay: 3000 });
+    if (existing) return existing.id;
+    throw new DataSourceNotFoundError(name);
+}
+
 /** Wrap a Notion API call; convert 404 object_not_found to DataSourceNotFoundError. */
 async function notionCall<T>(name: string, fn: () => Promise<T>): Promise<T> {
     try {

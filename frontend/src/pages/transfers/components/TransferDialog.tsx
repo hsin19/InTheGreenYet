@@ -14,14 +14,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { type AccountConfig } from "@/hooks/useAppData";
 import {
-    createTransfer,
-    type CreateTransferInput,
-} from "@/lib/notion";
+    type AccountConfig,
+    useAppData,
+} from "@/hooks/useAppData";
+import { type CreateTransferInput } from "@/lib/notion";
 import { useState } from "react";
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const todayISO = () => new Date().toLocaleDateString("sv-SE");
 
 const emptyForm = (): CreateTransferInput => ({
     title: "",
@@ -38,10 +38,8 @@ const emptyForm = (): CreateTransferInput => ({
 interface TransferDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    token: string;
     currencies: string[];
     accounts: Record<string, AccountConfig>;
-    onCreated: () => void;
     baseCurrency: string;
     getFiatToBaseRate: (currency: string) => number | null;
 }
@@ -49,13 +47,12 @@ interface TransferDialogProps {
 export function TransferDialog({
     open,
     onOpenChange,
-    token,
     currencies,
     accounts,
-    onCreated,
     baseCurrency,
     getFiatToBaseRate,
 }: TransferDialogProps) {
+    const { addTransfer } = useAppData();
     const [form, setForm] = useState<CreateTransferInput>(emptyForm);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -93,8 +90,7 @@ export function TransferDialog({
         setError(null);
         try {
             const title = form.title.trim() || `${form.from || "?"} to ${form.to || "?"}`;
-            await createTransfer(token, { ...form, title });
-            onCreated();
+            await addTransfer({ ...form, title });
             handleOpenChange(false);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to save");
