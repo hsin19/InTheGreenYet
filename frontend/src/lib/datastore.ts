@@ -79,7 +79,11 @@ export class NotionStore implements DataStore {
     readonly mode = "online" as const;
     readonly canWrite = true;
 
-    constructor(private token: string) {}
+    private token: string;
+
+    constructor(token: string) {
+        this.token = token;
+    }
 
     async getTransfers(): Promise<Transfer[]> {
         const data = await apiFetch<{ transfers: Transfer[]; }>("/api/transfers", this.token);
@@ -128,7 +132,11 @@ export class IdbStore implements DataStore {
     readonly mode: StoreMode = "local-only";
     readonly canWrite = true;
 
-    constructor(private namespace: string) {}
+    private namespace: string;
+
+    constructor(namespace: string) {
+        this.namespace = namespace;
+    }
 
     private db() {
         return openIdb(this.namespace);
@@ -209,7 +217,15 @@ export class SwrStore implements DataStore {
     readonly mode = "online" as const;
     readonly canWrite = true;
 
-    constructor(private token: string, private cache: IdbStore, private remote: NotionStore) {}
+    private token: string;
+    private cache: IdbStore;
+    private remote: NotionStore;
+
+    constructor(token: string, cache: IdbStore, remote: NotionStore) {
+        this.token = token;
+        this.cache = cache;
+        this.remote = remote;
+    }
 
     getTransfers() { return this.cache.getTransfers(); }
     getConfig() { return this.cache.getConfig(); }
@@ -265,7 +281,11 @@ export class ReadOnlyStore implements DataStore {
     readonly mode = "offline" as const;
     readonly canWrite = false;
 
-    constructor(private inner: DataStore) {}
+    private inner: DataStore;
+
+    constructor(inner: DataStore) {
+        this.inner = inner;
+    }
 
     getTransfers() { return this.inner.getTransfers(); }
     getConfig() { return this.inner.getConfig(); }
