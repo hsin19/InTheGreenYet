@@ -57,7 +57,9 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
     const login = useCallback(() => {
         const apiBase = import.meta.env.VITE_API_BASE_URL || window.location.origin;
         const redirectUri = `${apiBase}/auth/notion/callback`;
-        const url = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${NOTION_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code`;
+        const state = crypto.randomUUID();
+        sessionStorage.setItem("oauth_state", state);
+        const url = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${NOTION_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&state=${state}`;
         window.location.href = url;
     }, []);
 

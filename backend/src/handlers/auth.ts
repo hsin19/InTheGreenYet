@@ -28,6 +28,8 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
         const callbackUrl = new URL("/callback", env.FRONTEND_URL);
         if (data.workspace_name) callbackUrl.searchParams.set("workspace_name", data.workspace_name);
         if (data.workspace_id) callbackUrl.searchParams.set("workspace_id", data.workspace_id);
+        const state = url.searchParams.get("state");
+        if (state) callbackUrl.searchParams.set("state", state);
         callbackUrl.hash = `access_token=${encodeURIComponent(data.access_token)}`;
 
         return Response.redirect(callbackUrl.toString(), 302);

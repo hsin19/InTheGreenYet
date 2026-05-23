@@ -16,15 +16,24 @@ function Callback() {
         const workspaceName = searchParams.get("workspace_name");
         const workspaceId = searchParams.get("workspace_id");
         const error = searchParams.get("error");
+        const returnedState = searchParams.get("state");
+        const storedState = sessionStorage.getItem("oauth_state");
+        sessionStorage.removeItem("oauth_state");
 
         if (error) {
             console.error("OAuth error:", error);
-            navigate("/landing", { replace: true });
+            navigate(`/landing?error=${encodeURIComponent(error)}`, { replace: true });
+            return;
+        }
+
+        if (!storedState || storedState !== returnedState) {
+            console.error("OAuth state mismatch");
+            navigate("/landing?error=state_mismatch", { replace: true });
             return;
         }
 
         if (!accessToken) {
-            navigate("/landing", { replace: true });
+            navigate("/landing?error=missing_token", { replace: true });
             return;
         }
 

@@ -15,7 +15,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans: "Inter", system-ui, sans-serif;
     --color-green-400: #4ade80;
     --color-green-500: #22c55e;
     --color-green-600: #16a34a;

@@ -71,7 +71,7 @@ export function Accounts() {
             try {
                 await createSnapshots(auth.access_token, [{
                     account: key,
-                    date: new Date().toISOString(),
+                    date: new Date().toLocaleDateString("sv-SE"),
                     amount: cfg.amount,
                     currency: cfg.currency || "USD", // Fallback to USD if not set
                 }]);

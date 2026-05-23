@@ -20,11 +20,11 @@ export default defineConfig({
             manifest: {
                 name: "InTheGreenYet",
                 short_name: "InTheGreenYet",
-                background_color: "#0a0a0a",
-                theme_color: "#0a0a0a",
+                background_color: "#0f1117",
+                theme_color: "#0f1117",
             },
             workbox: {
-                globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+                globPatterns: ["**/*.{js,css,html,svg,png,ico,webp}"],
                 cleanupOutdatedCaches: true,
                 clientsClaim: true,
             },
@@ -56,6 +56,15 @@ export default defineConfig({
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
+        },
+    },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    react: ["react", "react-dom", "react-router-dom"],
+                },
+            },
         },
     },
 });

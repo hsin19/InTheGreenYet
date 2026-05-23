@@ -1,30 +1,49 @@
 import bgMainDark from "@/assets/images/bg-main-dark.png?format=webp&quality=80&imagetools";
-import { Navigate } from "react-router-dom";
+import {
+    Navigate,
+    useSearchParams,
+} from "react-router-dom";
 import { GitHubIcon } from "../components/icons/GitHubIcon";
 import { NotionIcon } from "../components/icons/NotionIcon";
 import { Button } from "../components/ui/button";
 import { useNotion } from "../hooks/useNotion";
 
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+    state_mismatch: "Authorization request mismatch — please try again.",
+    missing_token: "Authorization did not return a token.",
+    token_exchange_failed: "Failed to complete authorization with Notion.",
+    access_denied: "Authorization was denied.",
+};
+
 function Landing() {
     const { auth, initStatus, initError, login, logout, retryInit } = useNotion();
+    const [searchParams] = useSearchParams();
+    const oauthError = searchParams.get("error");
 
     if (auth && initStatus !== "error") return <Navigate to="/" replace />;
 
     const actionBlock = (() => {
         if (!auth) {
             return (
-                <div className="relative mt-6 group">
-                    <div className="relative p-[2px] rounded-xl overflow-hidden group-hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
-                        <div className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_25%,rgba(255,255,255,0.8)_95%,rgba(255,255,255,1)_100%)] opacity-100" />
-                        <div className="relative rounded-[10px] bg-green-700">
-                            <Button
-                                size="lg"
-                                onClick={login}
-                                className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
-                            >
-                                <NotionIcon className="w-5 h-5 mr-2" />
-                                Connect to Notion
-                            </Button>
+                <div className="mt-6 flex flex-col items-center gap-4">
+                    {oauthError && (
+                        <p className="text-red-400 text-sm font-medium max-w-[280px] text-center">
+                            {OAUTH_ERROR_MESSAGES[oauthError] ?? "Authorization failed."}
+                        </p>
+                    )}
+                    <div className="relative group">
+                        <div className="relative p-[2px] rounded-xl overflow-hidden group-hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
+                            <div className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_25%,rgba(255,255,255,0.8)_95%,rgba(255,255,255,1)_100%)] opacity-100" />
+                            <div className="relative rounded-[10px] bg-green-700">
+                                <Button
+                                    size="lg"
+                                    onClick={login}
+                                    className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
+                                >
+                                    <NotionIcon className="w-5 h-5 mr-2" />
+                                    Connect to Notion
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

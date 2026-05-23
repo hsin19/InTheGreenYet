@@ -68,15 +68,18 @@ function AppLayout() {
     return (
         <AppDataProvider>
             <div className="min-h-screen bg-surface text-white flex flex-col font-sans relative">
-                {/* Background image and elements for Glassmorphism */}
+                {/* Background texture + ambient glows (pure CSS gradients, no GPU blur) */}
                 <div
-                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-50 pointer-events-none"
-                    style={{ backgroundImage: `url(${bgMainDark})` }}
+                    className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+                    style={{
+                        backgroundImage: `
+                            radial-gradient(ellipse 50% 50% at 0% 0%, rgba(52, 211, 153, 0.08), transparent 60%),
+                            radial-gradient(ellipse 50% 50% at 100% 100%, rgba(129, 140, 248, 0.08), transparent 60%),
+                            linear-gradient(rgba(15, 17, 23, 0.5), rgba(15, 17, 23, 0.5)),
+                            url(${bgMainDark})
+                        `,
+                    }}
                 />
-                <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
-                    <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-emerald-900/10 blur-[120px]" />
-                    <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-900/10 blur-[120px]" />
-                </div>
 
                 <AppNav />
                 {/* Main Content */}
