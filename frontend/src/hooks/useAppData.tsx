@@ -239,23 +239,25 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
     }, [exchangeRates, config.baseCurrency]);
 
     return (
-        <AppDataContext value={{
-            status,
-            syncing,
-            syncError,
-            lastSyncedAt,
-            canWrite: store.canWrite,
-            transfers,
-            config,
-            exchangeRates,
-            error,
-            refresh,
-            addTransfer,
-            addSnapshots,
-            saveConfig,
-            getAccountName,
-            getFiatToBaseRate,
-        }}>
+        <AppDataContext
+            value={{
+                status,
+                syncing,
+                syncError,
+                lastSyncedAt,
+                canWrite: store.canWrite,
+                transfers,
+                config,
+                exchangeRates,
+                error,
+                refresh,
+                addTransfer,
+                addSnapshots,
+                saveConfig,
+                getAccountName,
+                getFiatToBaseRate,
+            }}
+        >
             {children}
         </AppDataContext>
     );

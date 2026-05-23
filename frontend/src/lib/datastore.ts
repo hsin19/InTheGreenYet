@@ -227,9 +227,15 @@ export class SwrStore implements DataStore {
         this.remote = remote;
     }
 
-    getTransfers() { return this.cache.getTransfers(); }
-    getConfig() { return this.cache.getConfig(); }
-    getLastSyncedAt() { return this.cache.getLastSyncedAt(); }
+    getTransfers() {
+        return this.cache.getTransfers();
+    }
+    getConfig() {
+        return this.cache.getConfig();
+    }
+    getLastSyncedAt() {
+        return this.cache.getLastSyncedAt();
+    }
 
     async revalidate(): Promise<void> {
         try {
@@ -259,15 +265,21 @@ export class SwrStore implements DataStore {
 
     async addTransfer(input: CreateTransferInput): Promise<Transfer> {
         const row = await this.remote.addTransfer(input);
-        try { await this.cache.putTransfer(row); }
-        catch (err) { console.warn("Failed to cache new transfer", err); }
+        try {
+            await this.cache.putTransfer(row);
+        } catch (err) {
+            console.warn("Failed to cache new transfer", err);
+        }
         return row;
     }
 
     async saveConfig(key: string, value: unknown): Promise<void> {
         await this.remote.saveConfig(key, value);
-        try { await this.cache.saveConfig(key, value); }
-        catch (err) { console.warn("Failed to cache config", err); }
+        try {
+            await this.cache.saveConfig(key, value);
+        } catch (err) {
+            console.warn("Failed to cache config", err);
+        }
     }
 
     async addSnapshots(snapshots: CreateSnapshotInput[]): Promise<void> {
@@ -287,14 +299,28 @@ export class ReadOnlyStore implements DataStore {
         this.inner = inner;
     }
 
-    getTransfers() { return this.inner.getTransfers(); }
-    getConfig() { return this.inner.getConfig(); }
-    getLastSyncedAt() { return this.inner.getLastSyncedAt(); }
-    revalidate() { return this.inner.revalidate(); }
+    getTransfers() {
+        return this.inner.getTransfers();
+    }
+    getConfig() {
+        return this.inner.getConfig();
+    }
+    getLastSyncedAt() {
+        return this.inner.getLastSyncedAt();
+    }
+    revalidate() {
+        return this.inner.revalidate();
+    }
 
-    addTransfer(): Promise<Transfer> { throw new Error("Read-only mode"); }
-    saveConfig(): Promise<void> { throw new Error("Read-only mode"); }
-    addSnapshots(): Promise<void> { throw new Error("Read-only mode"); }
+    addTransfer(): Promise<Transfer> {
+        throw new Error("Read-only mode");
+    }
+    saveConfig(): Promise<void> {
+        throw new Error("Read-only mode");
+    }
+    addSnapshots(): Promise<void> {
+        throw new Error("Read-only mode");
+    }
 }
 
 // ─── Factory ──────────────────────────────────────────────────

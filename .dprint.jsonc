@@ -39,7 +39,8 @@
     "**/*-lock.json",
     "dist/**",
     ".wrangler/**",
-    "worker-configuration.d.ts"
+    "worker-configuration.d.ts",
+    "**/*.svg"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.95.15.wasm",

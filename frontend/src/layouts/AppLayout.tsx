@@ -73,14 +73,16 @@ function AppLayout() {
                 <AppNav />
                 {/* Main Content */}
                 <main className="flex-1 relative z-10 w-full max-w-7xl mx-auto pb-28 sm:pb-0 sm:pt-28">
-                    <Suspense fallback={
-                        <div className="flex min-h-[50vh] items-center justify-center pt-24">
-                            <div className="flex flex-col items-center gap-4">
-                                <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                                <p className="text-muted text-sm font-medium">Loading...</p>
+                    <Suspense
+                        fallback={
+                            <div className="flex min-h-[50vh] items-center justify-center pt-24">
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
+                                    <p className="text-muted text-sm font-medium">Loading...</p>
+                                </div>
                             </div>
-                        </div>
-                    }>
+                        }
+                    >
                         <Outlet />
                     </Suspense>
                 </main>
