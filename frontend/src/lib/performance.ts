@@ -1,4 +1,4 @@
-import type { Transfer } from "./notion";
+import type { Transfer } from "./model";
 
 export interface CurrencyFlow {
     currency: string;

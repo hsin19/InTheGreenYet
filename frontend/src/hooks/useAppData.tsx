@@ -20,7 +20,7 @@ import type {
     CreateSnapshotInput,
     CreateTransferInput,
     Transfer,
-} from "../lib/notion";
+} from "../lib/model";
 import { useNotion } from "./useNotion";
 
 type Status = "loading" | "ready" | "error";

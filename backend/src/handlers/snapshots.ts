@@ -1,5 +1,5 @@
+import type { CreateSnapshotInput } from "../model";
 import {
-    CreateSnapshotInput,
     createSnapshots,
     querySnapshots,
 } from "../notion";

@@ -56,52 +56,13 @@ const SNAPSHOTS_PROPERTIES = {
     Currency: { rich_text: {} },
 } as const;
 
-// ─── Types ───────────────────────────────────────────────────
-
-export interface NotionTransferRow {
-    id: string;
-    title: string;
-    amount: number | null;
-    currency: string | null;
-    fee: number | null;
-    exchangeRate: number | null;
-    date: string | null;
-    from: string;
-    to: string;
-    note: string;
-}
-
-export interface CreateTransferInput {
-    title: string;
-    amount: number | null;
-    currency: string | null;
-    fee: number | null;
-    exchangeRate: number | null;
-    date: string | null;
-    from: string;
-    to: string;
-    note: string;
-}
-
-export interface NotionConfigRow {
-    key: string;
-    value: unknown;
-}
-
-export interface NotionSnapshotRow {
-    id: string;
-    account: string;
-    date: string | null;
-    amount: number | null;
-    currency: string | null;
-}
-
-export interface CreateSnapshotInput {
-    account: string;
-    date: string;
-    amount: number;
-    currency: string;
-}
+import type {
+    ConfigRow,
+    CreateSnapshotInput,
+    CreateTransferInput,
+    Snapshot,
+    Transfer,
+} from "./model";
 
 // ─── Functions ───────────────────────────────────────────────
 
@@ -167,10 +128,10 @@ export async function searchDataSource(
 }
 
 /** Query all transfer rows, sorted by date descending. */
-export async function queryTransfers(token: string): Promise<NotionTransferRow[]> {
+export async function queryTransfers(token: string): Promise<Transfer[]> {
     const notion = createClient(token);
     const dataSourceId = await resolveDataSource(token, DATASOURCE_NAME);
-    const rows: NotionTransferRow[] = [];
+    const rows: Transfer[] = [];
     let cursor: string | undefined;
 
     do {
@@ -359,7 +320,7 @@ export async function createSnapshotsDataSource(
 export async function queryConfig(
     token: string,
     key?: string,
-): Promise<NotionConfigRow[]> {
+): Promise<ConfigRow[]> {
     const notion = createClient(token);
     const dataSourceId = await resolveDataSource(token, CONFIG_DATASOURCE_NAME);
 
@@ -426,10 +387,10 @@ export async function updateConfig(
 }
 
 /** Query all snapshot rows, sorted by date descending. */
-export async function querySnapshots(token: string): Promise<NotionSnapshotRow[]> {
+export async function querySnapshots(token: string): Promise<Snapshot[]> {
     const notion = createClient(token);
     const dataSourceId = await resolveDataSource(token, SNAPSHOTS_DATASOURCE_NAME);
-    const rows: NotionSnapshotRow[] = [];
+    const rows: Snapshot[] = [];
     let cursor: string | undefined;
 
     do {

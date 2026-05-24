@@ -18,7 +18,7 @@ import {
     type AccountConfig,
     useAppData,
 } from "@/hooks/useAppData";
-import { type CreateTransferInput } from "@/lib/notion";
+import { type CreateTransferInput } from "@/lib/model";
 import { useState } from "react";
 
 const todayISO = () => new Date().toLocaleDateString("sv-SE");

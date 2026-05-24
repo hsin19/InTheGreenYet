@@ -1,5 +1,3 @@
-import { apiFetch } from "./api";
-
 export interface Transfer {
     id: string;
     title: string;
@@ -20,13 +18,17 @@ export interface ConfigRow {
     value: unknown;
 }
 
+export interface Snapshot {
+    id: string;
+    account: string;
+    date: string | null;
+    amount: number | null;
+    currency: string | null;
+}
+
 export interface CreateSnapshotInput {
     account: string;
     date: string;
     amount: number;
     currency: string;
-}
-
-export async function init(token: string): Promise<void> {
-    await apiFetch<{ ok: boolean; }>("/api/init", token, { method: "POST" });
 }

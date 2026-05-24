@@ -7,13 +7,12 @@ import {
     apiFetch,
     DataSourceNotFoundError,
 } from "./api";
-import {
-    type ConfigRow,
-    type CreateSnapshotInput,
-    type CreateTransferInput,
-    init,
-    type Transfer,
-} from "./notion";
+import type {
+    ConfigRow,
+    CreateSnapshotInput,
+    CreateTransferInput,
+    Transfer,
+} from "./model";
 
 // ─── DataStore interface ──────────────────────────────────────
 
@@ -124,6 +123,11 @@ export class NotionStore implements DataStore {
             body: JSON.stringify({ snapshots }),
         });
     }
+
+    /** Provision data sources on the Notion side. Used by SwrStore to self-heal. */
+    async init(): Promise<void> {
+        await apiFetch<{ ok: boolean; }>("/api/init", this.token, { method: "POST" });
+    }
 }
 
 // ─── IdbStore — talks to IndexedDB only ───────────────────────
@@ -217,12 +221,10 @@ export class SwrStore implements DataStore {
     readonly mode = "online" as const;
     readonly canWrite = true;
 
-    private token: string;
     private cache: IdbStore;
     private remote: NotionStore;
 
-    constructor(token: string, cache: IdbStore, remote: NotionStore) {
-        this.token = token;
+    constructor(cache: IdbStore, remote: NotionStore) {
         this.cache = cache;
         this.remote = remote;
     }
@@ -243,7 +245,7 @@ export class SwrStore implements DataStore {
         } catch (err) {
             if (err instanceof DataSourceNotFoundError) {
                 // First-run or backend wiped — provision data sources and retry once.
-                await init(this.token);
+                await this.remote.init();
                 await this.syncFromRemote();
                 return;
             }
@@ -336,6 +338,6 @@ export function createDataStore({ auth, readOnly }: CreateDataStoreOptions): Dat
         return readOnly ? new ReadOnlyStore(idb) : idb;
     }
     const idb = new IdbStore(auth.workspace_id ?? "default");
-    const swr = new SwrStore(auth.access_token, idb, new NotionStore(auth.access_token));
+    const swr = new SwrStore(idb, new NotionStore(auth.access_token));
     return readOnly ? new ReadOnlyStore(swr) : swr;
 }
