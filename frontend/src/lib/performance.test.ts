@@ -7,9 +7,10 @@ import type { Transfer } from "./model";
 import {
     accountBaseValue,
     type AccountFlow,
+    type AccountPerformance,
     calculatePerformance,
     computeAccountFlows,
-    sortAccountKeysByBaseValue,
+    sortAccountKeys,
 } from "./performance";
 
 describe("Performance Calculations", () => {
@@ -175,39 +176,48 @@ describe("Performance Calculations", () => {
         });
     });
 
-    describe("sortAccountKeysByBaseValue", () => {
-        const perfOf = (key: string, amount: number | null, currency: string) => calculatePerformance(key, amount, currency, [], mockGetFiatToBaseRate);
-
-        it("ranks by base-currency value, not the raw amount", () => {
-            const performances = {
-                twd: perfOf("twd", 1000, "TWD"), // 1000 TWD
-                usd: perfOf("usd", 100, "USD"), // 100 USD = 3100 TWD
+    describe("sortAccountKeys", () => {
+        // Minimal performance carrying only the fields the sort reads.
+        const perf = (netCostBase: number, plBase: number | null): AccountPerformance => ({
+            accountKey: "x",
+            currentAmount: null,
+            currency: "USD",
+            netCost: 0,
+            pl: null,
+            yieldPercentage: null,
+            netCostBase,
+            plBase,
+        });
+        it("places investment accounts before non-investment ones, regardless of value", () => {
+            const accounts = {
+                bank: { isInvestment: false }, // large net cost, but not an investment
+                inv: { isInvestment: true }, // small balance, investment
             };
+            const performances = { bank: perf(9999, null), inv: perf(0, 100) };
 
-            const sorted = sortAccountKeysByBaseValue(["twd", "usd"], performances);
-
-            // 100 USD outranks 1000 TWD once converted; raw-amount sorting would invert this.
-            expect(sorted).toEqual(["usd", "twd"]);
+            expect(sortAccountKeys(accounts, performances)).toEqual(["inv", "bank"]);
         });
 
-        it("sorts accounts without a performance entry last", () => {
-            const performances = { a: perfOf("a", 50, "USD") };
+        it("treats an undefined isInvestment flag as an investment", () => {
+            const accounts = { undef: {}, bank: { isInvestment: false } };
+            const performances = { undef: perf(0, 100), bank: perf(9999, null) };
 
-            const sorted = sortAccountKeysByBaseValue(["missing", "a"], performances);
-
-            expect(sorted).toEqual(["a", "missing"]);
+            expect(sortAccountKeys(accounts, performances)).toEqual(["undef", "bank"]);
         });
 
-        it("does not mutate the input array", () => {
-            const performances = {
-                a: perfOf("a", 1, "USD"),
-                b: perfOf("b", 2, "USD"),
-            };
-            const keys = ["a", "b"];
+        it("ranks investment accounts by base value (balance), descending", () => {
+            const accounts = { small: { isInvestment: true }, big: { isInvestment: true } };
+            const performances = { small: perf(0, 1000), big: perf(0, 3100) };
 
-            sortAccountKeysByBaseValue(keys, performances);
+            expect(sortAccountKeys(accounts, performances)).toEqual(["big", "small"]);
+        });
 
-            expect(keys).toEqual(["a", "b"]);
+        it("ranks non-investment accounts by net cost, not balance", () => {
+            // 'a' has the larger balance (plBase) but the smaller net cost -> ranks lower.
+            const accounts = { a: { isInvestment: false }, b: { isInvestment: false } };
+            const performances = { a: perf(5000, 99999), b: perf(8000, 0) };
+
+            expect(sortAccountKeys(accounts, performances)).toEqual(["b", "a"]);
         });
     });
 });

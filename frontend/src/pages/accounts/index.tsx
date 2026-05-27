@@ -13,7 +13,7 @@ import {
     type AccountPerformance,
     calculatePerformance,
     computeAccountFlows,
-    sortAccountKeysByBaseValue,
+    sortAccountKeys,
 } from "../../lib/performance";
 import { AccountCard } from "./components/AccountCard";
 import { AccountDialog } from "./components/AccountDialog";
@@ -81,7 +81,7 @@ export function Accounts() {
         await persistAccounts(next);
     };
 
-    const sortedKeys = sortAccountKeysByBaseValue(Object.keys(accounts), accountPerformances);
+    const sortedKeys = sortAccountKeys(accounts, accountPerformances);
 
     return (
         <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">

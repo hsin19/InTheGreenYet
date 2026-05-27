@@ -218,13 +218,27 @@ export function accountBaseValue(perf: AccountPerformance | undefined): number {
 }
 
 /**
- * Sort account keys by their base-currency value, descending. Accounts held in
- * different currencies are compared on equal footing (raw amounts are not), so e.g.
- * 100 USD outranks 1000 TWD. Keys without a performance entry sort last.
+ * Sort account keys for display. Investment accounts come first, non-investment
+ * (e.g. bank) accounts after. Within the investment group accounts are ranked by
+ * current base-currency value (balance); within the non-investment group by net
+ * cost. Both groups are descending, and accounts in different currencies are
+ * compared on equal footing (raw amounts are not). Keys without a performance
+ * entry sort last within their group.
  */
-export function sortAccountKeysByBaseValue(
-    keys: string[],
+export function sortAccountKeys(
+    accounts: Record<string, { isInvestment?: boolean; }>,
     performances: Record<string, AccountPerformance>,
 ): string[] {
-    return [...keys].sort((keyA, keyB) => accountBaseValue(performances[keyB]) - accountBaseValue(performances[keyA]));
+    const isInvestment = (key: string) => accounts[key]?.isInvestment !== false;
+    const sortValueOf = (key: string): number => {
+        const perf = performances[key];
+        if (!perf) return -Infinity;
+        return isInvestment(key) ? accountBaseValue(perf) : perf.netCostBase;
+    };
+    return Object.keys(accounts).sort((keyA, keyB) => {
+        const groupA = isInvestment(keyA) ? 0 : 1;
+        const groupB = isInvestment(keyB) ? 0 : 1;
+        if (groupA !== groupB) return groupA - groupB;
+        return sortValueOf(keyB) - sortValueOf(keyA);
+    });
 }
