@@ -19,6 +19,7 @@ import {
     useEffect,
     useState,
 } from "react";
+import { BinanceKeyGuide } from "./BinanceKeyGuide";
 
 interface AccountDialogProps {
     open: boolean;
@@ -47,6 +48,8 @@ export function AccountDialog({
     const [currency, setCurrency] = useState("");
     const [accountType, setAccountType] = useState("bank");
     const [isInvestment, setIsInvestment] = useState(true);
+    const [apiKey, setApiKey] = useState("");
+    const [apiSecret, setApiSecret] = useState("");
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -57,12 +60,16 @@ export function AccountDialog({
             setDisplayName("");
             setCurrency("");
             setAccountType("bank");
+            setApiKey("");
+            setApiSecret("");
         } else {
             setKey(editingKey ?? "");
             setDisplayName(existingConfig?.displayName ?? "");
             setCurrency(existingConfig?.currency ?? "");
             setAccountType(existingConfig?.accountType ?? "bank");
             setIsInvestment(existingConfig?.isInvestment ?? true);
+            setApiKey(existingConfig?.apiKey ?? "");
+            setApiSecret(existingConfig?.apiSecret ?? "");
         }
         setError(null);
         setSaving(false);
@@ -89,13 +96,21 @@ export function AccountDialog({
         setSaving(true);
         setError(null);
         try {
-            await onSave(trimmedKey, {
+            const next: AccountConfig = {
                 ...(existingConfig ?? {}),
                 displayName: trimmedName,
                 currency: currency,
                 accountType: accountType,
                 isInvestment: isInvestment,
-            });
+            };
+            // API credentials only belong to Binance accounts; drop them otherwise.
+            delete next.apiKey;
+            delete next.apiSecret;
+            if (accountType === "binance") {
+                if (apiKey.trim()) next.apiKey = apiKey.trim();
+                if (apiSecret.trim()) next.apiSecret = apiSecret.trim();
+            }
+            await onSave(trimmedKey, next);
             onOpenChange(false);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Failed to save");
@@ -182,6 +197,39 @@ export function AccountDialog({
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {accountType === "binance" && (
+                        <div className="flex flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs text-muted">Binance API Key</label>
+                                <Input
+                                    value={apiKey}
+                                    onChange={e => setApiKey(e.target.value)}
+                                    type="password"
+                                    autoComplete="off"
+                                    placeholder="API Key"
+                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                                <label className="text-xs text-muted">Binance API Secret</label>
+                                <Input
+                                    value={apiSecret}
+                                    onChange={e => setApiSecret(e.target.value)}
+                                    type="password"
+                                    autoComplete="off"
+                                    placeholder="API Secret"
+                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                />
+                            </div>
+                            <div className="flex items-center justify-between gap-2">
+                                <p className="text-muted/50 text-xs">
+                                    Use a read-only key (disable Trading &amp; Withdrawals).
+                                </p>
+                                <BinanceKeyGuide />
+                            </div>
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-2 pt-1">
                         <span className="relative flex-shrink-0 w-4 h-4">

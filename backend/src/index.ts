@@ -1,4 +1,5 @@
 import { handleOAuthCallback } from "./handlers/auth";
+import { handleBinanceBalance } from "./handlers/binance";
 import {
     handleGetConfig,
     handleUpdateConfig,
@@ -55,6 +56,10 @@ export default {
 
         if (url.pathname === "/api/snapshots" && request.method === "POST") {
             return handleCreateSnapshots(request, url, env);
+        }
+
+        if (url.pathname === "/api/binance/balance" && request.method === "POST") {
+            return handleBinanceBalance(request, url, env);
         }
 
         if (url.pathname === "/health") {

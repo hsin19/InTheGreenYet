@@ -32,3 +32,15 @@ export interface CreateSnapshotInput {
     amount: number;
     currency: string;
 }
+
+export interface BinanceBalanceRequest {
+    apiKey: string;
+    apiSecret: string;
+    currency: string;
+}
+
+export interface BinanceBalance {
+    total: number;
+    currency: string;
+    fetchedAt: string;
+}

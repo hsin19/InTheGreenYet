@@ -9,13 +9,13 @@ export class DataSourceNotFoundError extends Error {
 
 export async function apiFetch<T>(
     path: string,
-    token: string,
+    token?: string | null,
     options: RequestInit = {},
 ): Promise<T> {
     const res = await fetch(`${API_BASE_URL}${path}`, {
         ...options,
         headers: {
-            Authorization: `Bearer ${token}`,
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
             ...(options.body ? { "Content-Type": "application/json" } : {}),
             ...((options.headers as Record<string, string>) ?? {}),
         },

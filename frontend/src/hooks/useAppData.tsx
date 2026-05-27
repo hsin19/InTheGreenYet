@@ -32,6 +32,8 @@ export interface AccountConfig {
     amountUpdatedAt?: string | null;
     isInvestment?: boolean;
     accountType?: string;
+    apiKey?: string;
+    apiSecret?: string;
 }
 
 export interface AppConfig {

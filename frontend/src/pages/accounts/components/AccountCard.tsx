@@ -16,10 +16,14 @@ import {
 } from "@/components/ui/card";
 import { type AccountConfig } from "@/hooks/useAppData";
 import {
+    Check,
+    RefreshCw,
     Settings2,
     Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import { fetchBinanceBalance } from "../../../lib/binance";
+import type { BinanceBalance } from "../../../lib/model";
 import {
     type AccountFlow,
     type AccountPerformance,
@@ -50,6 +54,42 @@ export function AccountCard({
 }: AccountCardProps) {
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [costExpanded, setCostExpanded] = useState(false);
+    const [binanceLoading, setBinanceLoading] = useState(false);
+    const [binanceResult, setBinanceResult] = useState<BinanceBalance | null>(null);
+    const [binanceError, setBinanceError] = useState<string | null>(null);
+    const [applying, setApplying] = useState(false);
+
+    const showBinanceRefresh = config.accountType === "binance" && !!config.apiKey && !!config.apiSecret;
+
+    const handleBinanceRefresh = async () => {
+        if (!config.apiKey || !config.apiSecret) return;
+        setBinanceLoading(true);
+        setBinanceError(null);
+        try {
+            setBinanceResult(await fetchBinanceBalance(config.apiKey, config.apiSecret, config.currency || "USDT"));
+        } catch (err) {
+            setBinanceError(err instanceof Error ? err.message : "Failed to fetch Binance balance");
+        } finally {
+            setBinanceLoading(false);
+        }
+    };
+
+    const handleApplyBinance = async () => {
+        if (binanceResult == null) return;
+        setApplying(true);
+        try {
+            await onSaveAccount(accountKey, {
+                ...config,
+                amount: binanceResult.total,
+                amountUpdatedAt: new Date().toISOString(),
+            });
+            setBinanceResult(null);
+        } catch (err) {
+            setBinanceError(err instanceof Error ? err.message : "Failed to apply balance");
+        } finally {
+            setApplying(false);
+        }
+    };
 
     const updatedAt = config.amountUpdatedAt
         ? new Date(config.amountUpdatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })
@@ -65,6 +105,17 @@ export function AccountCard({
                         </p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                        {showBinanceRefresh && (
+                            <button
+                                onClick={handleBinanceRefresh}
+                                disabled={binanceLoading}
+                                className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                                aria-label={`Fetch Binance balance for ${accountKey}`}
+                                title="Fetch live balance from Binance"
+                            >
+                                <RefreshCw className={`w-3.5 h-3.5 ${binanceLoading ? "animate-spin" : ""}`} />
+                            </button>
+                        )}
                         <button
                             onClick={() => setSettingsOpen(true)}
                             className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -105,6 +156,25 @@ export function AccountCard({
                 </CardHeader>
 
                 <CardContent className="px-4 pb-5 pt-5 flex flex-col gap-5 justify-end flex-1">
+                    {binanceError && <p className="text-rose-400 text-xs">{binanceError}</p>}
+                    {binanceResult != null && (
+                        <div className="flex items-center justify-between gap-2 bg-amber-400/10 border border-amber-400/30 rounded-md px-3 py-2">
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-amber-300/80 uppercase tracking-wider font-semibold">Binance Live</span>
+                                <span className="text-sm text-white tabular-nums font-semibold">
+                                    {binanceResult.currency} {Math.round(binanceResult.total).toLocaleString()}
+                                </span>
+                            </div>
+                            <button
+                                onClick={handleApplyBinance}
+                                disabled={applying}
+                                className="flex items-center gap-1 text-xs rounded-md bg-amber-400/20 border border-amber-400/40 text-amber-200 px-2.5 py-1.5 hover:bg-amber-400/30 transition-colors cursor-pointer disabled:opacity-50"
+                            >
+                                <Check className="w-3.5 h-3.5" />
+                                {applying ? "Saving..." : "Apply"}
+                            </button>
+                        </div>
+                    )}
                     {performance && (
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-end">
