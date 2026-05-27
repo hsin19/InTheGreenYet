@@ -39,7 +39,13 @@ export interface BinanceBalanceRequest {
     currency: string;
 }
 
-export interface BinanceBalance {
+export interface BitgetBalanceRequest {
+    apiKey: string;
+    apiSecret: string;
+    passphrase: string;
+}
+
+export interface ProviderBalance {
     total: number;
     currency: string;
     fetchedAt: string;

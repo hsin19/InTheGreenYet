@@ -19,7 +19,7 @@ import {
     useEffect,
     useState,
 } from "react";
-import { BinanceKeyGuide } from "./BinanceKeyGuide";
+import { getApiProvider } from "./apiProviders";
 
 interface AccountDialogProps {
     open: boolean;
@@ -48,10 +48,11 @@ export function AccountDialog({
     const [currency, setCurrency] = useState("");
     const [accountType, setAccountType] = useState("bank");
     const [isInvestment, setIsInvestment] = useState(true);
-    const [apiKey, setApiKey] = useState("");
-    const [apiSecret, setApiSecret] = useState("");
+    const [credentials, setCredentials] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const provider = getApiProvider(accountType);
 
     useEffect(() => {
         if (!open) return;
@@ -60,16 +61,19 @@ export function AccountDialog({
             setDisplayName("");
             setCurrency("");
             setAccountType("bank");
-            setApiKey("");
-            setApiSecret("");
+            setCredentials({});
         } else {
             setKey(editingKey ?? "");
             setDisplayName(existingConfig?.displayName ?? "");
             setCurrency(existingConfig?.currency ?? "");
             setAccountType(existingConfig?.accountType ?? "bank");
             setIsInvestment(existingConfig?.isInvestment ?? true);
-            setApiKey(existingConfig?.apiKey ?? "");
-            setApiSecret(existingConfig?.apiSecret ?? "");
+            setCredentials({
+                apiKey: existingConfig?.apiKey ?? "",
+                apiSecret: existingConfig?.apiSecret ?? "",
+                apiPassphrase: existingConfig?.apiPassphrase ?? "",
+                apiMode: existingConfig?.apiMode ?? "",
+            });
         }
         setError(null);
         setSaving(false);
@@ -103,12 +107,17 @@ export function AccountDialog({
                 accountType: accountType,
                 isInvestment: isInvestment,
             };
-            // API credentials only belong to Binance accounts; drop them otherwise.
-            delete next.apiKey;
-            delete next.apiSecret;
-            if (accountType === "binance") {
-                if (apiKey.trim()) next.apiKey = apiKey.trim();
-                if (apiSecret.trim()) next.apiSecret = apiSecret.trim();
+            // Provider fields (all `api*`) only belong to API-backed accounts; drop them otherwise.
+            const bag = next as unknown as Record<string, unknown>;
+            for (const k of Object.keys(bag)) {
+                if (k.startsWith("api")) delete bag[k];
+            }
+            if (provider) {
+                for (const field of provider.fields) {
+                    const raw = (credentials[field.name] ?? "").trim();
+                    const value = raw || (field.kind === "select" ? field.default : "");
+                    if (value) next[field.name] = value;
+                }
             }
             await onSave(trimmedKey, next);
             onOpenChange(false);
@@ -198,35 +207,48 @@ export function AccountDialog({
                         </Select>
                     </div>
 
-                    {accountType === "binance" && (
+                    {provider && (
                         <div className="flex flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
-                            <div className="flex flex-col gap-1">
-                                <label className="text-xs text-muted">Binance API Key</label>
-                                <Input
-                                    value={apiKey}
-                                    onChange={e => setApiKey(e.target.value)}
-                                    type="password"
-                                    autoComplete="off"
-                                    placeholder="API Key"
-                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
-                                />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <label className="text-xs text-muted">Binance API Secret</label>
-                                <Input
-                                    value={apiSecret}
-                                    onChange={e => setApiSecret(e.target.value)}
-                                    type="password"
-                                    autoComplete="off"
-                                    placeholder="API Secret"
-                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
-                                />
-                            </div>
+                            <p className="text-xs font-medium text-white">Connect to {provider.label}</p>
+                            {provider.note && (
+                                <p className="rounded-md border border-amber-400/30 bg-amber-400/10 px-2.5 py-1.5 text-[11px] text-amber-200/90 leading-relaxed">
+                                    {provider.note}
+                                </p>
+                            )}
+                            {provider.fields.map(field => (
+                                <div key={field.name} className="flex flex-col gap-1">
+                                    <label className="text-xs text-muted">{field.label}</label>
+                                    {field.kind === "select"
+                                        ? (
+                                            <Select
+                                                value={credentials[field.name] || field.default}
+                                                onValueChange={v => setCredentials(c => ({ ...c, [field.name]: v }))}
+                                            >
+                                                <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
+                                                    {field.options.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                                                </SelectContent>
+                                            </Select>
+                                        )
+                                        : (
+                                            <Input
+                                                value={credentials[field.name] ?? ""}
+                                                onChange={e => setCredentials(c => ({ ...c, [field.name]: e.target.value }))}
+                                                type="password"
+                                                autoComplete="off"
+                                                placeholder={field.label}
+                                                className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                            />
+                                        )}
+                                </div>
+                            ))}
                             <div className="flex items-center justify-between gap-2">
                                 <p className="text-muted/50 text-xs">
-                                    Use a read-only key (disable Trading &amp; Withdrawals).
+                                    {provider.keyHint ?? "Use a read-only key."}
                                 </p>
-                                <BinanceKeyGuide />
+                                <provider.guide />
                             </div>
                         </div>
                     )}

@@ -1,5 +1,6 @@
 import { handleOAuthCallback } from "./handlers/auth";
 import { handleBinanceBalance } from "./handlers/binance";
+import { handleBitgetBalance } from "./handlers/bitget";
 import {
     handleGetConfig,
     handleUpdateConfig,
@@ -60,6 +61,10 @@ export default {
 
         if (url.pathname === "/api/binance/balance" && request.method === "POST") {
             return handleBinanceBalance(request, url, env);
+        }
+
+        if (url.pathname === "/api/bitget/balance" && request.method === "POST") {
+            return handleBitgetBalance(request, url, env);
         }
 
         if (url.pathname === "/health") {

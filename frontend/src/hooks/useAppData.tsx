@@ -34,6 +34,8 @@ export interface AccountConfig {
     accountType?: string;
     apiKey?: string;
     apiSecret?: string;
+    apiPassphrase?: string;
+    apiMode?: string;
 }
 
 export interface AppConfig {

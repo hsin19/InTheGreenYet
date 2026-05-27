@@ -10,17 +10,33 @@ import {
     ExternalLink,
     ShieldCheck,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import {
+    type ReactNode,
+    useState,
+} from "react";
 import { CopyableValue } from "./CopyableValue";
 
-const API_MANAGEMENT_URL = "https://www.binance.com/en/my/settings/api-management";
+const API_MANAGEMENT_URL = "https://www.bitget.com/account/newapi";
+
+/** Suggest a passphrase so the user doesn't have to invent one. Letters+digits, no ambiguous chars. */
+function generatePassphrase(): string {
+    const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
+}
+
+/** A freshly suggested passphrase (regenerated each time the guide opens). */
+function PassphraseField() {
+    const [passphrase] = useState(generatePassphrase);
+    return <CopyableValue value={passphrase} />;
+}
 
 const STEPS: { title: string; body: ReactNode; }[] = [
     {
         title: "Open API Management",
         body: (
             <>
-                Sign in to Binance, then go to{" "}
+                Sign in to Bitget, then go to{" "}
                 <a
                     href={API_MANAGEMENT_URL}
                     target="_blank"
@@ -38,29 +54,40 @@ const STEPS: { title: string; body: ReactNode; }[] = [
         title: "Create an API key",
         body: (
             <>
-                Click <span className="text-white">Create API</span>, choose <span className="text-white">System generated</span>, give it a label — feel free to use this: <CopyableValue value="InTheGreenYet" /> — and finish the 2FA verification.
+                Click <span className="text-white">Create API</span>, choose <span className="text-white">System-generated API key</span>, then fill in the fields — feel free to use these suggestions:
+                <ul className="mt-1.5 flex flex-col gap-1.5">
+                    <li className="flex items-center gap-2">
+                        <span className="w-24 shrink-0">Note</span>
+                        <CopyableValue value="InTheGreenYet" />
+                    </li>
+                    <li className="flex items-center gap-2">
+                        <span className="w-24 shrink-0">Passphrase</span>
+                        <PassphraseField />
+                    </li>
+                </ul>
+                <span className="mt-1.5 block">Keep the passphrase — the app needs it alongside the key and secret.</span>
             </>
         ),
     },
     {
-        title: "Leave the defaults as-is",
+        title: "Set read-only permissions",
         body: (
             <>
-                No need to change anything. A new key already has only <span className="text-white">Reading</span> enabled, which is all this app needs. Leave <span className="text-white">IP access restrictions</span> unrestricted too — this app runs on Cloudflare&apos;s rotating IPs, so a fixed allowlist would block it.
+                For <span className="text-white">Permissions</span> choose <span className="text-white">Read-only</span>, then tick <span className="text-white">Select all</span> — in read-only mode every box is read-only (&quot;Search for…&quot;), so the key still can&apos;t trade or withdraw. Leave <span className="text-white">IP access</span> unrestricted — this app runs on Cloudflare&apos;s rotating IPs, so a fixed allowlist would block it.
             </>
         ),
     },
     {
-        title: "Copy the keys",
+        title: "Copy the credentials",
         body: (
             <>
-                Copy the <span className="text-white">API Key</span> and <span className="text-white">Secret Key</span> (the secret is shown only once) and paste them into the fields above.
+                Copy the <span className="text-white">API Key</span>, <span className="text-white">Secret Key</span> (shown only once) and the <span className="text-white">passphrase</span> you set, then paste all three into the fields above.
             </>
         ),
     },
 ];
 
-export function BinanceKeyGuide() {
+export function BitgetKeyGuide() {
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -74,7 +101,7 @@ export function BinanceKeyGuide() {
             <DialogContent className="bg-surface/80 backdrop-blur-3xl border border-white/20 text-white sm:max-w-lg shadow-[0_0_50px_-12px_rgba(0,0,0,0.8)] p-6 gap-5 overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                 <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-white">Get your Binance API key</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold text-white">Get your Bitget API key</DialogTitle>
                     <DialogDescription className="text-muted">
                         Create a read-only key — InTheGreenYet only reads your balances, it never trades or withdraws.
                     </DialogDescription>
@@ -88,7 +115,7 @@ export function BinanceKeyGuide() {
                             </span>
                             <div className="flex flex-col gap-0.5">
                                 <p className="text-sm font-medium text-white">{step.title}</p>
-                                <p className="text-xs text-muted leading-relaxed">{step.body}</p>
+                                <div className="text-xs text-muted leading-relaxed">{step.body}</div>
                             </div>
                         </li>
                     ))}

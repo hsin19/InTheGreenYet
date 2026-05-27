@@ -22,13 +22,16 @@ import {
     Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { fetchBinanceBalance } from "../../../lib/binance";
-import type { BinanceBalance } from "../../../lib/model";
+import type { ProviderBalance } from "../../../lib/model";
 import {
     type AccountFlow,
     type AccountPerformance,
 } from "../../../lib/performance";
 import { AccountDialog } from "./AccountDialog";
+import {
+    getApiProvider,
+    hasCredentials,
+} from "./apiProviders";
 import { InlineAmount } from "./InlineAmount";
 
 interface AccountCardProps {
@@ -54,38 +57,39 @@ export function AccountCard({
 }: AccountCardProps) {
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [costExpanded, setCostExpanded] = useState(false);
-    const [binanceLoading, setBinanceLoading] = useState(false);
-    const [binanceResult, setBinanceResult] = useState<BinanceBalance | null>(null);
-    const [binanceError, setBinanceError] = useState<string | null>(null);
+    const [liveLoading, setLiveLoading] = useState(false);
+    const [liveResult, setLiveResult] = useState<ProviderBalance | null>(null);
+    const [liveError, setLiveError] = useState<string | null>(null);
     const [applying, setApplying] = useState(false);
 
-    const showBinanceRefresh = config.accountType === "binance" && !!config.apiKey && !!config.apiSecret;
+    const provider = getApiProvider(config.accountType);
+    const showRefresh = !!provider && hasCredentials(config);
 
-    const handleBinanceRefresh = async () => {
-        if (!config.apiKey || !config.apiSecret) return;
-        setBinanceLoading(true);
-        setBinanceError(null);
+    const handleRefresh = async () => {
+        if (!provider || !hasCredentials(config)) return;
+        setLiveLoading(true);
+        setLiveError(null);
         try {
-            setBinanceResult(await fetchBinanceBalance(config.apiKey, config.apiSecret, config.currency || "USDT"));
+            setLiveResult(await provider.fetchBalance(config));
         } catch (err) {
-            setBinanceError(err instanceof Error ? err.message : "Failed to fetch Binance balance");
+            setLiveError(err instanceof Error ? err.message : `Failed to fetch ${provider.label} balance`);
         } finally {
-            setBinanceLoading(false);
+            setLiveLoading(false);
         }
     };
 
-    const handleApplyBinance = async () => {
-        if (binanceResult == null) return;
+    const handleApply = async () => {
+        if (liveResult == null) return;
         setApplying(true);
         try {
             await onSaveAccount(accountKey, {
                 ...config,
-                amount: binanceResult.total,
+                amount: liveResult.total,
                 amountUpdatedAt: new Date().toISOString(),
             });
-            setBinanceResult(null);
+            setLiveResult(null);
         } catch (err) {
-            setBinanceError(err instanceof Error ? err.message : "Failed to apply balance");
+            setLiveError(err instanceof Error ? err.message : "Failed to apply balance");
         } finally {
             setApplying(false);
         }
@@ -105,15 +109,15 @@ export function AccountCard({
                         </p>
                     </div>
                     <div className="flex items-center gap-1 shrink-0 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                        {showBinanceRefresh && (
+                        {showRefresh && provider && (
                             <button
-                                onClick={handleBinanceRefresh}
-                                disabled={binanceLoading}
+                                onClick={handleRefresh}
+                                disabled={liveLoading}
                                 className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
-                                aria-label={`Fetch Binance balance for ${accountKey}`}
-                                title="Fetch live balance from Binance"
+                                aria-label={`Fetch ${provider.label} balance for ${accountKey}`}
+                                title={`Fetch live balance from ${provider.label}`}
                             >
-                                <RefreshCw className={`w-3.5 h-3.5 ${binanceLoading ? "animate-spin" : ""}`} />
+                                <RefreshCw className={`w-3.5 h-3.5 ${liveLoading ? "animate-spin" : ""}`} />
                             </button>
                         )}
                         <button
@@ -156,17 +160,17 @@ export function AccountCard({
                 </CardHeader>
 
                 <CardContent className="px-4 pb-5 pt-5 flex flex-col gap-5 justify-end flex-1">
-                    {binanceError && <p className="text-rose-400 text-xs">{binanceError}</p>}
-                    {binanceResult != null && (
+                    {liveError && <p className="text-rose-400 text-xs">{liveError}</p>}
+                    {liveResult != null && (
                         <div className="flex items-center justify-between gap-2 bg-amber-400/10 border border-amber-400/30 rounded-md px-3 py-2">
                             <div className="flex flex-col">
-                                <span className="text-[10px] text-amber-300/80 uppercase tracking-wider font-semibold">Binance Live</span>
+                                <span className="text-[10px] text-amber-300/80 uppercase tracking-wider font-semibold">{provider?.label} Live</span>
                                 <span className="text-sm text-white tabular-nums font-semibold">
-                                    {binanceResult.currency} {Math.round(binanceResult.total).toLocaleString()}
+                                    {liveResult.currency} {Math.round(liveResult.total).toLocaleString()}
                                 </span>
                             </div>
                             <button
-                                onClick={handleApplyBinance}
+                                onClick={handleApply}
                                 disabled={applying}
                                 className="flex items-center gap-1 text-xs rounded-md bg-amber-400/20 border border-amber-400/40 text-amber-200 px-2.5 py-1.5 hover:bg-amber-400/30 transition-colors cursor-pointer disabled:opacity-50"
                             >

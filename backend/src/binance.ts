@@ -1,4 +1,4 @@
-import type { BinanceBalance } from "./model";
+import type { ProviderBalance } from "./model";
 import { ClientError } from "./utils";
 
 const BINANCE_BASE = "https://api.binance.com";
@@ -35,7 +35,7 @@ export async function fetchBinanceTotal(
     apiKey: string,
     apiSecret: string,
     quoteAsset: string,
-): Promise<BinanceBalance> {
+): Promise<ProviderBalance> {
     const params = new URLSearchParams({
         quoteAsset,
         recvWindow: "10000",

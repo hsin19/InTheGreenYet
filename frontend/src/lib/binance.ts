@@ -1,7 +1,7 @@
 import { apiFetch } from "./api";
 import type {
-    BinanceBalance,
     BinanceBalanceRequest,
+    ProviderBalance,
 } from "./model";
 
 /**
@@ -13,9 +13,9 @@ export async function fetchBinanceBalance(
     apiKey: string,
     apiSecret: string,
     currency: string,
-): Promise<BinanceBalance> {
+): Promise<ProviderBalance> {
     const payload: BinanceBalanceRequest = { apiKey, apiSecret, currency };
-    return apiFetch<BinanceBalance>("/api/binance/balance", null, {
+    return apiFetch<ProviderBalance>("/api/binance/balance", null, {
         method: "POST",
         body: JSON.stringify(payload),
     });
