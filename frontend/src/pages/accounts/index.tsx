@@ -13,6 +13,7 @@ import {
     type AccountPerformance,
     calculatePerformance,
     computeAccountFlows,
+    sortAccountKeysByBaseValue,
 } from "../../lib/performance";
 import { AccountCard } from "./components/AccountCard";
 import { AccountDialog } from "./components/AccountDialog";
@@ -80,14 +81,7 @@ export function Accounts() {
         await persistAccounts(next);
     };
 
-    const entries = Object.entries(accounts).sort(([keyA, accA], [keyB, accB]) => {
-        const amountA = accA.amount ?? -Infinity;
-        const amountB = accB.amount ?? -Infinity;
-        if (amountB !== amountA) return amountB - amountA;
-        const netCostA = Math.abs(accountPerformances[keyA]?.netCostBase ?? 0);
-        const netCostB = Math.abs(accountPerformances[keyB]?.netCostBase ?? 0);
-        return netCostB - netCostA;
-    });
+    const sortedKeys = sortAccountKeysByBaseValue(Object.keys(accounts), accountPerformances);
 
     return (
         <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
@@ -112,7 +106,7 @@ export function Accounts() {
                 </div>
             </div>
 
-            {status === "ready" && entries.length > 0 && (
+            {status === "ready" && sortedKeys.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
                     <Card className="p-4 gap-1">
                         <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Cost</span>
@@ -162,7 +156,7 @@ export function Accounts() {
 
             {status === "ready" && (
                 <>
-                    {entries.length === 0 ? (
+                    {sortedKeys.length === 0 ? (
                         <div className="flex flex-col items-center gap-3 py-16 text-center">
                             <p className="text-muted text-sm">No accounts yet.</p>
                             <Button
@@ -174,11 +168,11 @@ export function Accounts() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {entries.map(([key, acc]) => (
+                            {sortedKeys.map(key => (
                                 <AccountCard
                                     key={key}
                                     accountKey={key}
-                                    config={acc}
+                                    config={accounts[key]}
                                     baseCurrency={config.baseCurrency}
                                     availableCurrencies={config.currencies}
                                     performance={accountPerformances[key]}

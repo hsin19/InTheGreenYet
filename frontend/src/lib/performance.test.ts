@@ -5,9 +5,11 @@ import {
 } from "vitest";
 import type { Transfer } from "./model";
 import {
+    accountBaseValue,
     type AccountFlow,
     calculatePerformance,
     computeAccountFlows,
+    sortAccountKeysByBaseValue,
 } from "./performance";
 
 describe("Performance Calculations", () => {
@@ -158,6 +160,54 @@ describe("Performance Calculations", () => {
             expect(perf.yieldPercentage).toBe(20);
             expect(perf.netCost).toBe(1000);
             expect(perf.pl).toBe(200);
+        });
+    });
+
+    describe("accountBaseValue", () => {
+        it("returns netCostBase + plBase (current value in base currency)", () => {
+            // No flows -> netCostBase 0; 100 USD @ 31 -> plBase 3100.
+            const perf = calculatePerformance("x", 100, "USD", [], mockGetFiatToBaseRate);
+            expect(accountBaseValue(perf)).toBe(3100);
+        });
+
+        it("returns -Infinity when the performance entry is missing", () => {
+            expect(accountBaseValue(undefined)).toBe(-Infinity);
+        });
+    });
+
+    describe("sortAccountKeysByBaseValue", () => {
+        const perfOf = (key: string, amount: number | null, currency: string) => calculatePerformance(key, amount, currency, [], mockGetFiatToBaseRate);
+
+        it("ranks by base-currency value, not the raw amount", () => {
+            const performances = {
+                twd: perfOf("twd", 1000, "TWD"), // 1000 TWD
+                usd: perfOf("usd", 100, "USD"), // 100 USD = 3100 TWD
+            };
+
+            const sorted = sortAccountKeysByBaseValue(["twd", "usd"], performances);
+
+            // 100 USD outranks 1000 TWD once converted; raw-amount sorting would invert this.
+            expect(sorted).toEqual(["usd", "twd"]);
+        });
+
+        it("sorts accounts without a performance entry last", () => {
+            const performances = { a: perfOf("a", 50, "USD") };
+
+            const sorted = sortAccountKeysByBaseValue(["missing", "a"], performances);
+
+            expect(sorted).toEqual(["a", "missing"]);
+        });
+
+        it("does not mutate the input array", () => {
+            const performances = {
+                a: perfOf("a", 1, "USD"),
+                b: perfOf("b", 2, "USD"),
+            };
+            const keys = ["a", "b"];
+
+            sortAccountKeysByBaseValue(keys, performances);
+
+            expect(keys).toEqual(["a", "b"]);
         });
     });
 });

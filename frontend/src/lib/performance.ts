@@ -210,3 +210,21 @@ export function calculatePerformance(
         plBase,
     };
 }
+
+/** Current value of an account expressed in the base currency (same basis as the "Total Assets" card). */
+export function accountBaseValue(perf: AccountPerformance | undefined): number {
+    if (!perf) return -Infinity;
+    return perf.netCostBase + (perf.plBase ?? 0);
+}
+
+/**
+ * Sort account keys by their base-currency value, descending. Accounts held in
+ * different currencies are compared on equal footing (raw amounts are not), so e.g.
+ * 100 USD outranks 1000 TWD. Keys without a performance entry sort last.
+ */
+export function sortAccountKeysByBaseValue(
+    keys: string[],
+    performances: Record<string, AccountPerformance>,
+): string[] {
+    return [...keys].sort((keyA, keyB) => accountBaseValue(performances[keyB]) - accountBaseValue(performances[keyA]));
+}
