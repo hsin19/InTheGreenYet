@@ -65,7 +65,7 @@ jobs:
 
           google-chrome --headless --dump-dom --virtual-time-budget=5000 \
             --disable-gpu --no-sandbox \
-            http://127.0.0.1:4173 > /tmp/rendered.html
+            http://127.0.0.1:4173 > /tmp/rendered.html 2> /tmp/chrome.log
 
           grep -q 'Connect to Notion' /tmp/rendered.html
           kill $PID || true
@@ -75,6 +75,8 @@ jobs:
         run: |
           echo "=== vite.log ==="
           cat /tmp/vite.log 2>/dev/null || echo "(no vite log)"
+          echo "=== chrome.log ==="
+          cat /tmp/chrome.log 2>/dev/null || echo "(no chrome log)"
           echo "=== rendered.html (first 2KB) ==="
           head -c 2048 /tmp/rendered.html 2>/dev/null || echo "(no rendered dump)"
 
