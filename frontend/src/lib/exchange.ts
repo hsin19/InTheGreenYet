@@ -6,62 +6,56 @@ export interface ExchangeRates {
 const CACHE_KEY = "inthegreenyet_exchange_rates";
 const CACHE_TTL = 1000 * 60 * 60 * 12; // 12 hours
 
-interface CacheData {
+interface CacheEntry {
     timestamp: number;
     rates: ExchangeRates;
 }
 
-/**
- * Fetches exchange rates from fawazahmed0 currency-api.
- * Caches the result in localStorage to prevent rate limiting/unnecessary requests.
- * @param baseCurrency The currency to fetch rates against (e.g., 'usd')
- */
-export async function fetchExchangeRates(baseCurrency: string = "twd"): Promise<ExchangeRates | null> {
-    const cacheKey = `${CACHE_KEY}_${baseCurrency.toLowerCase()}`;
-    const cached = localStorage.getItem(cacheKey);
+function cacheKeyFor(baseCurrency: string): string {
+    return `${CACHE_KEY}_${baseCurrency.toLowerCase()}`;
+}
 
-    if (cached) {
-        try {
-            const parsed: CacheData = JSON.parse(cached);
-            if (Date.now() - parsed.timestamp < CACHE_TTL) {
-                return parsed.rates;
-            }
-        } catch (e) {
-            console.warn("Failed to parse cached exchange rates", e);
-        }
+function readCache(baseCurrency: string): CacheEntry | null {
+    const cached = localStorage.getItem(cacheKeyFor(baseCurrency));
+    if (!cached) return null;
+    try {
+        return JSON.parse(cached) as CacheEntry;
+    } catch (e) {
+        console.warn("Failed to parse cached exchange rates", e);
+        return null;
     }
+}
 
+async function fetchFromNetwork(baseCurrency: string): Promise<ExchangeRates | null> {
     try {
         const url = `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${baseCurrency.toLowerCase()}.json`;
         const res = await fetch(url);
-
         if (!res.ok) {
             throw new Error(`Failed to fetch exchange rates: ${res.status} ${res.statusText}`);
         }
-
         const data: ExchangeRates = await res.json();
-
-        const cacheData: CacheData = {
-            timestamp: Date.now(),
-            rates: data,
-        };
-        localStorage.setItem(cacheKey, JSON.stringify(cacheData));
-
+        localStorage.setItem(
+            cacheKeyFor(baseCurrency),
+            JSON.stringify({ timestamp: Date.now(), rates: data } satisfies CacheEntry),
+        );
         return data;
     } catch (error) {
         console.error("Error fetching exchange rates:", error);
-
-        // If fetch fails but we have stale cache, return it as fallback
-        if (cached) {
-            try {
-                const parsed: CacheData = JSON.parse(cached);
-                console.log("Using stale cached exchange rates as fallback");
-                return parsed.rates;
-            } catch {
-                // Ignore parsing errors on fallback
-            }
-        }
-
         return null;
     }
+}
+
+export function loadExchangeRates(
+    baseCurrency: string,
+    onUpdate: (rates: ExchangeRates) => void,
+): void {
+    const cached = readCache(baseCurrency);
+    if (cached) onUpdate(cached.rates);
+
+    const stale = !cached || Date.now() - cached.timestamp >= CACHE_TTL;
+    if (!stale) return;
+
+    void fetchFromNetwork(baseCurrency).then(rates => {
+        if (rates) onUpdate(rates);
+    });
 }

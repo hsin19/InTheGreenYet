@@ -7,7 +7,7 @@ import {
 } from "vitest";
 import {
     type ExchangeRates,
-    fetchExchangeRates,
+    loadExchangeRates,
 } from "./exchange";
 
 // Mock localStorage for Node environment
@@ -32,7 +32,11 @@ Object.defineProperty(globalThis, "localStorage", {
     writable: true,
 });
 
-describe("Exchange Rate Fetching", () => {
+function flushPromises(): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+describe("loadExchangeRates", () => {
     beforeEach(() => {
         mockLocalStorage.clear();
         vi.restoreAllMocks();
@@ -40,7 +44,7 @@ describe("Exchange Rate Fetching", () => {
         vi.spyOn(console, "error").mockImplementation(() => {});
     });
 
-    it("should fetch rates from API and cache them when local storage is empty", async () => {
+    it("fetches rates from the API and caches them when localStorage is empty", async () => {
         const mockRates: ExchangeRates = {
             date: "2026-05-24",
             twd: { usd: 0.032, usdt: 0.032, twd: 1 },
@@ -51,14 +55,20 @@ describe("Exchange Rate Fetching", () => {
             json: async () => mockRates,
         } as Response);
 
-        const result = await fetchExchangeRates("twd");
+        const onUpdate = vi.fn();
+        loadExchangeRates("twd", onUpdate);
+
+        // No cache → no sync emit
+        expect(onUpdate).not.toHaveBeenCalled();
+
+        await flushPromises();
 
         expect(fetchSpy).toHaveBeenCalledWith(
             "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/twd.json",
         );
-        expect(result).toEqual(mockRates);
+        expect(onUpdate).toHaveBeenCalledTimes(1);
+        expect(onUpdate).toHaveBeenCalledWith(mockRates);
 
-        // Check if cached in localStorage
         const cached = localStorage.getItem("inthegreenyet_exchange_rates_twd");
         expect(cached).toBeDefined();
         const parsed = JSON.parse(cached!);
@@ -66,7 +76,7 @@ describe("Exchange Rate Fetching", () => {
         expect(Date.now() - parsed.timestamp).toBeLessThan(1000);
     });
 
-    it("should return cached rates if they are fresh without calling fetch", async () => {
+    it("emits cached rates synchronously without calling fetch when cache is fresh", async () => {
         const mockRates: ExchangeRates = {
             date: "2026-05-24",
             twd: { usd: 0.032, twd: 1 },
@@ -82,13 +92,18 @@ describe("Exchange Rate Fetching", () => {
 
         const fetchSpy = vi.spyOn(globalThis, "fetch");
 
-        const result = await fetchExchangeRates("twd");
+        const onUpdate = vi.fn();
+        loadExchangeRates("twd", onUpdate);
 
+        expect(onUpdate).toHaveBeenCalledTimes(1);
+        expect(onUpdate).toHaveBeenCalledWith(mockRates);
+
+        await flushPromises();
         expect(fetchSpy).not.toHaveBeenCalled();
-        expect(result).toEqual(mockRates);
+        expect(onUpdate).toHaveBeenCalledTimes(1);
     });
 
-    it("should fetch fresh rates if cached rates are expired", async () => {
+    it("emits stale cache first, then fresh rates after revalidation", async () => {
         const staleRates: ExchangeRates = {
             date: "2026-05-20",
             twd: { usd: 0.031 },
@@ -106,18 +121,22 @@ describe("Exchange Rate Fetching", () => {
             }),
         );
 
-        const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+        vi.spyOn(globalThis, "fetch").mockResolvedValue({
             ok: true,
             json: async () => freshRates,
         } as Response);
 
-        const result = await fetchExchangeRates("twd");
+        const onUpdate = vi.fn();
+        loadExchangeRates("twd", onUpdate);
 
-        expect(fetchSpy).toHaveBeenCalled();
-        expect(result).toEqual(freshRates);
+        expect(onUpdate).toHaveBeenNthCalledWith(1, staleRates);
+
+        await flushPromises();
+        expect(onUpdate).toHaveBeenNthCalledWith(2, freshRates);
+        expect(onUpdate).toHaveBeenCalledTimes(2);
     });
 
-    it("should fallback to stale cache if fetch fails", async () => {
+    it("emits only the stale cache when fetch fails", async () => {
         const staleRates: ExchangeRates = {
             date: "2026-05-20",
             twd: { usd: 0.031 },
@@ -133,16 +152,22 @@ describe("Exchange Rate Fetching", () => {
 
         vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network Error"));
 
-        const result = await fetchExchangeRates("twd");
+        const onUpdate = vi.fn();
+        loadExchangeRates("twd", onUpdate);
 
-        expect(result).toEqual(staleRates);
+        expect(onUpdate).toHaveBeenNthCalledWith(1, staleRates);
+
+        await flushPromises();
+        expect(onUpdate).toHaveBeenCalledTimes(1);
     });
 
-    it("should return null if fetch fails and there is no cache", async () => {
+    it("does not emit when fetch fails and there is no cache", async () => {
         vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Network Error"));
 
-        const result = await fetchExchangeRates("twd");
+        const onUpdate = vi.fn();
+        loadExchangeRates("twd", onUpdate);
 
-        expect(result).toBeNull();
+        await flushPromises();
+        expect(onUpdate).not.toHaveBeenCalled();
     });
 });

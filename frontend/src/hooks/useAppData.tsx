@@ -13,7 +13,7 @@ import {
 } from "../lib/datastore";
 import {
     type ExchangeRates,
-    fetchExchangeRates,
+    loadExchangeRates,
 } from "../lib/exchange";
 import type {
     ConfigRow,
@@ -115,9 +115,17 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
         let cancelled = false;
         let hasCache = false;
 
+        const loadRates = (baseCurrency: string) => {
+            loadExchangeRates(baseCurrency, rates => {
+                if (!cancelled) setExchangeRates(rates);
+            });
+        };
+
         const load = async () => {
             setSyncing(true);
             setSyncError(null);
+
+            let baseCurrency = DEFAULT_CONFIG.baseCurrency;
 
             // 1. Hydrate from whatever the store already has.
             try {
@@ -130,8 +138,10 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
 
                 if (cachedTransfers.length > 0 || cachedConfigRows.length > 0) {
                     hasCache = true;
+                    const cachedConfig = parseConfig(cachedConfigRows);
+                    baseCurrency = cachedConfig.baseCurrency;
                     setTransfers(sortTransfersDesc(cachedTransfers));
-                    setConfig(parseConfig(cachedConfigRows));
+                    setConfig(cachedConfig);
                     setLastSyncedAt(cachedSyncedAt);
                     setStatus("ready");
                 }
@@ -139,7 +149,9 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
                 console.warn("Failed to hydrate from store", err);
             }
 
-            // 2. Revalidate against upstream (no-op for non-Swr stores).
+            loadRates(baseCurrency);
+
+            // 2. Revalidate the store against upstream (no-op for non-Swr stores).
             try {
                 await store.revalidate();
                 if (cancelled) return;
@@ -152,15 +164,16 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
                 if (cancelled) return;
 
                 const parsed = parseConfig(freshConfigRows);
-                const rates = await fetchExchangeRates(parsed.baseCurrency);
-                if (cancelled) return;
-
                 setTransfers(sortTransfersDesc(freshTransfers));
-                setExchangeRates(rates);
                 setConfig(parsed);
                 setLastSyncedAt(freshSyncedAt);
                 setError(null);
                 setStatus("ready");
+
+                // Upstream may report a different base than we loaded for — reload.
+                if (parsed.baseCurrency !== baseCurrency) {
+                    loadRates(parsed.baseCurrency);
+                }
             } catch (err) {
                 if (cancelled) return;
                 const message = err instanceof Error ? err.message : "Unknown error";
