@@ -50,7 +50,7 @@ jobs:
           VITE_API_BASE_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
         run: npm run build --workspace=@inthegreenyet/frontend
 
-      - name: Smoke (vite preview)
+      - name: Smoke (vite preview + headless render)
         run: |
           npm run preview --workspace=@inthegreenyet/frontend -- --port 4173 --strictPort --host 127.0.0.1 > /tmp/vite.log 2>&1 &
           PID=$!
@@ -63,14 +63,20 @@ jobs:
             sleep 1
           done
 
-          curl -fsS http://127.0.0.1:4173 | grep -q 'id="root"'
+          google-chrome --headless --dump-dom --virtual-time-budget=5000 \
+            --disable-gpu --no-sandbox \
+            http://127.0.0.1:4173 > /tmp/rendered.html
+
+          grep -q 'Connect to Notion' /tmp/rendered.html
           kill $PID || true
 
-      - name: Dump preview log on failure
+      - name: Dump logs on failure
         if: failure()
         run: |
           echo "=== vite.log ==="
           cat /tmp/vite.log 2>/dev/null || echo "(no vite log)"
+          echo "=== rendered.html (first 2KB) ==="
+          head -c 2048 /tmp/rendered.html 2>/dev/null || echo "(no rendered dump)"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
