@@ -44,6 +44,38 @@ jobs:
         working-directory: backend
         run: npx wrangler deploy --dry-run
 
+      - name: Smoke (wrangler dev /health)
+        run: |
+          cat > backend/.dev.vars <<EOF
+          NOTION_CLIENT_ID=dummy
+          NOTION_CLIENT_SECRET=dummy
+          FRONTEND_URL=http://127.0.0.1:4173
+          EOF
+
+          npm run dev --workspace=@inthegreenyet/backend -- --port 8787 --ip 127.0.0.1 > /tmp/wrangler.log 2>&1 &
+          PID=$!
+
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8787/health >/dev/null 2>&1; then
+              echo "Worker ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+
+          echo "--- /health ---"
+          curl -fsS http://127.0.0.1:8787/health
+          echo
+          curl -fsS http://127.0.0.1:8787/health | grep -q '"status":"ok"'
+          kill $PID || true
+          rm -f backend/.dev.vars
+
+      - name: Dump wrangler log on failure
+        if: failure()
+        run: |
+          echo "=== wrangler.log ==="
+          cat /tmp/wrangler.log 2>/dev/null || echo "(no wrangler log)"
+
       - name: Deploy Worker
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: cloudflare/wrangler-action@v4

@@ -50,6 +50,28 @@ jobs:
           VITE_API_BASE_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
         run: npm run build --workspace=@inthegreenyet/frontend
 
+      - name: Smoke (vite preview)
+        run: |
+          npm run preview --workspace=@inthegreenyet/frontend -- --port 4173 --strictPort --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          PID=$!
+
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173 >/dev/null 2>&1; then
+              echo "Preview ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+
+          curl -fsS http://127.0.0.1:4173 | grep -q 'id="root"'
+          kill $PID || true
+
+      - name: Dump preview log on failure
+        if: failure()
+        run: |
+          echo "=== vite.log ==="
+          cat /tmp/vite.log 2>/dev/null || echo "(no vite log)"
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
         with:
