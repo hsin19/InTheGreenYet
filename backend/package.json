@@ -8,6 +8,8 @@
     "start": "wrangler dev",
     "test": "vitest",
     "lint": "eslint .",
+    "prebuild": "npm run cf-typegen",
+    "build": "tsc --noEmit",
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
