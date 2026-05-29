@@ -60,8 +60,10 @@ export default defineConfig({
     build: {
         rollupOptions: {
             output: {
-                manualChunks: {
-                    react: ["react", "react-dom", "react-router-dom"],
+                manualChunks(id) {
+                    if (/[\\/]node_modules[\\/](react|react-dom|react-router-dom)[\\/]/.test(id)) {
+                        return "react";
+                    }
                 },
             },
         },

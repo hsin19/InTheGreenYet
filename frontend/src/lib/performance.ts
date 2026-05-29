@@ -177,7 +177,7 @@ export function calculatePerformance(
     const plBase = currentBase !== null ? currentBase - netCostBase : null;
 
     // Native calculations
-    let netCostNative = 0;
+    let netCostNative: number;
     const liveRate = getFiatToBaseRate(currency);
 
     if (liveRate != null && liveRate > 0) {

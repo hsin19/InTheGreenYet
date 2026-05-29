@@ -22,6 +22,11 @@ export function Accounts() {
     const { config, status, transfers, getFiatToBaseRate, refresh, saveConfig, addSnapshots } = useAppData();
 
     const [addOpen, setAddOpen] = useState(false);
+    const [dialogKey, setDialogKey] = useState(0);
+    const openAddDialog = () => {
+        setDialogKey(k => k + 1);
+        setAddOpen(true);
+    };
 
     const accounts = status === "ready" ? config.accounts : {};
 
@@ -98,7 +103,7 @@ export function Accounts() {
                     </Button>
                     <Button
                         size="icon"
-                        onClick={() => setAddOpen(true)}
+                        onClick={openAddDialog}
                         title="Add Account"
                     >
                         <Plus className="w-4 h-4" />
@@ -161,7 +166,7 @@ export function Accounts() {
                             <p className="text-muted text-sm">No accounts yet.</p>
                             <Button
                                 variant="link"
-                                onClick={() => setAddOpen(true)}
+                                onClick={openAddDialog}
                             >
                                 Add your first account &rarr;
                             </Button>
@@ -187,6 +192,7 @@ export function Accounts() {
             )}
 
             <AccountDialog
+                key={dialogKey}
                 open={addOpen}
                 onOpenChange={setAddOpen}
                 editingKey={null}

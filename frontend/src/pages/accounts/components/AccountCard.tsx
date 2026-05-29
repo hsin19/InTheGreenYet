@@ -56,6 +56,7 @@ export function AccountCard({
     onDelete,
 }: AccountCardProps) {
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [dialogKey, setDialogKey] = useState(0);
     const [costExpanded, setCostExpanded] = useState(false);
     const [liveLoading, setLiveLoading] = useState(false);
     const [liveResult, setLiveResult] = useState<ProviderBalance | null>(null);
@@ -121,7 +122,10 @@ export function AccountCard({
                             </button>
                         )}
                         <button
-                            onClick={() => setSettingsOpen(true)}
+                            onClick={() => {
+                                setDialogKey(k => k + 1);
+                                setSettingsOpen(true);
+                            }}
                             className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                             aria-label={`Settings for ${accountKey}`}
                         >
@@ -245,6 +249,7 @@ export function AccountCard({
             </Card>
 
             <AccountDialog
+                key={dialogKey}
                 open={settingsOpen}
                 onOpenChange={setSettingsOpen}
                 editingKey={accountKey}

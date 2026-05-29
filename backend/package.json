@@ -13,8 +13,8 @@
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.12.21",
-    "wrangler": "^4.68.0"
+    "@cloudflare/vitest-pool-workers": "^0.16.10",
+    "wrangler": "^4.86.0"
   },
   "dependencies": {
     "@notionhq/client": "^5.11.1"
