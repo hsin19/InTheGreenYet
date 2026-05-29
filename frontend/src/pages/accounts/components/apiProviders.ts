@@ -1,10 +1,12 @@
 import { type AccountConfig } from "@/hooks/useAppData";
 import { fetchBinanceBalance } from "@/lib/binance";
 import { fetchBitgetBalance } from "@/lib/bitget";
+import { fetchMaxBalance } from "@/lib/max";
 import type { ProviderBalance } from "@/lib/model";
 import type { ComponentType } from "react";
 import { BinanceKeyGuide } from "./BinanceKeyGuide";
 import { BitgetKeyGuide } from "./BitgetKeyGuide";
+import { MaxKeyGuide } from "./MaxKeyGuide";
 
 /**
  * Credential fields a provider can require — derived from every `api*` key on
@@ -54,6 +56,9 @@ const API_KEY: CredentialField = { name: "apiKey", label: "API Key" };
 const API_SECRET: CredentialField = { name: "apiSecret", label: "API Secret" };
 const PASSPHRASE: CredentialField = { name: "apiPassphrase", label: "Passphrase" };
 
+const MAX_ACCESS_KEY: CredentialField = { name: "apiKey", label: "Access Key" };
+const MAX_SECRET_KEY: CredentialField = { name: "apiSecret", label: "Secret Key" };
+
 const BITGET_ACCOUNT_MODE: SelectField = {
     kind: "select",
     name: "apiMode",
@@ -77,6 +82,14 @@ export const API_PROVIDERS: Record<string, ApiProvider> = {
         keyHint: "Set the key to Read-only (Select all is safe).",
         note: "Classic Trading account only, reported in USDT. On-chain Earn balances aren't included — Bitget's API doesn't expose them.",
         fetchBalance: c => fetchBitgetBalance(c.apiKey!, c.apiSecret!, c.apiPassphrase!),
+    },
+    max: {
+        label: "MAX",
+        fields: [MAX_ACCESS_KEY, MAX_SECRET_KEY],
+        guide: MaxKeyGuide,
+        keyHint: "Use a read-only key with IP access unrestricted.",
+        note: "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included.",
+        fetchBalance: c => fetchMaxBalance(c.apiKey!, c.apiSecret!),
     },
 };
 

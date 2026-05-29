@@ -36,13 +36,21 @@ they live in the user's own Notion config. Each provider signs differently, so
 **the signer is per-provider and not shared** — only the `ProviderBalance`
 response shape and the frontend plumbing are common.
 
-Two integrations already exist and are your templates. **Read both before writing
-anything** — pick whichever is the closer analog to the new provider:
+Two integrations already exist — **read both before writing anything**, not to copy
+verbatim but to absorb the shape and idioms. A new provider may match neither; when it
+doesn't, write its signer and balance logic fresh and keep them as their own clean
+piece rather than forcing them into a template's mold. The boilerplate around them
+(handler, lib wrapper, descriptor entry) still copies cleanly.
 
 | Template                 | Credentials                   | Signing                                     |
 | ------------------------ | ----------------------------- | ------------------------------------------- |
 | `backend/src/binance.ts` | key + secret                  | HMAC-SHA256 of the query string, **hex**    |
 | `backend/src/bitget.ts`  | key + secret + **passphrase** | HMAC-SHA256 of `ts+method+path`, **base64** |
+
+**Encoding is two independent axes, not one toggle:** how the signed string is built
+_and_ how the digest is encoded vary separately. MAX is a third combo — it signs a
+**base64 payload** (a JSON of sorted `path`+`nonce`) yet hex-encodes the **signature**.
+Don't classify a provider as "base64" or "hex"; confirm each axis on its own.
 
 The frontend is fully declarative: adding a provider there is mostly **one entry**
 in `frontend/src/pages/accounts/components/apiProviders.ts`.
@@ -51,19 +59,30 @@ in `frontend/src/pages/accounts/components/apiProviders.ts`.
 
 This is where integrations actually differ; get it right before coding. Use the
 provider's official API docs via whatever documentation lookup, browser, or web
-fetch tool is available. Pin down:
+fetch tool is available. **If the docs site is a JS-rendered SPA that fetch tools
+return empty for, the provider's official SDK source is the authoritative fallback —
+clone the repo and read it; signing, endpoints, and field names are all there. For
+MAX this was the single biggest time-saver.** Pin down:
 
 1. **Balance endpoint.** Prefer a single "total assets across all account types"
    endpoint (Binance `sapi/v1/asset/wallet/balance`, Bitget
    `/api/v2/account/all-account-balance`). If none exists, you may need to sum a
    few endpoints (spot + funding + futures…). Note the response shape and which
-   field holds the per-wallet value.
+   field holds the per-wallet value. **Some exchanges report only per-asset balances
+   with no valued total at all — MAX's `/api/v3/wallet/spot/accounts` returns
+   `{currency, balance, locked, staked}` per coin. Then you must fetch the public
+   tickers, build a price map, and value each asset yourself: direct `<coin><quote>`
+   market if it exists, else bridge via `<coin>usdt × usdt<quote>`. Log any asset with
+   no market, so a silent gap can't masquerade as a complete total.**
 2. **Quote currency.** Does it accept a quote-asset param (Binance), or only
    report in one currency (Bitget is USDT-only)? This decides the `currency` you
    return and whether the account's currency matters.
 3. **Credentials needed.** key + secret? a passphrase too? a token / account id?
-4. **Signing scheme.** What string is signed (query? `ts+method+path+body`?),
-   which HMAC hash, and the encoding (**hex vs base64** — easy to get wrong).
+4. **Signing scheme.** What string is signed (query? `ts+method+path+body`? a base64
+   JSON payload carrying `path`+`nonce`, like MAX?), which HMAC hash, and the digest
+   encoding (**hex vs base64** — easy to get wrong, and independent of how the signed
+   string itself is encoded). Note any nonce/timestamp freshness window (MAX rejects a
+   nonce more than 30s off server time).
 5. **Required headers** (e.g. `X-MBX-APIKEY` vs `ACCESS-KEY` / `ACCESS-SIGN` /
    `ACCESS-TIMESTAMP` / `ACCESS-PASSPHRASE`).
 6. **Error shape.** Read it carefully — see the gotcha about non-2xx bodies below.
@@ -177,7 +196,13 @@ Manual final check:
   Binance returns HTTP 401 with a JSON body; Bitget returns HTTP 400 _and_ an
   in-body `code` like `40037`. Parse the body regardless of status and key off the
   code so the user gets "Apikey does not exist", not "HTTP 400".
-- **hex vs base64** is the most common signing mistake. Confirm from the docs.
+- **hex vs base64** is the most common signing mistake — and the payload encoding and
+  the signature encoding are _separate_ choices (MAX = base64 payload + hex signature).
+  Confirm both axes from the docs or the SDK source, not by analogy to another provider.
+- **Public market-data endpoints have their own quirks.** When you need "all prices"
+  to value holdings, verify the call actually returns everything: MAX's `/api/v3/tickers`
+  rejects a param-less call (`markets is missing`), while v2 `/api/v2/tickers` returns
+  every market in one shot. Pick the version that does what you need.
 - **`erasableSyntaxOnly`** is on in the frontend tsconfig: no `enum`, `namespace`,
   or constructor parameter properties. Use plain field declarations / unions.
 - **`<provider.guide />`** (dot notation) is a valid JSX component reference, so the

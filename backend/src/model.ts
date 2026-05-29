@@ -45,6 +45,11 @@ export interface BitgetBalanceRequest {
     passphrase: string;
 }
 
+export interface MaxBalanceRequest {
+    apiKey: string;
+    apiSecret: string;
+}
+
 export interface ProviderBalance {
     total: number;
     currency: string;

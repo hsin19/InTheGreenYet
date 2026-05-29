@@ -6,6 +6,7 @@ import {
     handleUpdateConfig,
 } from "./handlers/config";
 import { handleInit } from "./handlers/init";
+import { handleMaxBalance } from "./handlers/max";
 import {
     handleCreateSnapshots,
     handleGetSnapshots,
@@ -65,6 +66,10 @@ export default {
 
         if (url.pathname === "/api/bitget/balance" && request.method === "POST") {
             return handleBitgetBalance(request, url, env);
+        }
+
+        if (url.pathname === "/api/max/balance" && request.method === "POST") {
+            return handleMaxBalance(request, url, env);
         }
 
         if (url.pathname === "/health") {
