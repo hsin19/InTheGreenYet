@@ -2,6 +2,16 @@
 
 Personal investment tracker. React 19 SPA → Cloudflare Worker → Notion API.
 
+## Skills
+
+Reusable task procedures live as `SKILL.md` files. When a task matches the
+description below, **read the full file before acting** — don't work from this
+summary alone.
+
+- **add-provider** — connect a new account provider's live-balance API
+  (crypto exchange / stock broker / bank): a Worker signing proxy plus a
+  declarative frontend entry. → `skills/add-provider/SKILL.md`
+
 ## Workspace
 
 npm workspaces; **always run commands from the repo root**.
