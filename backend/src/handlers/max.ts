@@ -18,7 +18,7 @@ export async function handleMaxBalance(request: Request, _url: URL, env: Env): P
             throw new ClientError("Missing apiKey/apiSecret");
         }
 
-        const result = await fetchMaxTotal(body.apiKey, body.apiSecret, request.headers.get("User-Agent") ?? undefined);
+        const result = await fetchMaxTotal(body.apiKey, body.apiSecret);
         return jsonResponse(result, 200, env.FRONTEND_URL);
     } catch (err) {
         console.error("handleMaxBalance error:", err);

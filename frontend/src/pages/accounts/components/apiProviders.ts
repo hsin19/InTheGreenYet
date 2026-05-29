@@ -88,7 +88,7 @@ export const API_PROVIDERS: Record<string, ApiProvider> = {
         fields: [MAX_ACCESS_KEY, MAX_SECRET_KEY],
         guide: MaxKeyGuide,
         keyHint: "Use a read-only key with IP access unrestricted.",
-        note: "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included.",
+        note: "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually.",
         fetchBalance: c => fetchMaxBalance(c.apiKey!, c.apiSecret!),
     },
 };
