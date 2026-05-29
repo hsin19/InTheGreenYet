@@ -15,10 +15,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { type AccountConfig } from "@/hooks/useAppData";
-import {
-    useEffect,
-    useState,
-} from "react";
+import { useState } from "react";
 import { getApiProvider } from "./apiProviders";
 
 interface AccountDialogProps {
@@ -43,41 +40,26 @@ export function AccountDialog({
 }: AccountDialogProps) {
     const isCreate = editingKey === null;
 
-    const [key, setKey] = useState("");
-    const [displayName, setDisplayName] = useState("");
-    const [currency, setCurrency] = useState("");
-    const [accountType, setAccountType] = useState("bank");
-    const [isInvestment, setIsInvestment] = useState(true);
-    const [credentials, setCredentials] = useState<Record<string, string>>({});
+    // Parent passes a fresh `key` prop on each open so this component remounts
+    // and lazy useState initializers re-run with the current props.
+    const [key, setKey] = useState(() => isCreate ? "" : editingKey);
+    const [displayName, setDisplayName] = useState(() => isCreate ? "" : existingConfig?.displayName ?? "");
+    const [currency, setCurrency] = useState(() => isCreate ? "" : existingConfig?.currency ?? "");
+    const [accountType, setAccountType] = useState(() => isCreate ? "bank" : existingConfig?.accountType ?? "bank");
+    const [isInvestment, setIsInvestment] = useState(() => isCreate ? true : existingConfig?.isInvestment ?? true);
+    const [credentials, setCredentials] = useState<Record<string, string>>(() => {
+        if (isCreate) return {};
+        return {
+            apiKey: existingConfig?.apiKey ?? "",
+            apiSecret: existingConfig?.apiSecret ?? "",
+            apiPassphrase: existingConfig?.apiPassphrase ?? "",
+            apiMode: existingConfig?.apiMode ?? "",
+        } as Record<string, string>;
+    });
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const provider = getApiProvider(accountType);
-
-    useEffect(() => {
-        if (!open) return;
-        if (isCreate) {
-            setKey("");
-            setDisplayName("");
-            setCurrency("");
-            setAccountType("bank");
-            setCredentials({});
-        } else {
-            setKey(editingKey ?? "");
-            setDisplayName(existingConfig?.displayName ?? "");
-            setCurrency(existingConfig?.currency ?? "");
-            setAccountType(existingConfig?.accountType ?? "bank");
-            setIsInvestment(existingConfig?.isInvestment ?? true);
-            setCredentials({
-                apiKey: existingConfig?.apiKey ?? "",
-                apiSecret: existingConfig?.apiSecret ?? "",
-                apiPassphrase: existingConfig?.apiPassphrase ?? "",
-                apiMode: existingConfig?.apiMode ?? "",
-            });
-        }
-        setError(null);
-        setSaving(false);
-    }, [open, isCreate, editingKey, existingConfig]);
 
     const handleSave = async () => {
         const trimmedKey = isCreate ? key.trim() : editingKey!;
