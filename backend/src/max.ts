@@ -68,20 +68,23 @@ async function signMax(secret: string, payload: string): Promise<string> {
 }
 
 /** Fetch every spot-wallet currency balance via the signed accounts endpoint. */
-async function fetchSpotAccounts(apiKey: string, apiSecret: string): Promise<MaxAccount[]> {
+async function fetchSpotAccounts(apiKey: string, apiSecret: string, userAgent?: string): Promise<MaxAccount[]> {
     const nonce = Date.now();
     // Payload keys must be sorted; with only nonce + path that's already the order.
     const payload = btoa(JSON.stringify({ nonce, path: ACCOUNTS_PATH }));
     const signature = await signMax(apiSecret, payload);
 
-    const res = await fetch(`${MAX_BASE}${ACCOUNTS_PATH}?nonce=${nonce}`, {
-        headers: {
-            "X-MAX-ACCESSKEY": apiKey,
-            "X-MAX-PAYLOAD": payload,
-            "X-MAX-SIGNATURE": signature,
-            "Content-Type": "application/json",
-        },
-    });
+    const headers: Record<string, string> = {
+        "X-MAX-ACCESSKEY": apiKey,
+        "X-MAX-PAYLOAD": payload,
+        "X-MAX-SIGNATURE": signature,
+        "Content-Type": "application/json",
+    };
+    // Forward the caller's real browser UA — the Workers fetch sends none by default,
+    // and MAX's edge may block a UA-less request.
+    if (userAgent) headers["User-Agent"] = userAgent;
+
+    const res = await fetch(`${MAX_BASE}${ACCOUNTS_PATH}?nonce=${nonce}`, { headers });
 
     if (!res.ok) {
         const { detail, code, edgeBlocked } = await readError(res);
@@ -105,10 +108,11 @@ async function fetchSpotAccounts(apiKey: string, apiSecret: string): Promise<Max
 }
 
 /** Fetch all market tickers (public) as a market-id → last-price map. */
-async function fetchPriceMap(): Promise<Map<string, number>> {
-    const res = await fetch(TICKERS_URL);
+async function fetchPriceMap(userAgent?: string): Promise<Map<string, number>> {
+    const res = await fetch(TICKERS_URL, userAgent ? { headers: { "User-Agent": userAgent } } : undefined);
     if (!res.ok) {
-        throw new ClientError(`Couldn't load MAX market prices: HTTP ${res.status}`);
+        const { detail } = await readError(res);
+        throw new ClientError(`Couldn't load MAX market prices: ${detail}`);
     }
     const tickers = await res.json() as Record<string, MaxTicker>;
     const prices = new Map<string, number>();
@@ -125,10 +129,10 @@ async function fetchPriceMap(): Promise<Map<string, number>> {
  * <coin>twd directly, else <coin>usdt × usdttwd. Currencies with no TWD/USDT
  * market are skipped (logged), since they can't be valued.
  */
-export async function fetchMaxTotal(apiKey: string, apiSecret: string): Promise<ProviderBalance> {
+export async function fetchMaxTotal(apiKey: string, apiSecret: string, userAgent?: string): Promise<ProviderBalance> {
     const [accounts, prices] = await Promise.all([
-        fetchSpotAccounts(apiKey, apiSecret),
-        fetchPriceMap(),
+        fetchSpotAccounts(apiKey, apiSecret, userAgent),
+        fetchPriceMap(userAgent),
     ]);
 
     const usdtTwd = prices.get("usdttwd");
