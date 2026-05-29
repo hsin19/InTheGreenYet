@@ -24,6 +24,33 @@ interface MaxTicker {
 }
 
 /**
+ * Build an error detail from a failed response. MAX's API wraps failures in
+ * `{ error: { code, message } }`, but a non-JSON body means the request never
+ * reached the API — usually Cloudflare's edge blocking this server's IP, which we
+ * detect so the message points at the real cause instead of a guessed-at one.
+ */
+async function readError(res: Response): Promise<{ detail: string; code?: number; edgeBlocked: boolean; }> {
+    const text = await res.text().catch(() => "");
+    let code: number | undefined;
+    let message: string | undefined;
+    try {
+        const json = JSON.parse(text) as MaxErrorBody;
+        code = json.error?.code;
+        message = json.error?.message;
+    } catch {
+        // non-JSON body (HTML challenge page, empty, etc.)
+    }
+    // Log the raw response so `wrangler tail` shows exactly what MAX returned.
+    console.error(`MAX ${res.status} response:`, text.slice(0, 500));
+    const edgeBlocked = !message && /cloudflare|attention required|cf-ray|just a moment|access denied/i.test(text);
+    // When it isn't MAX's JSON error envelope, surface a snippet of the body so the
+    // real cause is visible in the UI instead of a bare status code.
+    const snippet = text.replace(/\s+/g, " ").trim().slice(0, 160);
+    const detail = message ? `${message} (code ${code})` : `HTTP ${res.status}${snippet ? `: ${snippet}` : ""}`;
+    return { detail, code, edgeBlocked };
+}
+
+/**
  * MAX signs the *base64-encoded* JSON payload (which itself carries the request
  * path + nonce) with HMAC-SHA256 and hex-encodes the digest — base64 payload but
  * hex signature, unlike Binance (hex over the query) or Bitget (base64 digest).
@@ -56,22 +83,19 @@ async function fetchSpotAccounts(apiKey: string, apiSecret: string): Promise<Max
         },
     });
 
-    // MAX wraps failures in { success: false, error: { code, message } } and keys
-    // the cause off the code, so parse the body regardless of the HTTP status.
     if (!res.ok) {
-        const body = await res.json().catch(() => null) as MaxErrorBody | null;
-        const err = body?.error;
-        const detail = err ? `${err.message} (code ${err.code})` : `HTTP ${res.status}`;
-        // 2006 wrong signature, 2008 access key not found → bad credentials.
-        if (err && (err.code === 2006 || err.code === 2008)) {
+        const { detail, code, edgeBlocked } = await readError(res);
+        // A non-API block (HTML challenge) means MAX's edge rejected this server's IP,
+        // not the credentials — say so instead of blaming the key.
+        if (edgeBlocked) {
             throw new ClientError(
-                `MAX rejected the credentials — check the API key and secret are valid and have read permission. ${detail}`,
+                `MAX's Cloudflare edge blocked the request from this server (HTTP ${res.status}). MAX appears to reject requests from cloud/Worker IPs.`,
             );
         }
-        // Read permission missing / IP not allowed surface as authorization failures.
-        if (res.status === 403) {
+        // 2006 wrong signature, 2008 access key not found → bad credentials.
+        if (code === 2006 || code === 2008) {
             throw new ClientError(
-                `MAX rejected the request — give the key read access and leave its IP restriction empty (this app runs on Cloudflare's rotating IPs). ${detail}`,
+                `MAX rejected the credentials — check the API key and secret are valid and have read permission. ${detail}`,
             );
         }
         throw new ClientError(`MAX request failed: ${detail}`);
