@@ -115,37 +115,39 @@ export function TransferDialog({
                 <div className="flex flex-col gap-3 py-2">
                     {/* Title */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Title</label>
+                        <label htmlFor="transfer-title" className="text-xs text-muted">Title</label>
                         <Input
+                            id="transfer-title"
                             value={form.title}
                             onChange={e => set("title", e.target.value)}
                             placeholder={`${form.from || "?"} to ${form.to || "?"}`}
-                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                         />
                     </div>
 
                     {/* Date */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">
+                        <label htmlFor="transfer-date" className="text-xs text-muted">
                             Date <span className="text-red-400">*</span>
                         </label>
                         <Input
+                            id="transfer-date"
                             type="date"
                             value={form.date ?? ""}
                             onChange={e => set("date", e.target.value || null)}
-                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30 [color-scheme:dark]"
+                            className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 [color-scheme:dark]"
                         />
                     </div>
 
                     {/* From / To */}
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">
+                            <label htmlFor="transfer-from" className="text-xs text-muted">
                                 From <span className="text-red-400">*</span>
                             </label>
                             {hasAccounts ? (
                                 <Select value={form.from} onValueChange={val => set("from", val)}>
-                                    <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
+                                    <SelectTrigger id="transfer-from" className="bg-white/8 border-white/15 text-white">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -154,20 +156,21 @@ export function TransferDialog({
                                 </Select>
                             ) : (
                                 <Input
+                                    id="transfer-from"
                                     value={form.from}
                                     onChange={e => set("from", e.target.value)}
                                     placeholder="Source"
-                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                 />
                             )}
                         </div>
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">
+                            <label htmlFor="transfer-to" className="text-xs text-muted">
                                 To <span className="text-red-400">*</span>
                             </label>
                             {hasAccounts ? (
                                 <Select value={form.to} onValueChange={val => set("to", val)}>
-                                    <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
+                                    <SelectTrigger id="transfer-to" className="bg-white/8 border-white/15 text-white">
                                         <SelectValue placeholder="Select" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -176,10 +179,11 @@ export function TransferDialog({
                                 </Select>
                             ) : (
                                 <Input
+                                    id="transfer-to"
                                     value={form.to}
                                     onChange={e => set("to", e.target.value)}
                                     placeholder="Destination"
-                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                    className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                 />
                             )}
                         </div>
@@ -188,27 +192,28 @@ export function TransferDialog({
                     {/* Amount / Currency */}
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
-                            <label className="text-xs text-muted">
+                            <label htmlFor="transfer-amount" className="text-xs text-muted">
                                 Amount <span className="text-red-400">*</span>
                             </label>
                             <Input
+                                id="transfer-amount"
                                 type="number"
                                 step="any"
                                 value={form.amount ?? ""}
                                 onChange={e => set("amount", e.target.value ? Number(e.target.value) : null)}
                                 placeholder="0"
-                                className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                             />
                         </div>
                         <div className="flex flex-col gap-1 w-28">
-                            <label className="text-xs text-muted">
+                            <label htmlFor="transfer-currency" className="text-xs text-muted">
                                 Currency <span className="text-red-400">*</span>
                             </label>
                             <Select
                                 value={form.currency ?? ""}
                                 onValueChange={val => set("currency", val || null)}
                             >
-                                <SelectTrigger className="bg-white/8 border-white/15 text-white focus:ring-1 focus:ring-white/30">
+                                <SelectTrigger id="transfer-currency" className="bg-white/8 border-white/15 text-white">
                                     <SelectValue placeholder="—" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
@@ -226,19 +231,20 @@ export function TransferDialog({
                         return (
                             <div className="flex gap-3">
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label className="text-xs text-muted">Fee</label>
+                                    <label htmlFor="transfer-fee" className="text-xs text-muted">Fee</label>
                                     <Input
+                                        id="transfer-fee"
                                         type="number"
                                         step="any"
                                         value={form.fee ?? ""}
                                         onChange={e => set("fee", e.target.value ? Number(e.target.value) : null)}
                                         placeholder="0"
-                                        className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                        className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1 flex-1">
                                     <div className="flex items-baseline justify-between gap-1">
-                                        <label className="text-xs text-muted">Exchange Rate</label>
+                                        <label htmlFor="transfer-rate" className="text-xs text-muted">Exchange Rate</label>
                                         {refRate != null && (
                                             <span className="text-xs text-blue-400/70 tabular-nums">
                                                 ref {refRate.toFixed(4)}
@@ -246,12 +252,13 @@ export function TransferDialog({
                                         )}
                                     </div>
                                     <Input
+                                        id="transfer-rate"
                                         type="number"
                                         step="any"
                                         value={form.exchangeRate ?? ""}
                                         onChange={e => set("exchangeRate", e.target.value ? Number(e.target.value) : null)}
                                         placeholder={refRate != null ? refRate.toFixed(4) : "1"}
-                                        className="bg-white/8 border-white/15 text-white placeholder:text-muted/50 focus-visible:ring-1 focus-visible:ring-white/30"
+                                        className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                     />
                                 </div>
                             </div>
@@ -260,13 +267,14 @@ export function TransferDialog({
 
                     {/* Note */}
                     <div className="flex flex-col gap-1">
-                        <label className="text-xs text-muted">Note</label>
+                        <label htmlFor="transfer-note" className="text-xs text-muted">Note</label>
                         <textarea
+                            id="transfer-note"
                             value={form.note}
                             onChange={e => set("note", e.target.value)}
                             placeholder="Optional note"
                             rows={2}
-                            className="w-full bg-white/8 border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-muted/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/30 resize-none"
+                            className="w-full bg-white/8 border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 resize-none"
                         />
                     </div>
 
@@ -285,7 +293,7 @@ export function TransferDialog({
                         onClick={handleSave}
                         disabled={saving}
                     >
-                        {saving ? "Saving..." : "Save"}
+                        {saving ? "Saving…" : "Save"}
                     </Button>
                 </DialogFooter>
             </DialogContent>

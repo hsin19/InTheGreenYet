@@ -21,7 +21,7 @@
     --color-surface: #0f1117;
     --color-surface-card: #181b23;
     --color-surface-hover: #1f2330;
-    --color-muted: #6b7280;
+    --color-muted: #8a93a3;
 }
 
 body {
@@ -157,5 +157,22 @@ body {
     }
     html {
         @apply font-sans;
+    }
+    /* Keyboard focus for plain elements (shadcn controls have their own ring) */
+    :focus-visible {
+        outline: 2px solid var(--ring);
+        /* Inset so overflow-hidden cards don't clip the ring */
+        outline-offset: -2px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }

@@ -78,7 +78,7 @@ function AppLayout() {
                             <div className="flex min-h-[50vh] items-center justify-center pt-24">
                                 <div className="flex flex-col items-center gap-4">
                                     <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                                    <p className="text-muted text-sm font-medium">Loading...</p>
+                                    <p className="text-muted text-sm font-medium">Loading…</p>
                                 </div>
                             </div>
                         }

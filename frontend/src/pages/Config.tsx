@@ -1,5 +1,6 @@
 import { useAppData } from "@/hooks/useAppData";
 import {
+    AlertCircle,
     LogOut,
     Plus,
     RefreshCw,
@@ -47,13 +48,17 @@ function CurrencyInput({
     currencyOptions,
     placeholder,
     className,
+    id,
+    "aria-label": ariaLabel,
 }: {
-    value: string;
-    onChange: (val: string) => void;
-    onConfirm?: () => void;
-    currencyOptions: string[];
-    placeholder?: string;
-    className?: string;
+    "value": string;
+    "onChange": (val: string) => void;
+    "onConfirm"?: () => void;
+    "currencyOptions": string[];
+    "placeholder"?: string;
+    "className"?: string;
+    "id"?: string;
+    "aria-label"?: string;
 }) {
     const [open, setOpen] = useState(false);
     const filtered = value
@@ -64,6 +69,8 @@ function CurrencyInput({
         <Popover open={open && filtered.length > 0} onOpenChange={setOpen}>
             <PopoverAnchor asChild>
                 <Input
+                    id={id}
+                    aria-label={ariaLabel}
                     type="text"
                     value={value}
                     onChange={e => {
@@ -136,18 +143,22 @@ function BaseCurrencySection({
         <Card className="p-6 gap-5">
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h2 className="text-white font-semibold text-base">Base Currency</h2>
+                    <label htmlFor="base-currency" className="text-white font-semibold text-base block cursor-pointer text-pretty">
+                        Base Currency
+                    </label>
                     <p className="text-muted text-xs mt-0.5">The primary currency total assets are calculated in</p>
                 </div>
                 <SaveButton saving={state.saving} saved={state.saved} onSave={onSave} />
             </div>
 
             <CurrencyInput
+                id="base-currency"
+                aria-label="Base Currency"
                 value={state.value}
                 onChange={val => onChange({ ...state, value: val, error: null, saved: false })}
                 onConfirm={onSave}
                 currencyOptions={currencyOptions}
-                placeholder="e.g. USD, EUR, JPY..."
+                placeholder="e.g. USD, EUR, JPY…"
                 className="max-w-[200px]"
             />
             {state.error && <p className="text-red-400 text-xs">{state.error}</p>}
@@ -207,7 +218,7 @@ function CurrenciesSection({
                 {state.items.map(item => (
                     <span key={item} className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-white/10 text-sm text-white">
                         {item}
-                        <button onClick={() => removeItem(item)} className="text-muted hover:text-red-400 transition-colors cursor-pointer" aria-label={`Remove ${item}`}>
+                        <button onClick={() => removeItem(item)} className="-m-1 p-1 rounded text-muted hover:text-red-400 transition-colors cursor-pointer" aria-label={`Remove ${item}`}>
                             <Trash2 className="w-3 h-3" />
                         </button>
                     </span>
@@ -215,15 +226,18 @@ function CurrenciesSection({
             </div>
 
             <div className="flex items-center gap-2">
+                <label htmlFor="add-currency" className="sr-only">Add currency</label>
                 <CurrencyInput
+                    id="add-currency"
+                    aria-label="Add Currency"
                     value={state.input}
                     onChange={val => onChange({ ...state, input: val, error: null })}
                     onConfirm={() => addItem()}
                     currencyOptions={currencyOptions}
-                    placeholder="Add currency (e.g. EUR, JPY)..."
+                    placeholder="Add currency (e.g. EUR, JPY)…"
                     className="flex-1"
                 />
-                <Button size="icon" onClick={() => addItem()} disabled={!state.input.trim()}>
+                <Button size="icon" onClick={() => addItem()} disabled={!state.input.trim()} aria-label="Add currency button">
                     <Plus className="w-4 h-4" />
                 </Button>
             </div>
@@ -243,7 +257,7 @@ function SaveButton({ saving, saved, onSave }: { saving: boolean; saved: boolean
             disabled={saving}
         >
             {saving ? <RefreshCw className="w-3 h-3 animate-spin mr-1.5" /> : <Save className="w-3 h-3 mr-1.5" />}
-            {saving ? "Saving..." : saved ? "Saved!" : "Save"}
+            {saving ? "Saving…" : saved ? "Saved!" : "Save"}
         </Button>
     );
 }
@@ -317,19 +331,19 @@ function Config() {
     return (
         <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-white">Settings</h1>
+                <h1 className="text-2xl font-bold text-white text-pretty">Settings</h1>
             </div>
 
             {status === "loading" && (
                 <div className="flex flex-col items-center gap-3 py-16">
                     <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                    <p className="text-muted text-sm">Loading config...</p>
+                    <p className="text-muted text-sm">Loading config…</p>
                 </div>
             )}
 
             {status === "error" && (
                 <Card className="items-center text-center p-8 gap-3 border-red-500/20 shadow-red-500/5">
-                    <span className="text-2xl">❌</span>
+                    <AlertCircle className="size-7 text-rose-400" aria-hidden="true" />
                     <p className="text-red-400 text-sm font-medium">Failed to load config</p>
                     <Button variant="secondary" onClick={refresh} className="mt-2">
                         Retry

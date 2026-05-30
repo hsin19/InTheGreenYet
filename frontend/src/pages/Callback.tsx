@@ -47,8 +47,11 @@ function Callback() {
     }, [searchParams, navigate, setAuthData]);
 
     return (
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <p>Connecting to Notion...</p>
+        <div className="flex min-h-screen items-center justify-center bg-surface">
+            <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
+                <p className="text-muted text-sm font-medium">Connecting to Notion…</p>
+            </div>
         </div>
     );
 }

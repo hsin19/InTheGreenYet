@@ -3,6 +3,7 @@ import {
     useAppData,
 } from "@/hooks/useAppData";
 import {
+    AlertCircle,
     Plus,
     RefreshCw,
 } from "lucide-react";
@@ -91,20 +92,23 @@ export function Accounts() {
     return (
         <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8 flex items-start justify-between">
-                <h1 className="text-2xl font-bold text-white">Accounts</h1>
+                <h1 className="text-2xl font-bold text-white text-pretty">Accounts</h1>
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
                         size="icon"
                         onClick={refresh}
                         disabled={status === "loading"}
+                        aria-label="Refresh accounts"
+                        title="Refresh"
                     >
                         <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
                     </Button>
                     <Button
                         size="icon"
                         onClick={openAddDialog}
-                        title="Add Account"
+                        aria-label="Add account"
+                        title="Add account"
                     >
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -141,13 +145,13 @@ export function Accounts() {
             {status === "loading" && (
                 <div className="flex flex-col items-center gap-3 py-16">
                     <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                    <p className="text-muted text-sm">Loading accounts...</p>
+                    <p className="text-muted text-sm">Loading accounts…</p>
                 </div>
             )}
 
             {status === "error" && (
                 <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3">
-                    <span className="text-2xl">❌</span>
+                    <AlertCircle className="size-7 text-rose-400" aria-hidden="true" />
                     <p className="text-red-400 text-sm font-medium">Failed to load accounts</p>
                     <Button
                         variant="secondary"

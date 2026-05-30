@@ -38,7 +38,7 @@ function Landing() {
                             onClick={login}
                             className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
                         >
-                            <NotionIcon className="w-5 h-5 mr-2" />
+                            <NotionIcon className="w-5 h-5 mr-2" aria-hidden="true" />
                             Connect to Notion
                         </Button>
                     </div>
@@ -67,18 +67,20 @@ function Landing() {
                     <img
                         src="/icon.svg"
                         alt="InTheGreenYet"
+                        width={96}
+                        height={96}
                         className="relative w-24 h-24 drop-shadow-lg"
                     />
                 </div>
 
                 {/* Title */}
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                    <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl text-pretty">
                         InTheGreenYet
                     </h1>
                     <p className="mt-2 text-muted text-sm sm:text-base leading-relaxed">
-                        It's not about today's profit —<br className="sm:hidden" />
-                        it's about knowing where you truly stand.
+                        It’s not about today’s profit —<br className="sm:hidden" />
+                        it’s about knowing where you truly stand.
                     </p>
                 </div>
 
@@ -94,7 +96,7 @@ function Landing() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 text-muted/40 hover:text-muted transition-colors"
                 >
-                    <GitHubIcon className="w-3.5 h-3.5" />
+                    <GitHubIcon className="w-3.5 h-3.5" aria-hidden="true" />
                     hsin19/InTheGreenYet
                 </a>
             </footer>

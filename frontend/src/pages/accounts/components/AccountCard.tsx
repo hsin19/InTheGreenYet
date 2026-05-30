@@ -118,7 +118,7 @@ export function AccountCard({
                                 aria-label={`Fetch ${provider.label} balance for ${accountKey}`}
                                 title={`Fetch live balance from ${provider.label}`}
                             >
-                                <RefreshCw className={`w-3.5 h-3.5 ${liveLoading ? "animate-spin" : ""}`} />
+                                <RefreshCw className={`w-3.5 h-3.5 ${liveLoading ? "animate-spin" : ""}`} aria-hidden="true" />
                             </button>
                         )}
                         <button
@@ -129,7 +129,7 @@ export function AccountCard({
                             className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                             aria-label={`Settings for ${accountKey}`}
                         >
-                            <Settings2 className="w-3.5 h-3.5" />
+                            <Settings2 className="w-3.5 h-3.5" aria-hidden="true" />
                         </button>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
@@ -137,7 +137,7 @@ export function AccountCard({
                                     className="p-1.5 rounded text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
                                     aria-label={`Delete ${accountKey}`}
                                 >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                                 </button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-surface-card border-white/10 text-white">
@@ -178,8 +178,8 @@ export function AccountCard({
                                 disabled={applying}
                                 className="flex items-center gap-1 text-xs rounded-md bg-amber-400/20 border border-amber-400/40 text-amber-200 px-2.5 py-1.5 hover:bg-amber-400/30 transition-colors cursor-pointer disabled:opacity-50"
                             >
-                                <Check className="w-3.5 h-3.5" />
-                                {applying ? "Saving..." : "Apply"}
+                                <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                                {applying ? "Saving…" : "Apply"}
                             </button>
                         </div>
                     )}

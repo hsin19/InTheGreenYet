@@ -65,8 +65,9 @@ export function InlineAmount({
                         if (e.key === "Enter") commit();
                         if (e.key === "Escape") setEditing(false);
                     }}
-                    className="w-28 bg-surface border border-green-500/50 rounded px-2 py-0.5 text-sm text-white focus:outline-none"
+                    className="w-28 bg-surface border border-green-500/50 rounded px-2 py-0.5 text-sm text-white focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:outline-none"
                     autoFocus
+                    aria-label="Account balance"
                 />
             </div>
         );
@@ -85,11 +86,11 @@ export function InlineAmount({
                     <span className={`text-white tabular-nums ${large ? "font-semibold text-2xl" : "font-medium text-sm"}`}>
                         {config.amount.toLocaleString()}
                     </span>
-                    <Pencil className="w-3 h-3 text-muted hidden group-hover/amount:inline-block" />
+                    <Pencil className="w-3 h-3 text-muted hidden group-hover/amount:inline-block" aria-hidden="true" />
                 </>
             ) : (
                 <span className="text-muted/40 text-xs italic group-hover/amount:text-muted transition-colors">
-                    {saving ? "Saving..." : "Set balance"}
+                    {saving ? "Saving…" : "Set balance"}
                 </span>
             )}
         </button>
