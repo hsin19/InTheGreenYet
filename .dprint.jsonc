@@ -40,7 +40,8 @@
     "dist/**",
     ".wrangler/**",
     "worker-configuration.d.ts",
-    "**/*.svg"
+    "**/*.svg",
+    ".agents/**"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.95.15.wasm",
