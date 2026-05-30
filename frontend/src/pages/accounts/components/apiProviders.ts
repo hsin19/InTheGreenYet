@@ -3,6 +3,8 @@ import { fetchBinanceBalance } from "@/lib/binance";
 import { fetchBitgetBalance } from "@/lib/bitget";
 import { fetchMaxBalance } from "@/lib/max";
 import type { ProviderBalance } from "@/lib/model";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
 import type { ComponentType } from "react";
 import { BinanceKeyGuide } from "./BinanceKeyGuide";
 import { BitgetKeyGuide } from "./BitgetKeyGuide";
@@ -19,15 +21,15 @@ export type CredentialFieldName = Extract<keyof AccountConfig, `api${string}`>;
 export interface CredentialField {
     kind?: "secret";
     name: CredentialFieldName;
-    label: string;
+    label: MessageDescriptor;
 }
 
 /** A non-secret choice, rendered as a dropdown. Has a default so it's never "missing". */
 export interface SelectField {
     kind: "select";
     name: CredentialFieldName;
-    label: string;
-    options: { value: string; label: string; }[];
+    label: MessageDescriptor;
+    options: { value: string; label: MessageDescriptor; }[];
     default: string;
 }
 
@@ -46,24 +48,24 @@ export interface ApiProvider {
     /** Step-by-step guide for creating a read-only key on this provider. */
     guide: ComponentType;
     /** Short advice next to the guide link on what kind of key to create. */
-    keyHint?: string;
+    keyHint?: MessageDescriptor;
     /** Optional caveat shown in the connect box (e.g. coverage limits of the API). */
-    note?: string;
+    note?: MessageDescriptor;
     fetchBalance: (config: AccountConfig) => Promise<ProviderBalance>;
 }
 
-const API_KEY: CredentialField = { name: "apiKey", label: "API Key" };
-const API_SECRET: CredentialField = { name: "apiSecret", label: "API Secret" };
-const PASSPHRASE: CredentialField = { name: "apiPassphrase", label: "Passphrase" };
+const API_KEY: CredentialField = { name: "apiKey", label: msg`API Key` };
+const API_SECRET: CredentialField = { name: "apiSecret", label: msg`API Secret` };
+const PASSPHRASE: CredentialField = { name: "apiPassphrase", label: msg`Passphrase` };
 
-const MAX_ACCESS_KEY: CredentialField = { name: "apiKey", label: "Access Key" };
-const MAX_SECRET_KEY: CredentialField = { name: "apiSecret", label: "Secret Key" };
+const MAX_ACCESS_KEY: CredentialField = { name: "apiKey", label: msg`Access Key` };
+const MAX_SECRET_KEY: CredentialField = { name: "apiSecret", label: msg`Secret Key` };
 
 const BITGET_ACCOUNT_MODE: SelectField = {
     kind: "select",
     name: "apiMode",
-    label: "Account type",
-    options: [{ value: "classic", label: "Classic Trading account" }],
+    label: msg`Account type`,
+    options: [{ value: "classic", label: msg`Classic Trading account` }],
     default: "classic",
 };
 
@@ -72,23 +74,23 @@ export const API_PROVIDERS: Record<string, ApiProvider> = {
         label: "Binance",
         fields: [API_KEY, API_SECRET],
         guide: BinanceKeyGuide,
-        keyHint: "Use a read-only key (disable Trading & Withdrawals).",
+        keyHint: msg`Use a read-only key (disable Trading & Withdrawals).`,
         fetchBalance: c => fetchBinanceBalance(c.apiKey!, c.apiSecret!, c.currency || "USDT"),
     },
     bitget: {
         label: "Bitget",
         fields: [BITGET_ACCOUNT_MODE, API_KEY, API_SECRET, PASSPHRASE],
         guide: BitgetKeyGuide,
-        keyHint: "Set the key to Read-only (Select all is safe).",
-        note: "Classic Trading account only, reported in USDT. On-chain Earn balances aren't included — Bitget's API doesn't expose them.",
+        keyHint: msg`Set the key to Read-only (Select all is safe).`,
+        note: msg`Classic Trading account only, reported in USDT. On-chain Earn balances aren't included — Bitget's API doesn't expose them.`,
         fetchBalance: c => fetchBitgetBalance(c.apiKey!, c.apiSecret!, c.apiPassphrase!),
     },
     max: {
         label: "MAX",
         fields: [MAX_ACCESS_KEY, MAX_SECRET_KEY],
         guide: MaxKeyGuide,
-        keyHint: "Use a read-only key with IP access unrestricted.",
-        note: "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually.",
+        keyHint: msg`Use a read-only key with IP access unrestricted.`,
+        note: msg`Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually.`,
         fetchBalance: c => fetchMaxBalance(c.apiKey!, c.apiSecret!),
     },
 };

@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import {
     lazy,
     Suspense,
@@ -27,7 +28,9 @@ function App() {
                         <div className="flex min-h-screen items-center justify-center">
                             <div className="flex items-center gap-3">
                                 <div className="w-5 h-5 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                                <p className="text-muted text-sm">Loading…</p>
+                                <p className="text-muted text-sm">
+                                    <Trans>Loading…</Trans>
+                                </p>
                             </div>
                         </div>
                     }

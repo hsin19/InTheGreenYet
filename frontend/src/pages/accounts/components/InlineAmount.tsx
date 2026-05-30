@@ -1,4 +1,8 @@
 import { type AccountConfig } from "@/hooks/useAppData";
+import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
 import { Pencil } from "lucide-react";
 import {
     useRef,
@@ -18,6 +22,7 @@ export function InlineAmount({
     onSave,
     large = false,
 }: InlineAmountProps) {
+    const { t } = useLingui();
     const [editing, setEditing] = useState(false);
     const [value, setValue] = useState("");
     const [saving, setSaving] = useState(false);
@@ -67,7 +72,7 @@ export function InlineAmount({
                     }}
                     className="w-28 bg-surface border border-green-500/50 rounded px-2 py-0.5 text-sm text-white focus-visible:ring-2 focus-visible:ring-green-400 focus-visible:outline-none"
                     autoFocus
-                    aria-label="Account balance"
+                    aria-label={t`Account balance`}
                 />
             </div>
         );
@@ -78,7 +83,7 @@ export function InlineAmount({
             onClick={startEdit}
             disabled={saving}
             className="flex items-center gap-1.5 group/amount cursor-pointer text-left"
-            title="Click to edit balance"
+            title={t`Click to edit balance`}
         >
             {config.amount != null ? (
                 <>
@@ -90,7 +95,7 @@ export function InlineAmount({
                 </>
             ) : (
                 <span className="text-muted/40 text-xs italic group-hover/amount:text-muted transition-colors">
-                    {saving ? "Saving…" : "Set balance"}
+                    {saving ? <Trans>Saving…</Trans> : <Trans>Set balance</Trans>}
                 </span>
             )}
         </button>

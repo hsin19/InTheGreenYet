@@ -15,6 +15,10 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { type AccountConfig } from "@/hooks/useAppData";
+import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
 import { useState } from "react";
 import { getApiProvider } from "./apiProviders";
 
@@ -39,6 +43,7 @@ export function AccountDialog({
     onSave,
 }: AccountDialogProps) {
     const isCreate = editingKey === null;
+    const { t } = useLingui();
 
     // Parent passes a fresh `key` prop on each open so this component remounts
     // and lazy useState initializers re-run with the current props.
@@ -66,16 +71,16 @@ export function AccountDialog({
         const trimmedName = displayName.trim() || trimmedKey;
 
         if (isCreate && !trimmedKey) {
-            setError("Key is required");
+            setError(t`Key is required`);
             return;
         }
         if (isCreate && existingKeys.includes(trimmedKey)) {
-            setError(`Key "${trimmedKey}" already exists`);
+            setError(t`Key "${trimmedKey}" already exists`);
             return;
         }
 
         if (!currency) {
-            setError("Currency is required");
+            setError(t`Currency is required`);
             return;
         }
 
@@ -104,7 +109,7 @@ export function AccountDialog({
             await onSave(trimmedKey, next);
             onOpenChange(false);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to save");
+            setError(err instanceof Error ? err.message : t`Failed to save`);
         } finally {
             setSaving(false);
         }
@@ -116,7 +121,7 @@ export function AccountDialog({
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold text-white">
-                        {isCreate ? "New Account" : `Edit "${editingKey}"`}
+                        {isCreate ? <Trans>New Account</Trans> : <Trans>Edit "{editingKey}"</Trans>}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -124,29 +129,33 @@ export function AccountDialog({
                     {isCreate && (
                         <div className="flex flex-col gap-1">
                             <label htmlFor="account-key" className="text-xs text-muted">
-                                Key <span className="text-red-400">*</span>
+                                <Trans>Key</Trans> <span className="text-red-400">*</span>
                             </label>
                             <Input
                                 id="account-key"
                                 value={key}
                                 onChange={e => setKey(e.target.value)}
                                 onKeyDown={e => e.key === "Enter" && handleSave()}
-                                placeholder="e.g. binance"
+                                placeholder={t`e.g. binance`}
                                 className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                 autoFocus
                             />
-                            <p className="text-muted/50 text-xs">Identifier used in transfers. Cannot be changed later.</p>
+                            <p className="text-muted/50 text-xs">
+                                <Trans>Identifier used in transfers. Cannot be changed later.</Trans>
+                            </p>
                         </div>
                     )}
 
                     <div className="flex flex-col gap-1">
-                        <label htmlFor="account-display-name" className="text-xs text-muted">Display Name</label>
+                        <label htmlFor="account-display-name" className="text-xs text-muted">
+                            <Trans>Display Name</Trans>
+                        </label>
                         <Input
                             id="account-display-name"
                             value={displayName}
                             onChange={e => setDisplayName(e.target.value)}
                             onKeyDown={e => e.key === "Enter" && handleSave()}
-                            placeholder={isCreate ? key || "Display name" : editingKey ?? ""}
+                            placeholder={isCreate ? key || t`Display name` : editingKey ?? ""}
                             className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                             autoFocus={!isCreate}
                         />
@@ -154,55 +163,67 @@ export function AccountDialog({
 
                     <div className="flex flex-col gap-1">
                         <label htmlFor="account-currency" className="text-xs text-muted">
-                            Currency <span className="text-red-400">*</span>
+                            <Trans>Currency</Trans> <span className="text-red-400">*</span>
                         </label>
                         <Select
                             value={currency}
                             onValueChange={val => setCurrency(val)}
                         >
                             <SelectTrigger id="account-currency" className="bg-white/8 border-white/15 text-white">
-                                <SelectValue placeholder="Select currency" />
+                                <SelectValue placeholder={t`Select currency`} />
                             </SelectTrigger>
                             <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
                                 {availableCurrencies.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                             </SelectContent>
                         </Select>
-                        {availableCurrencies.length === 0 && <p className="text-amber-300/80 text-xs">No currencies yet — add one under Settings before creating an account.</p>}
+                        {availableCurrencies.length === 0 && (
+                            <p className="text-amber-300/80 text-xs">
+                                <Trans>No currencies yet — add one under Settings before creating an account.</Trans>
+                            </p>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-1">
                         <label htmlFor="account-type" className="text-xs text-muted">
-                            Account Type <span className="text-red-400">*</span>
+                            <Trans>Account Type</Trans> <span className="text-red-400">*</span>
                         </label>
                         <Select
                             value={accountType}
                             onValueChange={val => setAccountType(val)}
                         >
                             <SelectTrigger id="account-type" className="bg-white/8 border-white/15 text-white">
-                                <SelectValue placeholder="Select type" />
+                                <SelectValue placeholder={t`Select type`} />
                             </SelectTrigger>
                             <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
-                                <SelectItem value="bank">Bank</SelectItem>
+                                <SelectItem value="bank">
+                                    <Trans>Bank</Trans>
+                                </SelectItem>
                                 <SelectItem value="binance">Binance</SelectItem>
                                 <SelectItem value="okx">OKX</SelectItem>
                                 <SelectItem value="max">MAX</SelectItem>
                                 <SelectItem value="bitget">Bitget</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="other">
+                                    <Trans>Other</Trans>
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
                     {provider && (
                         <div className="flex flex-col gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
-                            <p className="text-xs font-medium text-white">Connect to {provider.label}</p>
+                            <p className="text-xs font-medium text-white">
+                                <Trans>Connect to {provider.label}</Trans>
+                            </p>
                             {provider.note && (
                                 <p className="rounded-md border border-amber-400/30 bg-amber-400/10 px-2.5 py-1.5 text-[11px] text-amber-200/90 leading-relaxed">
-                                    {provider.note}
+                                    {t(provider.note)}
                                 </p>
                             )}
                             {provider.fields.map(field => (
                                 <div key={field.name} className="flex flex-col gap-1">
-                                    <label htmlFor={`credential-${field.name}`} className="text-xs text-muted">{field.label}</label>
+                                    <label htmlFor={`credential-${field.name}`} className="text-xs text-muted">
+                                        {t(field.label)}
+                                    </label>
                                     {field.kind === "select"
                                         ? (
                                             <Select
@@ -213,7 +234,11 @@ export function AccountDialog({
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
-                                                    {field.options.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+                                                    {field.options.map(o => (
+                                                        <SelectItem key={o.value} value={o.value}>
+                                                            {t(o.label)}
+                                                        </SelectItem>
+                                                    ))}
                                                 </SelectContent>
                                             </Select>
                                         )
@@ -224,7 +249,7 @@ export function AccountDialog({
                                                 onChange={e => setCredentials(c => ({ ...c, [field.name]: e.target.value }))}
                                                 type="password"
                                                 autoComplete="off"
-                                                placeholder={field.label}
+                                                placeholder={t(field.label)}
                                                 className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                             />
                                         )}
@@ -232,7 +257,7 @@ export function AccountDialog({
                             ))}
                             <div className="flex items-center justify-between gap-2">
                                 <p className="text-muted/50 text-xs">
-                                    {provider.keyHint ?? "Use a read-only key."}
+                                    {provider.keyHint ? t(provider.keyHint) : t`Use a read-only key.`}
                                 </p>
                                 <provider.guide />
                             </div>
@@ -251,7 +276,7 @@ export function AccountDialog({
                             {isInvestment && <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[10px] text-black font-bold">✓</span>}
                         </span>
                         <span className="text-xs text-muted">
-                            Include in portfolio totals?
+                            <Trans>Include in portfolio totals?</Trans>
                         </span>
                     </label>
 
@@ -264,13 +289,13 @@ export function AccountDialog({
                         onClick={() => onOpenChange(false)}
                         disabled={saving}
                     >
-                        Cancel
+                        <Trans>Cancel</Trans>
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={saving}
                     >
-                        {saving ? "Saving…" : "Save"}
+                        {saving ? <Trans>Saving…</Trans> : <Trans>Save</Trans>}
                     </Button>
                 </DialogFooter>
             </DialogContent>

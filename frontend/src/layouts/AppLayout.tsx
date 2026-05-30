@@ -1,6 +1,10 @@
 import bgMainDark from "@/assets/images/bg-main-dark.png?format=webp&quality=80&imagetools";
 import { AppDataProvider } from "@/hooks/useAppData";
 import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
+import {
     ArrowLeftRight,
     Settings,
     Wallet,
@@ -14,6 +18,7 @@ import {
 import { useNotion } from "../hooks/useNotion";
 
 function AppNav() {
+    const { t } = useLingui();
     return (
         <header className="fixed bottom-6 sm:bottom-auto sm:top-6 inset-x-0 flex justify-center z-50 pointer-events-none px-4">
             <div className="pointer-events-auto flex items-center justify-between px-2 py-1.5 rounded-full border border-white/[0.15] bg-white/[0.07] backdrop-blur-xl shadow-2xl shadow-black/40 ring-1 ring-white/[0.05] w-fit gap-8 sm:gap-12 relative overflow-hidden">
@@ -22,26 +27,32 @@ function AppNav() {
                     <NavLink
                         to="/transfers"
                         className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
-                        aria-label="Transfers"
+                        aria-label={t`Transfers`}
                     >
                         <ArrowLeftRight className="w-4 h-4 shrink-0" />
-                        <span className="hidden sm:inline">Transfers</span>
+                        <span className="hidden sm:inline">
+                            <Trans>Transfers</Trans>
+                        </span>
                     </NavLink>
                     <NavLink
                         to="/accounts"
                         className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
-                        aria-label="Accounts"
+                        aria-label={t`Accounts`}
                     >
                         <Wallet className="w-4 h-4 shrink-0" />
-                        <span className="hidden sm:inline">Accounts</span>
+                        <span className="hidden sm:inline">
+                            <Trans>Accounts</Trans>
+                        </span>
                     </NavLink>
                     <NavLink
                         to="/config"
                         className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive ? "bg-white/[0.12] text-white ring-1 ring-white/[0.08]" : "text-muted hover:text-white hover:bg-white/[0.07]"}`}
-                        aria-label="Settings"
+                        aria-label={t`Settings`}
                     >
                         <Settings className="w-4 h-4 shrink-0" />
-                        <span className="hidden sm:inline">Settings</span>
+                        <span className="hidden sm:inline">
+                            <Trans>Settings</Trans>
+                        </span>
                     </NavLink>
                 </nav>
             </div>
@@ -78,7 +89,9 @@ function AppLayout() {
                             <div className="flex min-h-[50vh] items-center justify-center pt-24">
                                 <div className="flex flex-col items-center gap-4">
                                     <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                                    <p className="text-muted text-sm font-medium">Loading…</p>
+                                    <p className="text-muted text-sm font-medium">
+                                        <Trans>Loading…</Trans>
+                                    </p>
                                 </div>
                             </div>
                         }

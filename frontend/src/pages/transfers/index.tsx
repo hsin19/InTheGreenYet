@@ -3,6 +3,10 @@ import { Card } from "@/components/ui/card";
 import { useAppData } from "@/hooks/useAppData";
 import { useNotion } from "@/hooks/useNotion";
 import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
+import {
     AlertCircle,
     ChevronsDown,
     ChevronsUp,
@@ -18,6 +22,7 @@ function Transfers() {
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [addOpen, setAddOpen] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
+    const { t } = useLingui();
 
     const accountKeys = [...new Set(transfers.flatMap(t => [t.from, t.to].filter(Boolean)))];
     const filteredTransfers = selectedAccount
@@ -41,14 +46,16 @@ function Transfers() {
         <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
-                <h1 className="text-2xl font-bold text-white text-pretty">Transfers</h1>
+                <h1 className="text-2xl font-bold text-white text-pretty">
+                    <Trans>Transfers</Trans>
+                </h1>
                 <div className="flex items-center gap-2">
                     {status === "ready" && filteredTransfers.length > 0 && (
                         <>
-                            <Button variant="outline" size="icon" onClick={expandAll} aria-label="Expand all transfers" title="Expand all">
+                            <Button variant="outline" size="icon" onClick={expandAll} aria-label={t`Expand all transfers`} title={t`Expand all`}>
                                 <ChevronsDown className="w-4 h-4" />
                             </Button>
-                            <Button variant="outline" size="icon" onClick={collapseAll} aria-label="Collapse all transfers" title="Collapse all">
+                            <Button variant="outline" size="icon" onClick={collapseAll} aria-label={t`Collapse all transfers`} title={t`Collapse all`}>
                                 <ChevronsUp className="w-4 h-4" />
                             </Button>
                         </>
@@ -58,13 +65,13 @@ function Transfers() {
                         size="icon"
                         onClick={refresh}
                         disabled={status === "loading"}
-                        aria-label="Refresh transfers"
-                        title="Refresh"
+                        aria-label={t`Refresh transfers`}
+                        title={t`Refresh`}
                     >
                         <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
                     </Button>
                     {auth && (
-                        <Button size="icon" onClick={() => setAddOpen(true)} aria-label="Add transfer" title="Add transfer">
+                        <Button size="icon" onClick={() => setAddOpen(true)} aria-label={t`Add transfer`} title={t`Add transfer`}>
                             <Plus className="w-4 h-4" />
                         </Button>
                     )}
@@ -75,28 +82,36 @@ function Transfers() {
             {status === "loading" && (
                 <div className="flex flex-col items-center gap-3 py-16">
                     <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                    <p className="text-muted text-sm">Loading transfers…</p>
+                    <p className="text-muted text-sm">
+                        <Trans>Loading transfers…</Trans>
+                    </p>
                 </div>
             )}
 
             {status === "error" && (
                 <Card className="items-center text-center p-8 gap-3 border-red-500/20 shadow-red-500/5">
                     <AlertCircle className="size-7 text-rose-400" aria-hidden="true" />
-                    <p className="text-red-400 text-sm font-medium">Failed to load transfers</p>
+                    <p className="text-red-400 text-sm font-medium">
+                        <Trans>Failed to load transfers</Trans>
+                    </p>
                     <p className="text-muted text-xs">{error}</p>
                     <Button variant="secondary" onClick={refresh} className="mt-2">
-                        Retry
+                        <Trans>Retry</Trans>
                     </Button>
                 </Card>
             )}
 
             {status === "ready" && transfers.length === 0 && (
                 <Card className="items-center text-center p-8 gap-3">
-                    <p className="text-white font-medium">No transfers yet</p>
-                    <p className="text-muted text-sm">Record a deposit, withdrawal, or move between your accounts.</p>
+                    <p className="text-white font-medium">
+                        <Trans>No transfers yet</Trans>
+                    </p>
+                    <p className="text-muted text-sm">
+                        <Trans>Record a deposit, withdrawal, or move between your accounts.</Trans>
+                    </p>
                     {auth && (
                         <Button variant="link" onClick={() => setAddOpen(true)}>
-                            Add your first transfer &rarr;
+                            <Trans>Add your first transfer &rarr;</Trans>
                         </Button>
                     )}
                 </Card>
@@ -109,7 +124,7 @@ function Transfers() {
                         size="sm"
                         onClick={() => setSelectedAccount(null)}
                     >
-                        All
+                        <Trans>All</Trans>
                     </Button>
                     {accountKeys.map(key => (
                         <Button
@@ -126,7 +141,9 @@ function Transfers() {
 
             {status === "ready" && transfers.length > 0 && filteredTransfers.length === 0 && (
                 <Card className="items-center text-center p-8 gap-2">
-                    <p className="text-white font-medium">No transfers for this account</p>
+                    <p className="text-white font-medium">
+                        <Trans>No transfers for this account</Trans>
+                    </p>
                 </Card>
             )}
 
@@ -191,7 +208,9 @@ function Transfers() {
                                             <div className="flex items-center gap-3">
                                                 {transfer.fee != null && (
                                                     <span className="flex items-center gap-1 text-xs">
-                                                        <span className="text-white/30">Fee</span>
+                                                        <span className="text-white/30">
+                                                            <Trans>Fee</Trans>
+                                                        </span>
                                                         <span className="text-amber-400/80 tabular-nums">
                                                             {transfer.fee.toLocaleString()}
                                                         </span>
@@ -200,7 +219,9 @@ function Transfers() {
                                                 )}
                                                 {transfer.exchangeRate != null && (
                                                     <span className="flex items-center gap-1 text-xs">
-                                                        <span className="text-white/30">Rate</span>
+                                                        <span className="text-white/30">
+                                                            <Trans>Rate</Trans>
+                                                        </span>
                                                         <span className="text-blue-400/80 tabular-nums">
                                                             {transfer.exchangeRate.toLocaleString()}
                                                         </span>
@@ -208,7 +229,9 @@ function Transfers() {
                                                 )}
                                                 {effectiveRate != null && transfer.currency !== config.baseCurrency && (
                                                     <span className="flex items-center gap-1 text-xs">
-                                                        <span className="text-white/30">Eff. Rate</span>
+                                                        <span className="text-white/30">
+                                                            <Trans>Eff. Rate</Trans>
+                                                        </span>
                                                         <span className="text-purple-400/80 tabular-nums">
                                                             {effectiveRate.toFixed(4)}
                                                         </span>

@@ -3,6 +3,10 @@ import {
     useAppData,
 } from "@/hooks/useAppData";
 import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
+import {
     AlertCircle,
     Plus,
     RefreshCw,
@@ -21,6 +25,7 @@ import { AccountDialog } from "./components/AccountDialog";
 
 export function Accounts() {
     const { config, status, transfers, getFiatToBaseRate, refresh, saveConfig, addSnapshots } = useAppData();
+    const { t } = useLingui();
 
     const [addOpen, setAddOpen] = useState(false);
     const [dialogKey, setDialogKey] = useState(0);
@@ -92,23 +97,25 @@ export function Accounts() {
     return (
         <div className="flex min-h-full flex-col px-4 py-8 max-w-6xl mx-auto">
             <div className="mb-8 flex items-start justify-between">
-                <h1 className="text-2xl font-bold text-white text-pretty">Accounts</h1>
+                <h1 className="text-2xl font-bold text-white text-pretty">
+                    <Trans>Accounts</Trans>
+                </h1>
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
                         size="icon"
                         onClick={refresh}
                         disabled={status === "loading"}
-                        aria-label="Refresh accounts"
-                        title="Refresh"
+                        aria-label={t`Refresh accounts`}
+                        title={t`Refresh`}
                     >
                         <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
                     </Button>
                     <Button
                         size="icon"
                         onClick={openAddDialog}
-                        aria-label="Add account"
-                        title="Add account"
+                        aria-label={t`Add account`}
+                        title={t`Add account`}
                     >
                         <Plus className="w-4 h-4" />
                     </Button>
@@ -118,22 +125,30 @@ export function Accounts() {
             {status === "ready" && sortedKeys.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
                     <Card className="p-4 gap-1">
-                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Cost</span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
+                            <Trans>Total Cost</Trans>
+                        </span>
                         <span className="text-lg font-bold text-white tabular-nums">{config.baseCurrency} {Math.round(totalNetCost).toLocaleString()}</span>
                     </Card>
                     <Card className="p-4 gap-1">
-                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total Assets</span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
+                            <Trans>Total Assets</Trans>
+                        </span>
                         <span className="text-lg font-bold text-white tabular-nums">{config.baseCurrency} {Math.round(totalCurrentValue).toLocaleString()}</span>
                     </Card>
                     <Card className="p-4 gap-1">
-                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Total P&L</span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
+                            <Trans>Total P&L</Trans>
+                        </span>
                         <span className={`text-lg font-bold tabular-nums ${totalPL >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                             {config.baseCurrency} {totalPL >= 0 ? "+" : ""}
                             {Math.round(totalPL).toLocaleString()}
                         </span>
                     </Card>
                     <Card className="p-4 gap-1">
-                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Overall Yield</span>
+                        <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
+                            <Trans>Overall Yield</Trans>
+                        </span>
                         <span className={`text-lg font-bold tabular-nums ${totalYield >= 0 ? "text-emerald-400" : "text-rose-400/90"}`}>
                             {totalYield >= 0 ? "+" : ""}
                             {totalYield.toFixed(1)}%
@@ -145,20 +160,24 @@ export function Accounts() {
             {status === "loading" && (
                 <div className="flex flex-col items-center gap-3 py-16">
                     <div className="w-8 h-8 border-2 border-white/20 border-t-green-400 rounded-full animate-spin" />
-                    <p className="text-muted text-sm">Loading accounts…</p>
+                    <p className="text-muted text-sm">
+                        <Trans>Loading accounts…</Trans>
+                    </p>
                 </div>
             )}
 
             {status === "error" && (
                 <div className="bg-surface-card border border-red-500/20 rounded-2xl px-8 py-6 flex flex-col items-center gap-3">
                     <AlertCircle className="size-7 text-rose-400" aria-hidden="true" />
-                    <p className="text-red-400 text-sm font-medium">Failed to load accounts</p>
+                    <p className="text-red-400 text-sm font-medium">
+                        <Trans>Failed to load accounts</Trans>
+                    </p>
                     <Button
                         variant="secondary"
                         onClick={refresh}
                         className="mt-2"
                     >
-                        Retry
+                        <Trans>Retry</Trans>
                     </Button>
                 </div>
             )}
@@ -167,12 +186,14 @@ export function Accounts() {
                 <>
                     {sortedKeys.length === 0 ? (
                         <div className="flex flex-col items-center gap-3 py-16 text-center">
-                            <p className="text-muted text-sm">No accounts yet.</p>
+                            <p className="text-muted text-sm">
+                                <Trans>No accounts yet.</Trans>
+                            </p>
                             <Button
                                 variant="link"
                                 onClick={openAddDialog}
                             >
-                                Add your first account &rarr;
+                                <Trans>Add your first account &rarr;</Trans>
                             </Button>
                         </div>
                     ) : (

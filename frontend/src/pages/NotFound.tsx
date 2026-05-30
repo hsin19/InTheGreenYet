@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { Home } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -6,16 +7,18 @@ export function NotFound() {
         <div className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-16 text-center">
             <span className="text-6xl mb-4" role="img" aria-label="Flying saucer">🛸</span>
             <h1 className="text-4xl font-bold text-white mb-2 text-pretty">404</h1>
-            <h2 className="text-xl font-semibold text-white/80 mb-4 text-pretty">Page Not Found</h2>
+            <h2 className="text-xl font-semibold text-white/80 mb-4 text-pretty">
+                <Trans>Page Not Found</Trans>
+            </h2>
             <p className="text-muted text-sm max-w-sm mb-8">
-                Oops! Looks like you’ve wandered into uncharted territory. The page you’re looking for doesn’t exist.
+                <Trans>Oops! Looks like you’ve wandered into uncharted territory. The page you’re looking for doesn’t exist.</Trans>
             </p>
             <Link
                 to="/"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 hover:bg-green-500/25 transition-colors"
             >
                 <Home className="w-4 h-4" aria-hidden="true" />
-                Return to Safety
+                <Trans>Return to Safety</Trans>
             </Link>
         </div>
     );

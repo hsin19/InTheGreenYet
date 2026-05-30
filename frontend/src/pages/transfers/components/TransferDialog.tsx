@@ -19,6 +19,10 @@ import {
     useAppData,
 } from "@/hooks/useAppData";
 import { type CreateTransferInput } from "@/lib/model";
+import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
 import { useState } from "react";
 
 const todayISO = () => new Date().toLocaleDateString("sv-SE");
@@ -56,6 +60,7 @@ export function TransferDialog({
     const [form, setForm] = useState<CreateTransferInput>(emptyForm);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { t } = useLingui();
 
     const set = <K extends keyof CreateTransferInput>(key: K, value: CreateTransferInput[K]) => setForm(prev => ({ ...prev, [key]: value }));
 
@@ -70,30 +75,30 @@ export function TransferDialog({
 
     const handleSave = async () => {
         if (!form.from) {
-            setError("From is required");
+            setError(t`From is required`);
             return;
         }
         if (!form.to) {
-            setError("To is required");
+            setError(t`To is required`);
             return;
         }
         if (form.amount == null) {
-            setError("Amount is required");
+            setError(t`Amount is required`);
             return;
         }
         if (!form.currency) {
-            setError("Currency is required");
+            setError(t`Currency is required`);
             return;
         }
 
         setSaving(true);
         setError(null);
         try {
-            const title = form.title.trim() || `${form.from || "?"} to ${form.to || "?"}`;
+            const title = form.title.trim() || t`${form.from || "?"} to ${form.to || "?"}`;
             await addTransfer({ ...form, title });
             handleOpenChange(false);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to save");
+            setError(err instanceof Error ? err.message : t`Failed to save`);
         } finally {
             setSaving(false);
         }
@@ -108,19 +113,21 @@ export function TransferDialog({
                 <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold text-white">
-                        New Transfer
+                        <Trans>New Transfer</Trans>
                     </DialogTitle>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-3 py-2">
                     {/* Title */}
                     <div className="flex flex-col gap-1">
-                        <label htmlFor="transfer-title" className="text-xs text-muted">Title</label>
+                        <label htmlFor="transfer-title" className="text-xs text-muted">
+                            <Trans>Title</Trans>
+                        </label>
                         <Input
                             id="transfer-title"
                             value={form.title}
                             onChange={e => set("title", e.target.value)}
-                            placeholder={`${form.from || "?"} to ${form.to || "?"}`}
+                            placeholder={t`${form.from || "?"} to ${form.to || "?"}`}
                             className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                         />
                     </div>
@@ -128,7 +135,7 @@ export function TransferDialog({
                     {/* Date */}
                     <div className="flex flex-col gap-1">
                         <label htmlFor="transfer-date" className="text-xs text-muted">
-                            Date <span className="text-red-400">*</span>
+                            <Trans>Date</Trans> <span className="text-red-400">*</span>
                         </label>
                         <Input
                             id="transfer-date"
@@ -143,12 +150,12 @@ export function TransferDialog({
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
                             <label htmlFor="transfer-from" className="text-xs text-muted">
-                                From <span className="text-red-400">*</span>
+                                <Trans>From</Trans> <span className="text-red-400">*</span>
                             </label>
                             {hasAccounts ? (
                                 <Select value={form.from} onValueChange={val => set("from", val)}>
                                     <SelectTrigger id="transfer-from" className="bg-white/8 border-white/15 text-white">
-                                        <SelectValue placeholder="Select" />
+                                        <SelectValue placeholder={t`Select`} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
                                         {accountEntries.map(([key, a]) => <SelectItem key={key} value={key}>{a.displayName}</SelectItem>)}
@@ -159,19 +166,19 @@ export function TransferDialog({
                                     id="transfer-from"
                                     value={form.from}
                                     onChange={e => set("from", e.target.value)}
-                                    placeholder="Source"
+                                    placeholder={t`Source`}
                                     className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                 />
                             )}
                         </div>
                         <div className="flex flex-col gap-1 flex-1">
                             <label htmlFor="transfer-to" className="text-xs text-muted">
-                                To <span className="text-red-400">*</span>
+                                <Trans>To</Trans> <span className="text-red-400">*</span>
                             </label>
                             {hasAccounts ? (
                                 <Select value={form.to} onValueChange={val => set("to", val)}>
                                     <SelectTrigger id="transfer-to" className="bg-white/8 border-white/15 text-white">
-                                        <SelectValue placeholder="Select" />
+                                        <SelectValue placeholder={t`Select`} />
                                     </SelectTrigger>
                                     <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
                                         {accountEntries.map(([key, a]) => <SelectItem key={key} value={key}>{a.displayName}</SelectItem>)}
@@ -182,7 +189,7 @@ export function TransferDialog({
                                     id="transfer-to"
                                     value={form.to}
                                     onChange={e => set("to", e.target.value)}
-                                    placeholder="Destination"
+                                    placeholder={t`Destination`}
                                     className="bg-white/8 border-white/15 text-white placeholder:text-muted/50"
                                 />
                             )}
@@ -193,7 +200,7 @@ export function TransferDialog({
                     <div className="flex gap-3">
                         <div className="flex flex-col gap-1 flex-1">
                             <label htmlFor="transfer-amount" className="text-xs text-muted">
-                                Amount <span className="text-red-400">*</span>
+                                <Trans>Amount</Trans> <span className="text-red-400">*</span>
                             </label>
                             <Input
                                 id="transfer-amount"
@@ -207,7 +214,7 @@ export function TransferDialog({
                         </div>
                         <div className="flex flex-col gap-1 w-28">
                             <label htmlFor="transfer-currency" className="text-xs text-muted">
-                                Currency <span className="text-red-400">*</span>
+                                <Trans>Currency</Trans> <span className="text-red-400">*</span>
                             </label>
                             <Select
                                 value={form.currency ?? ""}
@@ -231,7 +238,9 @@ export function TransferDialog({
                         return (
                             <div className="flex gap-3">
                                 <div className="flex flex-col gap-1 flex-1">
-                                    <label htmlFor="transfer-fee" className="text-xs text-muted">Fee</label>
+                                    <label htmlFor="transfer-fee" className="text-xs text-muted">
+                                        <Trans>Fee</Trans>
+                                    </label>
                                     <Input
                                         id="transfer-fee"
                                         type="number"
@@ -244,10 +253,12 @@ export function TransferDialog({
                                 </div>
                                 <div className="flex flex-col gap-1 flex-1">
                                     <div className="flex items-baseline justify-between gap-1">
-                                        <label htmlFor="transfer-rate" className="text-xs text-muted">Exchange Rate</label>
+                                        <label htmlFor="transfer-rate" className="text-xs text-muted">
+                                            <Trans>Exchange Rate</Trans>
+                                        </label>
                                         {refRate != null && (
                                             <span className="text-xs text-blue-400/70 tabular-nums">
-                                                ref {refRate.toFixed(4)}
+                                                <Trans>ref {refRate.toFixed(4)}</Trans>
                                             </span>
                                         )}
                                     </div>
@@ -267,12 +278,14 @@ export function TransferDialog({
 
                     {/* Note */}
                     <div className="flex flex-col gap-1">
-                        <label htmlFor="transfer-note" className="text-xs text-muted">Note</label>
+                        <label htmlFor="transfer-note" className="text-xs text-muted">
+                            <Trans>Note</Trans>
+                        </label>
                         <textarea
                             id="transfer-note"
                             value={form.note}
                             onChange={e => set("note", e.target.value)}
-                            placeholder="Optional note"
+                            placeholder={t`Optional note`}
                             rows={2}
                             className="w-full bg-white/8 border border-white/15 rounded-md px-3 py-2 text-sm text-white placeholder:text-muted/50 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 resize-none"
                         />
@@ -287,13 +300,13 @@ export function TransferDialog({
                         onClick={() => handleOpenChange(false)}
                         disabled={saving}
                     >
-                        Cancel
+                        <Trans>Cancel</Trans>
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={saving}
                     >
-                        {saving ? "Saving…" : "Save"}
+                        {saving ? <Trans>Saving…</Trans> : <Trans>Save</Trans>}
                     </Button>
                 </DialogFooter>
             </DialogContent>

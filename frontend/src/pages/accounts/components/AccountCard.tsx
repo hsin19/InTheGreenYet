@@ -16,6 +16,10 @@ import {
 } from "@/components/ui/card";
 import { type AccountConfig } from "@/hooks/useAppData";
 import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
+import {
     Check,
     RefreshCw,
     Settings2,
@@ -62,6 +66,7 @@ export function AccountCard({
     const [liveResult, setLiveResult] = useState<ProviderBalance | null>(null);
     const [liveError, setLiveError] = useState<string | null>(null);
     const [applying, setApplying] = useState(false);
+    const { t } = useLingui();
 
     const provider = getApiProvider(config.accountType);
     const showRefresh = !!provider && hasCredentials(config);
@@ -73,7 +78,7 @@ export function AccountCard({
         try {
             setLiveResult(await provider.fetchBalance(config));
         } catch (err) {
-            setLiveError(err instanceof Error ? err.message : `Failed to fetch ${provider.label} balance`);
+            setLiveError(err instanceof Error ? err.message : t`Failed to fetch ${provider.label} balance`);
         } finally {
             setLiveLoading(false);
         }
@@ -90,7 +95,7 @@ export function AccountCard({
             });
             setLiveResult(null);
         } catch (err) {
-            setLiveError(err instanceof Error ? err.message : "Failed to apply balance");
+            setLiveError(err instanceof Error ? err.message : t`Failed to apply balance`);
         } finally {
             setApplying(false);
         }
@@ -115,8 +120,8 @@ export function AccountCard({
                                 onClick={handleRefresh}
                                 disabled={liveLoading}
                                 className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer disabled:opacity-50"
-                                aria-label={`Fetch ${provider.label} balance for ${accountKey}`}
-                                title={`Fetch live balance from ${provider.label}`}
+                                aria-label={t`Fetch ${provider.label} balance for ${accountKey}`}
+                                title={t`Fetch live balance from ${provider.label}`}
                             >
                                 <RefreshCw className={`w-3.5 h-3.5 ${liveLoading ? "animate-spin" : ""}`} aria-hidden="true" />
                             </button>
@@ -127,7 +132,7 @@ export function AccountCard({
                                 setSettingsOpen(true);
                             }}
                             className="p-1.5 rounded text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-                            aria-label={`Settings for ${accountKey}`}
+                            aria-label={t`Settings for ${accountKey}`}
                         >
                             <Settings2 className="w-3.5 h-3.5" aria-hidden="true" />
                         </button>
@@ -135,27 +140,29 @@ export function AccountCard({
                             <AlertDialogTrigger asChild>
                                 <button
                                     className="p-1.5 rounded text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
-                                    aria-label={`Delete ${accountKey}`}
+                                    aria-label={t`Delete ${accountKey}`}
                                 >
                                     <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                                 </button>
                             </AlertDialogTrigger>
                             <AlertDialogContent className="bg-surface-card border-white/10 text-white">
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-white">Delete "{accountKey}"?</AlertDialogTitle>
+                                    <AlertDialogTitle className="text-white">
+                                        <Trans>Delete "{accountKey}"?</Trans>
+                                    </AlertDialogTitle>
                                     <AlertDialogDescription className="text-muted">
-                                        This will remove the account from your config. Existing transfers referencing this account won't be affected.
+                                        <Trans>This will remove the account from your config. Existing transfers referencing this account won't be affected.</Trans>
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel className="border-white/10 text-muted hover:text-white bg-transparent">
-                                        Cancel
+                                        <Trans>Cancel</Trans>
                                     </AlertDialogCancel>
                                     <AlertDialogAction
                                         onClick={() => onDelete(accountKey)}
                                         className="bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/25"
                                     >
-                                        Delete
+                                        <Trans>Delete</Trans>
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
@@ -168,7 +175,9 @@ export function AccountCard({
                     {liveResult != null && (
                         <div className="flex items-center justify-between gap-2 bg-amber-400/10 border border-amber-400/30 rounded-md px-3 py-2">
                             <div className="flex flex-col">
-                                <span className="text-[10px] text-amber-300/80 uppercase tracking-wider font-semibold">{provider?.label} Live</span>
+                                <span className="text-[10px] text-amber-300/80 uppercase tracking-wider font-semibold">
+                                    <Trans>{provider?.label} Live</Trans>
+                                </span>
                                 <span className="text-sm text-white tabular-nums font-semibold">
                                     {liveResult.currency} {Math.round(liveResult.total).toLocaleString()}
                                 </span>
@@ -179,7 +188,7 @@ export function AccountCard({
                                 className="flex items-center gap-1 text-xs rounded-md bg-amber-400/20 border border-amber-400/40 text-amber-200 px-2.5 py-1.5 hover:bg-amber-400/30 transition-colors cursor-pointer disabled:opacity-50"
                             >
                                 <Check className="w-3.5 h-3.5" aria-hidden="true" />
-                                {applying ? "Saving…" : "Apply"}
+                                {applying ? <Trans>Saving…</Trans> : <Trans>Apply</Trans>}
                             </button>
                         </div>
                     )}
@@ -190,7 +199,9 @@ export function AccountCard({
                                     onClick={() => flow && setCostExpanded(v => !v)}
                                     className={`flex flex-col gap-0.5 text-left ${flow ? "cursor-pointer" : "cursor-default"}`}
                                 >
-                                    <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net Cost</span>
+                                    <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
+                                        <Trans>Net Cost</Trans>
+                                    </span>
                                     <span className={`text-xs tabular-nums transition-colors ${flow ? "hover:text-white" : ""}`}>
                                         {costExpanded && flow
                                             ? (
@@ -220,7 +231,9 @@ export function AccountCard({
                             </div>
                             {config.isInvestment !== false ? (
                                 <div className="flex justify-between items-center bg-white/5 px-2 py-1.5 rounded-md border border-white/10 shadow-inner">
-                                    <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">Net P&L</span>
+                                    <span className="text-[10px] text-muted uppercase tracking-wider font-semibold">
+                                        <Trans>Net P&L</Trans>
+                                    </span>
                                     <span className={`text-xs font-bold tabular-nums ${(performance.pl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                                         {performance.pl != null
                                             ? (
@@ -240,7 +253,9 @@ export function AccountCard({
                                 </div>
                             ) : (
                                 <div className="flex items-center bg-white/5 px-2 py-1.5 rounded-md border border-white/10">
-                                    <span className="text-[10px] text-muted/60 uppercase tracking-wider font-semibold">Cash Account</span>
+                                    <span className="text-[10px] text-muted/60 uppercase tracking-wider font-semibold">
+                                        <Trans>Cash Account</Trans>
+                                    </span>
                                 </div>
                             )}
                         </div>

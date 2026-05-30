@@ -1,4 +1,10 @@
 import bgMainDark from "@/assets/images/bg-main-dark.png?format=webp&quality=80&imagetools";
+import type { MessageDescriptor } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import {
+    Trans,
+    useLingui,
+} from "@lingui/react/macro";
 import {
     Navigate,
     useSearchParams,
@@ -8,25 +14,28 @@ import { NotionIcon } from "../components/icons/NotionIcon";
 import { Button } from "../components/ui/button";
 import { useNotion } from "../hooks/useNotion";
 
-const OAUTH_ERROR_MESSAGES: Record<string, string> = {
-    state_mismatch: "Authorization request mismatch — please try again.",
-    missing_token: "Authorization did not return a token.",
-    token_exchange_failed: "Failed to complete authorization with Notion.",
-    access_denied: "Authorization was denied.",
+const OAUTH_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
+    state_mismatch: msg`Authorization request mismatch — please try again.`,
+    missing_token: msg`Authorization did not return a token.`,
+    token_exchange_failed: msg`Failed to complete authorization with Notion.`,
+    access_denied: msg`Authorization was denied.`,
 };
 
 function Landing() {
     const { auth, login } = useNotion();
     const [searchParams] = useSearchParams();
     const oauthError = searchParams.get("error");
+    const { t } = useLingui();
 
     if (auth) return <Navigate to="/" replace />;
+
+    const errorMsg = oauthError ? OAUTH_ERROR_MESSAGES[oauthError] : null;
 
     const actionBlock = (
         <div className="mt-6 flex flex-col items-center gap-4">
             {oauthError && (
                 <p className="text-red-400 text-sm font-medium max-w-[280px] text-center">
-                    {OAUTH_ERROR_MESSAGES[oauthError] ?? "Authorization failed."}
+                    {errorMsg ? t(errorMsg) : t`Authorization failed.`}
                 </p>
             )}
             <div className="relative group">
@@ -39,7 +48,7 @@ function Landing() {
                             className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
                         >
                             <NotionIcon className="w-5 h-5 mr-2" aria-hidden="true" />
-                            Connect to Notion
+                            <Trans>Connect to Notion</Trans>
                         </Button>
                     </div>
                 </div>
@@ -79,8 +88,7 @@ function Landing() {
                         InTheGreenYet
                     </h1>
                     <p className="mt-2 text-muted text-sm sm:text-base leading-relaxed">
-                        It’s not about today’s profit —<br className="sm:hidden" />
-                        it’s about knowing where you truly stand.
+                        <Trans>It’s not about today’s profit — it’s about knowing where you truly stand.</Trans>
                     </p>
                 </div>
 
@@ -89,7 +97,9 @@ function Landing() {
 
             {/* Footer */}
             <footer className="absolute bottom-6 flex flex-col items-center gap-2 text-xs text-muted/50">
-                <p>Your data stays in your Notion workspace.</p>
+                <p>
+                    <Trans>Your data stays in your Notion workspace and is never stored or transmitted externally.</Trans>
+                </p>
                 <a
                     href="https://github.com/hsin19/InTheGreenYet"
                     target="_blank"

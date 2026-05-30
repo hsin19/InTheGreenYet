@@ -12,3 +12,721 @@ msgstr ""
 "Last-Translator: \n"
 "Language-Team: \n"
 "Plural-Forms: \n"
+
+#. placeholder {0}: provider?.label
+#: src/pages/accounts/components/AccountCard.tsx:179
+msgid "{0} Live"
+msgstr "{0} 即時"
+
+#. placeholder {0}: form.from || "?"
+#. placeholder {1}: form.to || "?"
+#: src/pages/transfers/components/TransferDialog.tsx:97
+#: src/pages/transfers/components/TransferDialog.tsx:130
+msgid "{0} to {1}"
+msgstr "{0} 至 {1}"
+
+#: src/pages/Config.tsx:206
+msgid "{v} is not a supported currency"
+msgstr "{v} 不是支援的幣種"
+
+#: src/pages/Config.tsx:338
+msgid "{val} is not a supported currency"
+msgstr "{val} 不是支援的幣種"
+
+#: src/pages/Landing.tsx:91
+#~ msgid "A personal investment tracking app powered by Notion as the database backend."
+#~ msgstr "以 Notion 作為資料庫後端的個人投資追蹤工具。"
+
+#: src/pages/accounts/components/apiProviders.ts:61
+msgid "Access Key"
+msgstr "Access Key"
+
+#: src/pages/accounts/components/InlineAmount.tsx:75
+msgid "Account balance"
+msgstr "帳戶餘額"
+
+#: src/pages/accounts/components/apiProviders.ts:67
+msgid "Account type"
+msgstr "帳戶類型"
+
+#: src/pages/accounts/components/AccountDialog.tsx:188
+msgid "Account Type"
+msgstr "帳戶類型"
+
+#: src/layouts/AppLayout.tsx:40
+#: src/layouts/AppLayout.tsx:44
+#: src/pages/accounts/index.tsx:101
+msgid "Accounts"
+msgstr "帳戶"
+
+#: src/pages/accounts/index.tsx:117
+#: src/pages/accounts/index.tsx:118
+msgid "Add account"
+msgstr "新增帳戶"
+
+#: src/pages/Config.tsx:250
+msgid "Add Currency"
+msgstr "新增幣種"
+
+#: src/pages/Config.tsx:255
+msgid "Add currency (e.g. EUR, JPY)…"
+msgstr "新增幣種（例如 EUR、JPY）…"
+
+#: src/pages/Config.tsx:258
+msgid "Add currency button"
+msgstr "新增幣種按鈕"
+
+#: src/pages/transfers/index.tsx:74
+#: src/pages/transfers/index.tsx:74
+msgid "Add transfer"
+msgstr "新增交易"
+
+#: src/pages/accounts/index.tsx:196
+msgid "Add your first account →"
+msgstr "新增你的第一個帳戶 →"
+
+#: src/pages/transfers/index.tsx:114
+msgid "Add your first transfer →"
+msgstr "新增你的第一筆交易 →"
+
+#: src/pages/transfers/index.tsx:127
+msgid "All"
+msgstr "全部"
+
+#: src/pages/transfers/components/TransferDialog.tsx:203
+msgid "Amount"
+msgstr "金額"
+
+#: src/pages/transfers/components/TransferDialog.tsx:86
+msgid "Amount is required"
+msgstr "請輸入金額"
+
+#: src/pages/accounts/components/apiProviders.ts:57
+msgid "API Key"
+msgstr "API Key"
+
+#: src/pages/accounts/components/apiProviders.ts:58
+msgid "API Secret"
+msgstr "API Secret"
+
+#: src/pages/accounts/components/AccountCard.tsx:191
+msgid "Apply"
+msgstr "套用"
+
+#: src/pages/Landing.tsx:19
+msgid "Authorization did not return a token."
+msgstr "授權未回傳 Token。"
+
+#: src/pages/Landing.tsx:38
+msgid "Authorization failed."
+msgstr "授權失敗。"
+
+#: src/pages/Landing.tsx:18
+msgid "Authorization request mismatch — please try again."
+msgstr "授權請求不匹配，請再試一次。"
+
+#: src/pages/Landing.tsx:21
+msgid "Authorization was denied."
+msgstr "授權已被拒絕。"
+
+#: src/pages/Config.tsx:224
+msgid "Available currencies when creating transfers"
+msgstr "建立交易時可使用的幣種"
+
+#: src/pages/accounts/components/AccountDialog.tsx:199
+msgid "Bank"
+msgstr "銀行"
+
+#: src/pages/Config.tsx:153
+#: src/pages/Config.tsx:164
+msgid "Base Currency"
+msgstr "基準貨幣"
+
+#: src/pages/Config.tsx:334
+msgid "Base currency cannot be empty"
+msgstr "基準貨幣不能為空"
+
+#: src/pages/accounts/components/AccountCard.tsx:159
+#: src/pages/accounts/components/AccountDialog.tsx:292
+#: src/pages/Config.tsx:423
+#: src/pages/transfers/components/TransferDialog.tsx:303
+msgid "Cancel"
+msgstr "取消"
+
+#: src/pages/accounts/components/AccountCard.tsx:257
+msgid "Cash Account"
+msgstr "現金帳戶"
+
+#: src/pages/accounts/components/apiProviders.ts:68
+msgid "Classic Trading account"
+msgstr "經典交易帳戶"
+
+#: src/pages/accounts/components/apiProviders.ts:85
+msgid "Classic Trading account only, reported in USDT. On-chain Earn balances aren't included — Bitget's API doesn't expose them."
+msgstr "僅限經典交易帳戶，以 USDT 計算。不包含鏈上理財（Earn）餘額 — 因 Bitget API 未提供。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:46
+msgid "Click <0>Create API</0>, choose <1>System generated</1>, give it a label — feel free to use this: <2/> — and finish the 2FA verification."
+msgstr "點擊 <0>建立 API</0>，選擇 <1>系統產生</1>，為其命名（可以直接使用：<2/>），並完成雙重驗證（2FA）。"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:62
+msgid "Click <0>Create API</0>, choose <1>System-generated API key</1>, then fill in the fields — feel free to use these suggestions:<2><3><4>Note</4><5/></3><6><7>Passphrase</7><8/></6></2><9>Keep the passphrase — the app needs it alongside the key and secret.</9>"
+msgstr "點擊 <0>建立 API</0>，選擇 <1>系統自動生成的 API Key</1>，接著填寫欄位 — 建議使用以下設定：<2><3><4>備註名稱</4><5/></3><6><7>Passphrase (API 口令)</7><8/></6></2><9>請務必記住此 Passphrase (API 口令) — 本應用程式在連線時需要搭配此口令與 API 金鑰及私鑰。</9>"
+
+#: src/pages/accounts/components/InlineAmount.tsx:86
+msgid "Click to edit balance"
+msgstr "點擊以編輯餘額"
+
+#: src/pages/transfers/index.tsx:58
+msgid "Collapse all"
+msgstr "全部收合"
+
+#: src/pages/transfers/index.tsx:58
+msgid "Collapse all transfers"
+msgstr "收合所有交易"
+
+#. placeholder {0}: provider.label
+#: src/pages/accounts/components/AccountDialog.tsx:215
+msgid "Connect to {0}"
+msgstr "連線至 {0}"
+
+#: src/pages/Landing.tsx:51
+msgid "Connect to Notion"
+msgstr "連線至 Notion"
+
+#: src/pages/Callback.tsx:55
+msgid "Connecting to Notion…"
+msgstr "正在連線至 Notion…"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:62
+msgid "Copy the <0>API Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
+msgstr "複製 <0>API Key</0> 與 <1>Secret Key</1>（私鑰僅會顯示一次）並貼到上方欄位中。"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:89
+msgid "Copy the <0>API Key</0>, <1>Secret Key</1> (shown only once) and the <2>passphrase</2> you set, then paste all three into the fields above."
+msgstr "複製 <0>API Key</0>、<1>Secret Key</1>（僅顯示一次）以及你設定的 <2>密碼密鑰 (passphrase)</2>，然後將這三者貼到上方欄位。"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:87
+msgid "Copy the credentials"
+msgstr "複製憑證"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:60
+#: src/pages/accounts/components/MaxKeyGuide.tsx:68
+msgid "Copy the keys"
+msgstr "複製金鑰"
+
+#: src/pages/accounts/components/apiProviders.ts:93
+msgid "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually."
+msgstr "涵蓋您的 MAX 現貨錢包（可用 + 鎖定 + 質押），以 MAX 市場價格轉換為台幣（TWD）顯示。不包含槓桿錢包（m-wallet）持倉。若使用託管網頁版，即時同步可能會失敗 — MAX 會擋來自 Cloudflare 的請求；若重新整理出現錯誤，請手動更新餘額。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:89
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:116
+#: src/pages/accounts/components/MaxKeyGuide.tsx:97
+msgid "Create a read-only key — InTheGreenYet only reads your balances, it never trades or withdraws."
+msgstr "請建立唯讀金鑰 — InTheGreenYet 僅會讀取您的餘額，絕不會進行交易或提幣。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:44
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:60
+msgid "Create an API key"
+msgstr "建立 API 金鑰"
+
+#: src/pages/Config.tsx:221
+msgid "Currencies"
+msgstr "支援幣種"
+
+#: src/pages/accounts/components/AccountDialog.tsx:166
+#: src/pages/transfers/components/TransferDialog.tsx:217
+msgid "Currency"
+msgstr "幣種"
+
+#: src/pages/accounts/components/AccountDialog.tsx:83
+#: src/pages/transfers/components/TransferDialog.tsx:90
+msgid "Currency is required"
+msgstr "請選擇幣種"
+
+#: src/pages/transfers/components/TransferDialog.tsx:138
+msgid "Date"
+msgstr "日期"
+
+#: src/pages/accounts/components/AccountCard.tsx:165
+msgid "Delete"
+msgstr "刪除"
+
+#: src/pages/accounts/components/AccountCard.tsx:151
+msgid "Delete \"{accountKey}\"?"
+msgstr "刪除「{accountKey}」嗎？"
+
+#: src/pages/accounts/components/AccountCard.tsx:143
+msgid "Delete {accountKey}"
+msgstr "刪除 {accountKey}"
+
+#: src/pages/transfers/components/TransferDialog.tsx:192
+msgid "Destination"
+msgstr "目的地"
+
+#: src/pages/accounts/components/AccountDialog.tsx:158
+msgid "Display name"
+msgstr "顯示名稱"
+
+#: src/pages/accounts/components/AccountDialog.tsx:151
+msgid "Display Name"
+msgstr "顯示名稱"
+
+#: src/pages/accounts/components/AccountDialog.tsx:139
+msgid "e.g. binance"
+msgstr "例如：binance"
+
+#: src/pages/Config.tsx:169
+msgid "e.g. USD, EUR, JPY…"
+msgstr "例如：USD, EUR, JPY…"
+
+#: src/pages/accounts/components/AccountDialog.tsx:124
+msgid "Edit \"{editingKey}\""
+msgstr "編輯「{editingKey}」"
+
+#: src/pages/transfers/index.tsx:233
+msgid "Eff. Rate"
+msgstr "實際匯率"
+
+#: src/pages/transfers/components/TransferDialog.tsx:257
+msgid "Exchange Rate"
+msgstr "匯率"
+
+#: src/pages/transfers/index.tsx:55
+msgid "Expand all"
+msgstr "全部展開"
+
+#: src/pages/transfers/index.tsx:55
+msgid "Expand all transfers"
+msgstr "展開所有交易"
+
+#: src/pages/accounts/components/AccountCard.tsx:98
+msgid "Failed to apply balance"
+msgstr "套用餘額失敗"
+
+#: src/pages/Landing.tsx:20
+msgid "Failed to complete authorization with Notion."
+msgstr "與 Notion 的授權連線失敗。"
+
+#. placeholder {0}: provider.label
+#: src/pages/accounts/components/AccountCard.tsx:81
+msgid "Failed to fetch {0} balance"
+msgstr "讀取 {0} 餘額失敗"
+
+#: src/pages/accounts/index.tsx:173
+msgid "Failed to load accounts"
+msgstr "載入帳戶失敗"
+
+#: src/pages/Config.tsx:371
+msgid "Failed to load config"
+msgstr "載入設定失敗"
+
+#: src/pages/transfers/index.tsx:95
+msgid "Failed to load transfers"
+msgstr "載入交易失敗"
+
+#: src/pages/accounts/components/AccountDialog.tsx:112
+#: src/pages/Config.tsx:327
+#: src/pages/Config.tsx:346
+#: src/pages/transfers/components/TransferDialog.tsx:101
+msgid "Failed to save"
+msgstr "儲存失敗"
+
+#: src/pages/transfers/components/TransferDialog.tsx:242
+#: src/pages/transfers/index.tsx:212
+msgid "Fee"
+msgstr "手續費"
+
+#. placeholder {0}: provider.label
+#: src/pages/accounts/components/AccountCard.tsx:123
+msgid "Fetch {0} balance for {accountKey}"
+msgstr "擷取 {accountKey} 的 {0} 餘額"
+
+#. placeholder {0}: provider.label
+#: src/pages/accounts/components/AccountCard.tsx:124
+msgid "Fetch live balance from {0}"
+msgstr "從 {0} 獲取即時餘額"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:70
+msgid "Finish the 2FA verification, then copy the <0>Access Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
+msgstr "完成雙重驗證（2FA），接著複製 <0>Access Key</0> 與 <1>Secret Key</1>（私鑰僅會顯示一次）並貼到上方欄位。"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:81
+msgid "For <0>Permissions</0> choose <1>Read-only</1>, then tick <2>Select all</2> — in read-only mode every box is read-only (\"Search for…\"), so the key still can't trade or withdraw. Leave <3>IP access</3> unrestricted — this app runs on Cloudflare's rotating IPs, so a fixed allowlist would block it."
+msgstr "在 <0>權限</0> 選擇 <1>唯讀 (Read-only)</1> 並勾選 <2>全選 (Select all)</2> — 在唯讀模式下所有權限皆是唯讀（僅查詢），因此金鑰依然無法交易或提幣。請保持 <3>IP 存取限制</3> 為未限制 — 本應用程式運行於 Cloudflare 的動態 IP，設定固定白名單會導致連線被阻擋。"
+
+#: src/pages/transfers/components/TransferDialog.tsx:153
+msgid "From"
+msgstr "來源"
+
+#: src/pages/transfers/components/TransferDialog.tsx:78
+msgid "From is required"
+msgstr "請選擇來源"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:86
+msgid "Get your Binance API key"
+msgstr "取得您的 Binance API 金鑰"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:113
+msgid "Get your Bitget API key"
+msgstr "取得您的 Bitget API 金鑰"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:94
+msgid "Get your MAX API key"
+msgstr "取得您的 MAX API 金鑰"
+
+#: src/pages/Config.tsx:449
+msgid "GitHub repository"
+msgstr "GitHub 儲存庫"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:79
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:106
+#: src/pages/accounts/components/MaxKeyGuide.tsx:87
+msgid "How do I get these?"
+msgstr "如何取得這些資訊？"
+
+#: src/pages/accounts/components/AccountDialog.tsx:144
+msgid "Identifier used in transfers. Cannot be changed later."
+msgstr "交易中使用的唯一識別碼，建立後無法修改。"
+
+#: src/pages/accounts/components/AccountDialog.tsx:279
+msgid "Include in portfolio totals?"
+msgstr "是否納入投資組合總計？"
+
+#: src/pages/Config.tsx:441
+#: src/pages/Landing.tsx:91
+msgid "It’s not about today’s profit — it’s about knowing where you truly stand."
+msgstr "無關今日的損益漲跌 — 而是真正掌握您的資產全貌。"
+
+#: src/pages/Landing.tsx:91
+#~ msgid "It’s not about today’s profit —<0/>it’s about knowing where you truly stand."
+#~ msgstr "無關今日的損益漲跌 —<0/>而是真正掌握您的資產全貌。"
+
+#: src/pages/accounts/components/AccountDialog.tsx:132
+msgid "Key"
+msgstr "鍵值 (Key)"
+
+#: src/pages/accounts/components/AccountDialog.tsx:78
+msgid "Key \"{trimmedKey}\" already exists"
+msgstr "識別碼「{trimmedKey}」已存在"
+
+#: src/pages/accounts/components/AccountDialog.tsx:74
+msgid "Key is required"
+msgstr "識別碼為必填"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:54
+msgid "Leave <0>IP Whitelist</0> empty — blank means all IPs are allowed, which this app needs since it runs on Cloudflare's rotating IPs."
+msgstr "請將 <0>IP 白名單</0> 保持空白 — 空白代表允許所有 IP，由於本應用程式運行於 Cloudflare 的動態 IP，因此需要此設定。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:52
+msgid "Leave the defaults as-is"
+msgstr "保留預設值即可"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:52
+msgid "Leave the IP Whitelist blank"
+msgstr "將 IP 白名單保持空白"
+
+#: src/pages/accounts/index.tsx:164
+msgid "Loading accounts…"
+msgstr "正在載入帳戶…"
+
+#: src/pages/Config.tsx:362
+msgid "Loading config…"
+msgstr "正在載入設定…"
+
+#: src/pages/transfers/index.tsx:86
+msgid "Loading transfers…"
+msgstr "正在載入交易…"
+
+#: src/App.tsx:32
+#: src/layouts/AppLayout.tsx:93
+msgid "Loading…"
+msgstr "載入中…"
+
+#: src/pages/Config.tsx:409
+#: src/pages/Config.tsx:429
+msgid "Log out"
+msgstr "登出"
+
+#: src/pages/Config.tsx:415
+msgid "Log out of Notion?"
+msgstr "要登出 Notion 嗎？"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:44
+msgid "Name the token"
+msgstr "為憑證命名"
+
+#: src/pages/accounts/components/AccountCard.tsx:203
+msgid "Net Cost"
+msgstr "淨成本"
+
+#: src/pages/accounts/components/AccountCard.tsx:235
+msgid "Net P&L"
+msgstr "淨損益"
+
+#: src/pages/accounts/components/AccountDialog.tsx:124
+msgid "New Account"
+msgstr "新增帳戶"
+
+#: src/pages/transfers/components/TransferDialog.tsx:116
+msgid "New Transfer"
+msgstr "新增交易"
+
+#: src/pages/accounts/index.tsx:190
+msgid "No accounts yet."
+msgstr "目前沒有帳戶。"
+
+#: src/pages/Config.tsx:233
+msgid "No currencies yet"
+msgstr "目前無支援幣種"
+
+#: src/pages/accounts/components/AccountDialog.tsx:181
+msgid "No currencies yet — add one under Settings before creating an account."
+msgstr "目前沒有支援幣種 — 請先至「設定」新增幣種後再建立帳戶。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:54
+msgid "No need to change anything. A new key already has only <0>Reading</0> enabled, which is all this app needs. Leave <1>IP access restrictions</1> unrestricted too — this app runs on Cloudflare's rotating IPs, so a fixed allowlist would block it."
+msgstr "無需變更任何設定。新建的金鑰預設僅啟用 <0>唯讀 (Reading)</0> 權限，這已足夠本應用程式使用。請保持 <1>IP 存取限制</1> 為未限制 — 本應用程式運行於 Cloudflare 的動態 IP，設定固定白名單會導致連線被阻擋。"
+
+#: src/pages/transfers/index.tsx:145
+msgid "No transfers for this account"
+msgstr "此帳戶無交易紀錄"
+
+#: src/pages/transfers/index.tsx:107
+msgid "No transfers yet"
+msgstr "目前無交易紀錄"
+
+#: src/pages/transfers/components/TransferDialog.tsx:282
+msgid "Note"
+msgstr "備註"
+
+#: src/pages/Config.tsx:401
+msgid "Notion Workspace"
+msgstr "Notion 工作區"
+
+#: src/pages/NotFound.tsx:14
+msgid "Oops! Looks like you’ve wandered into uncharted territory. The page you’re looking for doesn’t exist."
+msgstr "哎呀！看來你迷路了。你所尋找的頁面並不存在。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:26
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:42
+msgid "Open API Management"
+msgstr "開啟 API 管理"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:26
+msgid "Open API Tokens"
+msgstr "開啟 API 憑證"
+
+#: src/pages/transfers/components/TransferDialog.tsx:288
+msgid "Optional note"
+msgstr "選填備註"
+
+#: src/pages/accounts/components/AccountDialog.tsx:206
+msgid "Other"
+msgstr "其他"
+
+#: src/pages/accounts/index.tsx:150
+msgid "Overall Yield"
+msgstr "整體報酬率"
+
+#: src/pages/NotFound.tsx:11
+msgid "Page Not Found"
+msgstr "頁面未找到"
+
+#: src/pages/accounts/components/apiProviders.ts:59
+msgid "Passphrase"
+msgstr "Passphrase (API 口令)"
+
+#: src/pages/transfers/index.tsx:223
+msgid "Rate"
+msgstr "匯率"
+
+#: src/pages/transfers/index.tsx:110
+msgid "Record a deposit, withdrawal, or move between your accounts."
+msgstr "記錄存款、提款或帳戶間的資金移轉。"
+
+#. placeholder {0}: refRate.toFixed(4)
+#: src/pages/transfers/components/TransferDialog.tsx:261
+msgid "ref {0}"
+msgstr "參考值 {0}"
+
+#: src/pages/accounts/index.tsx:110
+#: src/pages/transfers/index.tsx:69
+msgid "Refresh"
+msgstr "重新整理"
+
+#: src/pages/accounts/index.tsx:109
+msgid "Refresh accounts"
+msgstr "重新整理帳戶"
+
+#: src/pages/transfers/index.tsx:68
+msgid "Refresh transfers"
+msgstr "重新整理交易"
+
+#: src/pages/Config.tsx:239
+msgid "Remove {item}"
+msgstr "移除 {item}"
+
+#: src/pages/accounts/index.tsx:180
+#: src/pages/Config.tsx:374
+#: src/pages/transfers/index.tsx:99
+msgid "Retry"
+msgstr "重試"
+
+#: src/pages/NotFound.tsx:21
+msgid "Return to Safety"
+msgstr "返回安全區域"
+
+#: src/pages/accounts/components/AccountDialog.tsx:298
+#: src/pages/Config.tsx:278
+#: src/pages/transfers/components/TransferDialog.tsx:309
+msgid "Save"
+msgstr "儲存"
+
+#: src/pages/Config.tsx:278
+msgid "Saved!"
+msgstr "已儲存！"
+
+#: src/pages/accounts/components/AccountCard.tsx:191
+#: src/pages/accounts/components/AccountDialog.tsx:298
+#: src/pages/accounts/components/InlineAmount.tsx:98
+#: src/pages/Config.tsx:278
+#: src/pages/transfers/components/TransferDialog.tsx:309
+msgid "Saving…"
+msgstr "儲存中…"
+
+#: src/pages/accounts/components/apiProviders.ts:62
+msgid "Secret Key"
+msgstr "Secret Key"
+
+#: src/pages/transfers/components/TransferDialog.tsx:158
+#: src/pages/transfers/components/TransferDialog.tsx:181
+msgid "Select"
+msgstr "選擇"
+
+#: src/pages/accounts/components/AccountDialog.tsx:173
+msgid "Select currency"
+msgstr "選擇貨幣"
+
+#: src/pages/accounts/components/AccountDialog.tsx:195
+msgid "Select type"
+msgstr "選擇類型"
+
+#: src/pages/accounts/components/InlineAmount.tsx:98
+msgid "Set balance"
+msgstr "設定餘額"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:79
+msgid "Set read-only permissions"
+msgstr "設定唯讀權限"
+
+#: src/pages/accounts/components/apiProviders.ts:84
+msgid "Set the key to Read-only (Select all is safe)."
+msgstr "將金鑰設為唯讀權限（全選是安全的）。"
+
+#: src/layouts/AppLayout.tsx:50
+#: src/layouts/AppLayout.tsx:54
+#: src/pages/Config.tsx:354
+msgid "Settings"
+msgstr "設定"
+
+#: src/pages/accounts/components/AccountCard.tsx:135
+msgid "Settings for {accountKey}"
+msgstr "「{accountKey}」帳戶設定"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:28
+msgid "Sign in to Binance, then go to <0>Account → API Management<1/></0>."
+msgstr "登入 Binance，接著前往 <0>帳戶 → API 管理<1/></0>。"
+
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:44
+msgid "Sign in to Bitget, then go to <0>Account → API Management<1/></0>."
+msgstr "登入 Bitget，接著前往 <0>帳戶 → API 管理<1/></0>。"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:28
+msgid "Sign in to MAX, then go to <0>Security Settings → API Tokens<1/></0> and click <2>Add New API Token</2>."
+msgstr "登入 MAX，接著前往 <0>安全設定 → API 憑證 (API Tokens)<1/></0> 並點擊 <2>新增 API 憑證 (Add New API Token)</2>。"
+
+#: src/pages/transfers/components/TransferDialog.tsx:169
+msgid "Source"
+msgstr "來源"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:46
+msgid "The <0>Label</0> is optional — feel free to use this: <1/>."
+msgstr "標籤 <0>Label</0> 為選填 — 建議使用此設定：<1/>。"
+
+#: src/pages/Config.tsx:156
+msgid "The primary currency total assets are calculated in"
+msgstr "計算總資產時所使用的主要貨幣"
+
+#: src/pages/Config.tsx:418
+msgid "This will disconnect your workspace and log you out of the application."
+msgstr "這將會中斷您的 Notion 工作區連線並將您登出。"
+
+#: src/pages/accounts/components/AccountCard.tsx:154
+msgid "This will remove the account from your config. Existing transfers referencing this account won't be affected."
+msgstr "這將會從您的設定中移除此帳戶。現有引用此帳戶的交易不會受到影響。"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:60
+msgid "Tick only the Read scopes"
+msgstr "僅勾選讀取 (Read) 權限"
+
+#: src/pages/transfers/components/TransferDialog.tsx:124
+msgid "Title"
+msgstr "名稱"
+
+#: src/pages/transfers/components/TransferDialog.tsx:176
+msgid "To"
+msgstr "目的地"
+
+#: src/pages/transfers/components/TransferDialog.tsx:82
+msgid "To is required"
+msgstr "請選擇目的地"
+
+#: src/pages/accounts/index.tsx:135
+msgid "Total Assets"
+msgstr "總資產"
+
+#: src/pages/accounts/index.tsx:129
+msgid "Total Cost"
+msgstr "總成本"
+
+#: src/pages/accounts/index.tsx:141
+msgid "Total P&L"
+msgstr "總損益"
+
+#: src/layouts/AppLayout.tsx:30
+#: src/layouts/AppLayout.tsx:34
+#: src/pages/transfers/index.tsx:50
+msgid "Transfers"
+msgstr "交易記錄"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx:62
+msgid "Under <0>Scope Settings</0>, check the <1>Read</1> boxes (the balance comes from <2>Account & Personal Information</2>) and leave every <3>Write</3> box unchecked — this app never trades or withdraws."
+msgstr "在 <0>Scope 設定</0> 下，勾選所有的 <1>Read (讀取)</1> 欄位（餘額資訊來自 <2>Account & Personal Information</2>）並保持所有 <3>Write (寫入)</3> 欄位不勾選 — 本應用程式絕不進行交易或提幣。"
+
+#: src/pages/accounts/components/apiProviders.ts:77
+msgid "Use a read-only key (disable Trading & Withdrawals)."
+msgstr "請使用唯讀金鑰（停用交易與提幣功能）。"
+
+#: src/pages/accounts/components/apiProviders.ts:92
+msgid "Use a read-only key with IP access unrestricted."
+msgstr "請使用 IP 存取限制為未限制的唯讀金鑰。"
+
+#: src/pages/accounts/components/AccountDialog.tsx:260
+msgid "Use a read-only key."
+msgstr "請使用唯讀金鑰。"
+
+#: src/pages/Config.tsx:455
+#: src/pages/Landing.tsx:101
+msgid "Your data stays in your Notion workspace and is never stored or transmitted externally."
+msgstr "您的資料僅會留存在您的 Notion 工作區，絕不會被外部儲存或傳輸。"
+
+#: src/pages/Landing.tsx:100
+#~ msgid "Your data stays in your Notion workspace."
+#~ msgstr "您的資料只會儲存在您的 Notion 工作區中。"
+
+#: src/pages/accounts/components/BinanceKeyGuide.tsx:110
+#: src/pages/accounts/components/BitgetKeyGuide.tsx:137
+#: src/pages/accounts/components/MaxKeyGuide.tsx:118
+msgid "Your keys are stored in your own Notion workspace. Using a read-only key means they can never move your funds, even if exposed."
+msgstr "您的金鑰儲存在您個人的 Notion 工作區中。使用唯讀金鑰表示即使金鑰外洩，也無法動用您的資金。"
