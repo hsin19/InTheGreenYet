@@ -14,719 +14,721 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. placeholder {0}: provider?.label
-#: src/pages/accounts/components/AccountCard.tsx:179
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "{0} Live"
 msgstr "{0} Live"
 
 #. placeholder {0}: form.from || "?"
 #. placeholder {1}: form.to || "?"
-#: src/pages/transfers/components/TransferDialog.tsx:97
-#: src/pages/transfers/components/TransferDialog.tsx:130
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "{0} to {1}"
 msgstr "{0} to {1}"
 
-#: src/pages/Config.tsx:206
+#: src/pages/Config.tsx
 msgid "{v} is not a supported currency"
 msgstr "{v} is not a supported currency"
 
-#: src/pages/Config.tsx:338
+#: src/pages/Config.tsx
 msgid "{val} is not a supported currency"
 msgstr "{val} is not a supported currency"
 
-#: src/pages/Landing.tsx:91
+#: src/pages/Landing.tsx
 #~ msgid "A personal investment tracking app powered by Notion as the database backend."
 #~ msgstr "A personal investment tracking app powered by Notion as the database backend."
 
-#: src/pages/accounts/components/apiProviders.ts:61
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Access Key"
 msgstr "Access Key"
 
-#: src/pages/accounts/components/InlineAmount.tsx:75
+#: src/pages/accounts/components/InlineAmount.tsx
 msgid "Account balance"
 msgstr "Account balance"
 
-#: src/pages/accounts/components/apiProviders.ts:67
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Account type"
 msgstr "Account type"
 
-#: src/pages/accounts/components/AccountDialog.tsx:188
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Account Type"
 msgstr "Account Type"
 
-#: src/layouts/AppLayout.tsx:40
-#: src/layouts/AppLayout.tsx:44
-#: src/pages/accounts/index.tsx:101
+#: src/layouts/AppLayout.tsx
+#: src/pages/accounts/index.tsx
 msgid "Accounts"
 msgstr "Accounts"
 
-#: src/pages/accounts/index.tsx:117
-#: src/pages/accounts/index.tsx:118
+#: src/pages/accounts/index.tsx
 msgid "Add account"
 msgstr "Add account"
 
-#: src/pages/Config.tsx:250
+#: src/pages/Config.tsx
 msgid "Add Currency"
 msgstr "Add Currency"
 
-#: src/pages/Config.tsx:255
+#: src/pages/Config.tsx
 msgid "Add currency (e.g. EUR, JPY)…"
 msgstr "Add currency (e.g. EUR, JPY)…"
 
-#: src/pages/Config.tsx:258
+#: src/pages/Config.tsx
 msgid "Add currency button"
 msgstr "Add currency button"
 
-#: src/pages/transfers/index.tsx:74
-#: src/pages/transfers/index.tsx:74
+#: src/pages/transfers/index.tsx
 msgid "Add transfer"
 msgstr "Add transfer"
 
-#: src/pages/accounts/index.tsx:196
+#: src/pages/accounts/index.tsx
 msgid "Add your first account →"
 msgstr "Add your first account →"
 
-#: src/pages/transfers/index.tsx:114
+#: src/pages/transfers/index.tsx
 msgid "Add your first transfer →"
 msgstr "Add your first transfer →"
 
-#: src/pages/transfers/index.tsx:127
+#: src/pages/transfers/index.tsx
 msgid "All"
 msgstr "All"
 
-#: src/pages/transfers/components/TransferDialog.tsx:203
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Amount"
 msgstr "Amount"
 
-#: src/pages/transfers/components/TransferDialog.tsx:86
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Amount is required"
 msgstr "Amount is required"
 
-#: src/pages/accounts/components/apiProviders.ts:57
+#: src/pages/accounts/components/apiProviders.ts
 msgid "API Key"
 msgstr "API Key"
 
-#: src/pages/accounts/components/apiProviders.ts:58
+#: src/pages/accounts/components/apiProviders.ts
 msgid "API Secret"
 msgstr "API Secret"
 
-#: src/pages/accounts/components/AccountCard.tsx:191
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Apply"
 msgstr "Apply"
 
-#: src/pages/Landing.tsx:19
+#: src/pages/Landing.tsx
 msgid "Authorization did not return a token."
 msgstr "Authorization did not return a token."
 
-#: src/pages/Landing.tsx:38
+#: src/pages/Landing.tsx
 msgid "Authorization failed."
 msgstr "Authorization failed."
 
-#: src/pages/Landing.tsx:18
+#: src/pages/Landing.tsx
 msgid "Authorization request mismatch — please try again."
 msgstr "Authorization request mismatch — please try again."
 
-#: src/pages/Landing.tsx:21
+#: src/pages/Landing.tsx
 msgid "Authorization was denied."
 msgstr "Authorization was denied."
 
-#: src/pages/Config.tsx:224
+#: src/i18n.ts
+msgid "Auto (Browser Default)"
+msgstr "Auto (Browser Default)"
+
+#: src/pages/Config.tsx
 msgid "Available currencies when creating transfers"
 msgstr "Available currencies when creating transfers"
 
-#: src/pages/accounts/components/AccountDialog.tsx:199
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Bank"
 msgstr "Bank"
 
-#: src/pages/Config.tsx:153
-#: src/pages/Config.tsx:164
+#: src/pages/Config.tsx
 msgid "Base Currency"
 msgstr "Base Currency"
 
-#: src/pages/Config.tsx:334
+#: src/pages/Config.tsx
 msgid "Base currency cannot be empty"
 msgstr "Base currency cannot be empty"
 
-#: src/pages/accounts/components/AccountCard.tsx:159
-#: src/pages/accounts/components/AccountDialog.tsx:292
-#: src/pages/Config.tsx:423
-#: src/pages/transfers/components/TransferDialog.tsx:303
+#: src/pages/accounts/components/AccountCard.tsx
+#: src/pages/accounts/components/AccountDialog.tsx
+#: src/pages/Config.tsx
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/pages/accounts/components/AccountCard.tsx:257
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Cash Account"
 msgstr "Cash Account"
 
-#: src/pages/accounts/components/apiProviders.ts:68
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Classic Trading account"
 msgstr "Classic Trading account"
 
-#: src/pages/accounts/components/apiProviders.ts:85
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Classic Trading account only, reported in USDT. On-chain Earn balances aren't included — Bitget's API doesn't expose them."
 msgstr "Classic Trading account only, reported in USDT. On-chain Earn balances aren't included — Bitget's API doesn't expose them."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:46
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "Click <0>Create API</0>, choose <1>System generated</1>, give it a label — feel free to use this: <2/> — and finish the 2FA verification."
 msgstr "Click <0>Create API</0>, choose <1>System generated</1>, give it a label — feel free to use this: <2/> — and finish the 2FA verification."
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:62
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Click <0>Create API</0>, choose <1>System-generated API key</1>, then fill in the fields — feel free to use these suggestions:<2><3><4>Note</4><5/></3><6><7>Passphrase</7><8/></6></2><9>Keep the passphrase — the app needs it alongside the key and secret.</9>"
 msgstr "Click <0>Create API</0>, choose <1>System-generated API key</1>, then fill in the fields — feel free to use these suggestions:<2><3><4>Note</4><5/></3><6><7>Passphrase</7><8/></6></2><9>Keep the passphrase — the app needs it alongside the key and secret.</9>"
 
-#: src/pages/accounts/components/InlineAmount.tsx:86
+#: src/pages/accounts/components/InlineAmount.tsx
 msgid "Click to edit balance"
 msgstr "Click to edit balance"
 
-#: src/pages/transfers/index.tsx:58
+#: src/pages/transfers/index.tsx
 msgid "Collapse all"
 msgstr "Collapse all"
 
-#: src/pages/transfers/index.tsx:58
+#: src/pages/transfers/index.tsx
 msgid "Collapse all transfers"
 msgstr "Collapse all transfers"
 
 #. placeholder {0}: provider.label
-#: src/pages/accounts/components/AccountDialog.tsx:215
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Connect to {0}"
 msgstr "Connect to {0}"
 
-#: src/pages/Landing.tsx:51
+#: src/pages/Landing.tsx
 msgid "Connect to Notion"
 msgstr "Connect to Notion"
 
-#: src/pages/Callback.tsx:55
+#: src/pages/Callback.tsx
 msgid "Connecting to Notion…"
 msgstr "Connecting to Notion…"
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:62
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "Copy the <0>API Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
 msgstr "Copy the <0>API Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:89
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Copy the <0>API Key</0>, <1>Secret Key</1> (shown only once) and the <2>passphrase</2> you set, then paste all three into the fields above."
 msgstr "Copy the <0>API Key</0>, <1>Secret Key</1> (shown only once) and the <2>passphrase</2> you set, then paste all three into the fields above."
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:87
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Copy the credentials"
 msgstr "Copy the credentials"
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:60
-#: src/pages/accounts/components/MaxKeyGuide.tsx:68
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Copy the keys"
 msgstr "Copy the keys"
 
-#: src/pages/accounts/components/apiProviders.ts:93
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually."
 msgstr "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:89
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:116
-#: src/pages/accounts/components/MaxKeyGuide.tsx:97
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Create a read-only key — InTheGreenYet only reads your balances, it never trades or withdraws."
 msgstr "Create a read-only key — InTheGreenYet only reads your balances, it never trades or withdraws."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:44
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:60
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Create an API key"
 msgstr "Create an API key"
 
-#: src/pages/Config.tsx:221
+#: src/pages/Config.tsx
 msgid "Currencies"
 msgstr "Currencies"
 
-#: src/pages/accounts/components/AccountDialog.tsx:166
-#: src/pages/transfers/components/TransferDialog.tsx:217
+#: src/pages/accounts/components/AccountDialog.tsx
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Currency"
 msgstr "Currency"
 
-#: src/pages/accounts/components/AccountDialog.tsx:83
-#: src/pages/transfers/components/TransferDialog.tsx:90
+#: src/pages/accounts/components/AccountDialog.tsx
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Currency is required"
 msgstr "Currency is required"
 
-#: src/pages/transfers/components/TransferDialog.tsx:138
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Date"
 msgstr "Date"
 
-#: src/pages/accounts/components/AccountCard.tsx:165
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Delete"
 msgstr "Delete"
 
-#: src/pages/accounts/components/AccountCard.tsx:151
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Delete \"{accountKey}\"?"
 msgstr "Delete \"{accountKey}\"?"
 
-#: src/pages/accounts/components/AccountCard.tsx:143
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Delete {accountKey}"
 msgstr "Delete {accountKey}"
 
-#: src/pages/transfers/components/TransferDialog.tsx:192
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Destination"
 msgstr "Destination"
 
-#: src/pages/accounts/components/AccountDialog.tsx:158
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Display name"
 msgstr "Display name"
 
-#: src/pages/accounts/components/AccountDialog.tsx:151
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Display Name"
 msgstr "Display Name"
 
-#: src/pages/accounts/components/AccountDialog.tsx:139
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "e.g. binance"
 msgstr "e.g. binance"
 
-#: src/pages/Config.tsx:169
+#: src/pages/Config.tsx
 msgid "e.g. USD, EUR, JPY…"
 msgstr "e.g. USD, EUR, JPY…"
 
-#: src/pages/accounts/components/AccountDialog.tsx:124
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Edit \"{editingKey}\""
 msgstr "Edit \"{editingKey}\""
 
-#: src/pages/transfers/index.tsx:233
+#: src/pages/transfers/index.tsx
 msgid "Eff. Rate"
 msgstr "Eff. Rate"
 
-#: src/pages/transfers/components/TransferDialog.tsx:257
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Exchange Rate"
 msgstr "Exchange Rate"
 
-#: src/pages/transfers/index.tsx:55
+#: src/pages/transfers/index.tsx
 msgid "Expand all"
 msgstr "Expand all"
 
-#: src/pages/transfers/index.tsx:55
+#: src/pages/transfers/index.tsx
 msgid "Expand all transfers"
 msgstr "Expand all transfers"
 
-#: src/pages/accounts/components/AccountCard.tsx:98
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Failed to apply balance"
 msgstr "Failed to apply balance"
 
-#: src/pages/Landing.tsx:20
+#: src/pages/Landing.tsx
 msgid "Failed to complete authorization with Notion."
 msgstr "Failed to complete authorization with Notion."
 
 #. placeholder {0}: provider.label
-#: src/pages/accounts/components/AccountCard.tsx:81
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Failed to fetch {0} balance"
 msgstr "Failed to fetch {0} balance"
 
-#: src/pages/accounts/index.tsx:173
+#: src/pages/accounts/index.tsx
 msgid "Failed to load accounts"
 msgstr "Failed to load accounts"
 
-#: src/pages/Config.tsx:371
+#: src/pages/Config.tsx
 msgid "Failed to load config"
 msgstr "Failed to load config"
 
-#: src/pages/transfers/index.tsx:95
+#: src/pages/transfers/index.tsx
 msgid "Failed to load transfers"
 msgstr "Failed to load transfers"
 
-#: src/pages/accounts/components/AccountDialog.tsx:112
-#: src/pages/Config.tsx:327
-#: src/pages/Config.tsx:346
-#: src/pages/transfers/components/TransferDialog.tsx:101
+#: src/pages/accounts/components/AccountDialog.tsx
+#: src/pages/Config.tsx
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Failed to save"
 msgstr "Failed to save"
 
-#: src/pages/transfers/components/TransferDialog.tsx:242
-#: src/pages/transfers/index.tsx:212
+#: src/pages/transfers/components/TransferDialog.tsx
+#: src/pages/transfers/index.tsx
 msgid "Fee"
 msgstr "Fee"
 
 #. placeholder {0}: provider.label
-#: src/pages/accounts/components/AccountCard.tsx:123
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Fetch {0} balance for {accountKey}"
 msgstr "Fetch {0} balance for {accountKey}"
 
 #. placeholder {0}: provider.label
-#: src/pages/accounts/components/AccountCard.tsx:124
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Fetch live balance from {0}"
 msgstr "Fetch live balance from {0}"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:70
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Finish the 2FA verification, then copy the <0>Access Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
 msgstr "Finish the 2FA verification, then copy the <0>Access Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:81
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "For <0>Permissions</0> choose <1>Read-only</1>, then tick <2>Select all</2> — in read-only mode every box is read-only (\"Search for…\"), so the key still can't trade or withdraw. Leave <3>IP access</3> unrestricted — this app runs on Cloudflare's rotating IPs, so a fixed allowlist would block it."
 msgstr "For <0>Permissions</0> choose <1>Read-only</1>, then tick <2>Select all</2> — in read-only mode every box is read-only (\"Search for…\"), so the key still can't trade or withdraw. Leave <3>IP access</3> unrestricted — this app runs on Cloudflare's rotating IPs, so a fixed allowlist would block it."
 
-#: src/pages/transfers/components/TransferDialog.tsx:153
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "From"
 msgstr "From"
 
-#: src/pages/transfers/components/TransferDialog.tsx:78
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "From is required"
 msgstr "From is required"
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:86
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "Get your Binance API key"
 msgstr "Get your Binance API key"
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:113
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Get your Bitget API key"
 msgstr "Get your Bitget API key"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:94
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Get your MAX API key"
 msgstr "Get your MAX API key"
 
-#: src/pages/Config.tsx:449
+#: src/pages/Config.tsx
 msgid "GitHub repository"
 msgstr "GitHub repository"
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:79
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:106
-#: src/pages/accounts/components/MaxKeyGuide.tsx:87
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "How do I get these?"
 msgstr "How do I get these?"
 
-#: src/pages/accounts/components/AccountDialog.tsx:144
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Identifier used in transfers. Cannot be changed later."
 msgstr "Identifier used in transfers. Cannot be changed later."
 
-#: src/pages/accounts/components/AccountDialog.tsx:279
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Include in portfolio totals?"
 msgstr "Include in portfolio totals?"
 
-#: src/pages/Config.tsx:441
-#: src/pages/Landing.tsx:91
+#: src/pages/Config.tsx
+#: src/pages/Landing.tsx
 msgid "It’s not about today’s profit — it’s about knowing where you truly stand."
 msgstr "It’s not about today’s profit — it’s about knowing where you truly stand."
 
-#: src/pages/Landing.tsx:91
+#: src/pages/Landing.tsx
 #~ msgid "It’s not about today’s profit —<0/>it’s about knowing where you truly stand."
 #~ msgstr "It’s not about today’s profit —<0/>it’s about knowing where you truly stand."
 
-#: src/pages/accounts/components/AccountDialog.tsx:132
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Key"
 msgstr "Key"
 
-#: src/pages/accounts/components/AccountDialog.tsx:78
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Key \"{trimmedKey}\" already exists"
 msgstr "Key \"{trimmedKey}\" already exists"
 
-#: src/pages/accounts/components/AccountDialog.tsx:74
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Key is required"
 msgstr "Key is required"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:54
+#: src/pages/Config.tsx
+msgid "Language"
+msgstr "Language"
+
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Leave <0>IP Whitelist</0> empty — blank means all IPs are allowed, which this app needs since it runs on Cloudflare's rotating IPs."
 msgstr "Leave <0>IP Whitelist</0> empty — blank means all IPs are allowed, which this app needs since it runs on Cloudflare's rotating IPs."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:52
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "Leave the defaults as-is"
 msgstr "Leave the defaults as-is"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:52
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Leave the IP Whitelist blank"
 msgstr "Leave the IP Whitelist blank"
 
-#: src/pages/accounts/index.tsx:164
+#: src/pages/accounts/index.tsx
 msgid "Loading accounts…"
 msgstr "Loading accounts…"
 
-#: src/pages/Config.tsx:362
+#: src/pages/Config.tsx
 msgid "Loading config…"
 msgstr "Loading config…"
 
-#: src/pages/transfers/index.tsx:86
+#: src/pages/transfers/index.tsx
 msgid "Loading transfers…"
 msgstr "Loading transfers…"
 
-#: src/App.tsx:32
-#: src/layouts/AppLayout.tsx:93
+#: src/App.tsx
+#: src/layouts/AppLayout.tsx
 msgid "Loading…"
 msgstr "Loading…"
 
-#: src/pages/Config.tsx:409
-#: src/pages/Config.tsx:429
+#: src/pages/Config.tsx
 msgid "Log out"
 msgstr "Log out"
 
-#: src/pages/Config.tsx:415
+#: src/pages/Config.tsx
 msgid "Log out of Notion?"
 msgstr "Log out of Notion?"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:44
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Name the token"
 msgstr "Name the token"
 
-#: src/pages/accounts/components/AccountCard.tsx:203
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Net Cost"
 msgstr "Net Cost"
 
-#: src/pages/accounts/components/AccountCard.tsx:235
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Net P&L"
 msgstr "Net P&L"
 
-#: src/pages/accounts/components/AccountDialog.tsx:124
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "New Account"
 msgstr "New Account"
 
-#: src/pages/transfers/components/TransferDialog.tsx:116
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "New Transfer"
 msgstr "New Transfer"
 
-#: src/pages/accounts/index.tsx:190
+#: src/pages/accounts/index.tsx
 msgid "No accounts yet."
 msgstr "No accounts yet."
 
-#: src/pages/Config.tsx:233
+#: src/pages/Config.tsx
 msgid "No currencies yet"
 msgstr "No currencies yet"
 
-#: src/pages/accounts/components/AccountDialog.tsx:181
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "No currencies yet — add one under Settings before creating an account."
 msgstr "No currencies yet — add one under Settings before creating an account."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:54
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "No need to change anything. A new key already has only <0>Reading</0> enabled, which is all this app needs. Leave <1>IP access restrictions</1> unrestricted too — this app runs on Cloudflare's rotating IPs, so a fixed allowlist would block it."
 msgstr "No need to change anything. A new key already has only <0>Reading</0> enabled, which is all this app needs. Leave <1>IP access restrictions</1> unrestricted too — this app runs on Cloudflare's rotating IPs, so a fixed allowlist would block it."
 
-#: src/pages/transfers/index.tsx:145
+#: src/pages/transfers/index.tsx
 msgid "No transfers for this account"
 msgstr "No transfers for this account"
 
-#: src/pages/transfers/index.tsx:107
+#: src/pages/transfers/index.tsx
 msgid "No transfers yet"
 msgstr "No transfers yet"
 
-#: src/pages/transfers/components/TransferDialog.tsx:282
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Note"
 msgstr "Note"
 
-#: src/pages/Config.tsx:401
+#: src/pages/Config.tsx
 msgid "Notion Workspace"
 msgstr "Notion Workspace"
 
-#: src/pages/NotFound.tsx:14
+#: src/pages/NotFound.tsx
 msgid "Oops! Looks like you’ve wandered into uncharted territory. The page you’re looking for doesn’t exist."
 msgstr "Oops! Looks like you’ve wandered into uncharted territory. The page you’re looking for doesn’t exist."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:26
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:42
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Open API Management"
 msgstr "Open API Management"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:26
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Open API Tokens"
 msgstr "Open API Tokens"
 
-#: src/pages/transfers/components/TransferDialog.tsx:288
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Optional note"
 msgstr "Optional note"
 
-#: src/pages/accounts/components/AccountDialog.tsx:206
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Other"
 msgstr "Other"
 
-#: src/pages/accounts/index.tsx:150
+#: src/pages/accounts/index.tsx
 msgid "Overall Yield"
 msgstr "Overall Yield"
 
-#: src/pages/NotFound.tsx:11
+#: src/pages/NotFound.tsx
 msgid "Page Not Found"
 msgstr "Page Not Found"
 
-#: src/pages/accounts/components/apiProviders.ts:59
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Passphrase"
 msgstr "Passphrase"
 
-#: src/pages/transfers/index.tsx:223
+#: src/pages/transfers/index.tsx
 msgid "Rate"
 msgstr "Rate"
 
-#: src/pages/transfers/index.tsx:110
+#: src/pages/transfers/index.tsx
 msgid "Record a deposit, withdrawal, or move between your accounts."
 msgstr "Record a deposit, withdrawal, or move between your accounts."
 
 #. placeholder {0}: refRate.toFixed(4)
-#: src/pages/transfers/components/TransferDialog.tsx:261
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "ref {0}"
 msgstr "ref {0}"
 
-#: src/pages/accounts/index.tsx:110
-#: src/pages/transfers/index.tsx:69
+#: src/pages/accounts/index.tsx
+#: src/pages/transfers/index.tsx
 msgid "Refresh"
 msgstr "Refresh"
 
-#: src/pages/accounts/index.tsx:109
+#: src/pages/accounts/index.tsx
 msgid "Refresh accounts"
 msgstr "Refresh accounts"
 
-#: src/pages/transfers/index.tsx:68
+#: src/pages/transfers/index.tsx
 msgid "Refresh transfers"
 msgstr "Refresh transfers"
 
-#: src/pages/Config.tsx:239
+#: src/pages/Config.tsx
 msgid "Remove {item}"
 msgstr "Remove {item}"
 
-#: src/pages/accounts/index.tsx:180
-#: src/pages/Config.tsx:374
-#: src/pages/transfers/index.tsx:99
+#: src/pages/accounts/index.tsx
+#: src/pages/Config.tsx
+#: src/pages/transfers/index.tsx
 msgid "Retry"
 msgstr "Retry"
 
-#: src/pages/NotFound.tsx:21
+#: src/pages/NotFound.tsx
 msgid "Return to Safety"
 msgstr "Return to Safety"
 
-#: src/pages/accounts/components/AccountDialog.tsx:298
-#: src/pages/Config.tsx:278
-#: src/pages/transfers/components/TransferDialog.tsx:309
+#: src/pages/accounts/components/AccountDialog.tsx
+#: src/pages/Config.tsx
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Save"
 msgstr "Save"
 
-#: src/pages/Config.tsx:278
+#: src/pages/Config.tsx
 msgid "Saved!"
 msgstr "Saved!"
 
-#: src/pages/accounts/components/AccountCard.tsx:191
-#: src/pages/accounts/components/AccountDialog.tsx:298
-#: src/pages/accounts/components/InlineAmount.tsx:98
-#: src/pages/Config.tsx:278
-#: src/pages/transfers/components/TransferDialog.tsx:309
+#: src/pages/accounts/components/AccountCard.tsx
+#: src/pages/accounts/components/AccountDialog.tsx
+#: src/pages/accounts/components/InlineAmount.tsx
+#: src/pages/Config.tsx
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Saving…"
 msgstr "Saving…"
 
-#: src/pages/accounts/components/apiProviders.ts:62
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Secret Key"
 msgstr "Secret Key"
 
-#: src/pages/transfers/components/TransferDialog.tsx:158
-#: src/pages/transfers/components/TransferDialog.tsx:181
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Select"
 msgstr "Select"
 
-#: src/pages/accounts/components/AccountDialog.tsx:173
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Select currency"
 msgstr "Select currency"
 
-#: src/pages/accounts/components/AccountDialog.tsx:195
+#: src/pages/Config.tsx
+msgid "Select the display language for the application."
+msgstr "Select the display language for the application."
+
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Select type"
 msgstr "Select type"
 
-#: src/pages/accounts/components/InlineAmount.tsx:98
+#: src/pages/accounts/components/InlineAmount.tsx
 msgid "Set balance"
 msgstr "Set balance"
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:79
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Set read-only permissions"
 msgstr "Set read-only permissions"
 
-#: src/pages/accounts/components/apiProviders.ts:84
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Set the key to Read-only (Select all is safe)."
 msgstr "Set the key to Read-only (Select all is safe)."
 
-#: src/layouts/AppLayout.tsx:50
-#: src/layouts/AppLayout.tsx:54
-#: src/pages/Config.tsx:354
+#: src/layouts/AppLayout.tsx
+#: src/pages/Config.tsx
 msgid "Settings"
 msgstr "Settings"
 
-#: src/pages/accounts/components/AccountCard.tsx:135
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "Settings for {accountKey}"
 msgstr "Settings for {accountKey}"
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:28
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "Sign in to Binance, then go to <0>Account → API Management<1/></0>."
 msgstr "Sign in to Binance, then go to <0>Account → API Management<1/></0>."
 
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:44
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
 msgid "Sign in to Bitget, then go to <0>Account → API Management<1/></0>."
 msgstr "Sign in to Bitget, then go to <0>Account → API Management<1/></0>."
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:28
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Sign in to MAX, then go to <0>Security Settings → API Tokens<1/></0> and click <2>Add New API Token</2>."
 msgstr "Sign in to MAX, then go to <0>Security Settings → API Tokens<1/></0> and click <2>Add New API Token</2>."
 
-#: src/pages/transfers/components/TransferDialog.tsx:169
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Source"
 msgstr "Source"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:46
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "The <0>Label</0> is optional — feel free to use this: <1/>."
 msgstr "The <0>Label</0> is optional — feel free to use this: <1/>."
 
-#: src/pages/Config.tsx:156
+#: src/pages/Config.tsx
 msgid "The primary currency total assets are calculated in"
 msgstr "The primary currency total assets are calculated in"
 
-#: src/pages/Config.tsx:418
+#: src/pages/Config.tsx
 msgid "This will disconnect your workspace and log you out of the application."
 msgstr "This will disconnect your workspace and log you out of the application."
 
-#: src/pages/accounts/components/AccountCard.tsx:154
+#: src/pages/accounts/components/AccountCard.tsx
 msgid "This will remove the account from your config. Existing transfers referencing this account won't be affected."
 msgstr "This will remove the account from your config. Existing transfers referencing this account won't be affected."
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:60
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Tick only the Read scopes"
 msgstr "Tick only the Read scopes"
 
-#: src/pages/transfers/components/TransferDialog.tsx:124
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "Title"
 msgstr "Title"
 
-#: src/pages/transfers/components/TransferDialog.tsx:176
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "To"
 msgstr "To"
 
-#: src/pages/transfers/components/TransferDialog.tsx:82
+#: src/pages/transfers/components/TransferDialog.tsx
 msgid "To is required"
 msgstr "To is required"
 
-#: src/pages/accounts/index.tsx:135
+#: src/pages/accounts/index.tsx
 msgid "Total Assets"
 msgstr "Total Assets"
 
-#: src/pages/accounts/index.tsx:129
+#: src/pages/accounts/index.tsx
 msgid "Total Cost"
 msgstr "Total Cost"
 
-#: src/pages/accounts/index.tsx:141
+#: src/pages/accounts/index.tsx
 msgid "Total P&L"
 msgstr "Total P&L"
 
-#: src/layouts/AppLayout.tsx:30
-#: src/layouts/AppLayout.tsx:34
-#: src/pages/transfers/index.tsx:50
+#: src/layouts/AppLayout.tsx
+#: src/pages/transfers/index.tsx
 msgid "Transfers"
 msgstr "Transfers"
 
-#: src/pages/accounts/components/MaxKeyGuide.tsx:62
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Under <0>Scope Settings</0>, check the <1>Read</1> boxes (the balance comes from <2>Account & Personal Information</2>) and leave every <3>Write</3> box unchecked — this app never trades or withdraws."
 msgstr "Under <0>Scope Settings</0>, check the <1>Read</1> boxes (the balance comes from <2>Account & Personal Information</2>) and leave every <3>Write</3> box unchecked — this app never trades or withdraws."
 
-#: src/pages/accounts/components/apiProviders.ts:77
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Use a read-only key (disable Trading & Withdrawals)."
 msgstr "Use a read-only key (disable Trading & Withdrawals)."
 
-#: src/pages/accounts/components/apiProviders.ts:92
+#: src/pages/accounts/components/apiProviders.ts
 msgid "Use a read-only key with IP access unrestricted."
 msgstr "Use a read-only key with IP access unrestricted."
 
-#: src/pages/accounts/components/AccountDialog.tsx:260
+#: src/pages/accounts/components/AccountDialog.tsx
 msgid "Use a read-only key."
 msgstr "Use a read-only key."
 
-#: src/pages/Config.tsx:455
-#: src/pages/Landing.tsx:101
+#: src/pages/Config.tsx
+#: src/pages/Landing.tsx
 msgid "Your data stays in your Notion workspace and is never stored or transmitted externally."
 msgstr "Your data stays in your Notion workspace and is never stored or transmitted externally."
 
-#: src/pages/Landing.tsx:100
+#: src/pages/Landing.tsx
 #~ msgid "Your data stays in your Notion workspace."
 #~ msgstr "Your data stays in your Notion workspace."
 
-#: src/pages/accounts/components/BinanceKeyGuide.tsx:110
-#: src/pages/accounts/components/BitgetKeyGuide.tsx:137
-#: src/pages/accounts/components/MaxKeyGuide.tsx:118
+#: src/pages/accounts/components/BinanceKeyGuide.tsx
+#: src/pages/accounts/components/BitgetKeyGuide.tsx
+#: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Your keys are stored in your own Notion workspace. Using a read-only key means they can never move your funds, even if exposed."
 msgstr "Your keys are stored in your own Notion workspace. Using a read-only key means they can never move your funds, even if exposed."

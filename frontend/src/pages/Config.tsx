@@ -1,3 +1,10 @@
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useAppData } from "@/hooks/useAppData";
 import {
     Trans,
@@ -42,6 +49,12 @@ import {
     PopoverContent,
 } from "../components/ui/popover";
 import { useNotion } from "../hooks/useNotion";
+import {
+    getSelectedLocale,
+    LOCALE_OPTIONS,
+    type SelectedLocale,
+    setSelectedLocale,
+} from "../i18n";
 
 // ─── Shared CurrencyInput ─────────────────────────────────────
 
@@ -287,6 +300,14 @@ function Config() {
     const { auth, logout } = useNotion();
     const { t } = useLingui();
 
+    const [selectedLocale, setSelectedLocaleState] = useState(getSelectedLocale());
+
+    const handleLanguageChange = (val: string) => {
+        const locale = val as SelectedLocale;
+        setSelectedLocaleState(locale);
+        setSelectedLocale(locale);
+    };
+
     const isSupported = (currency: string): boolean => {
         if (!currency) return false;
         if (!exchangeRates) return true; // 無法驗證時放行
@@ -394,7 +415,35 @@ function Config() {
                 </div>
             )}
 
-            <div className="pt-4">
+            <div className="pt-4 flex flex-col gap-4">
+                <Card className="p-6 gap-4 border-white/[0.06]">
+                    <div>
+                        <h2 className="text-white font-semibold text-base">
+                            <Trans>Language</Trans>
+                        </h2>
+                        <p className="text-muted text-xs mt-0.5">
+                            <Trans>Select the display language for the application.</Trans>
+                        </p>
+                    </div>
+                    <div className="w-full max-w-xs">
+                        <Select
+                            value={selectedLocale}
+                            onValueChange={handleLanguageChange}
+                        >
+                            <SelectTrigger className="bg-white/8 border-white/15 text-white w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent className="bg-surface-card border-white/5 text-white backdrop-blur-xl">
+                                {LOCALE_OPTIONS.map(opt => (
+                                    <SelectItem key={opt.value} value={opt.value}>
+                                        {typeof opt.label === "string" ? opt.label : t(opt.label)}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </Card>
+
                 <Card className="p-6 gap-4 border-white/[0.06]">
                     <div>
                         <h2 className="text-white font-semibold text-base">
@@ -433,7 +482,7 @@ function Config() {
                     </AlertDialog>
                 </Card>
 
-                <Card className="p-6 gap-3 border-white/[0.06] mt-4">
+                <Card className="p-6 gap-3 border-white/[0.06]">
                     <div className="flex items-start justify-between gap-4">
                         <div>
                             <h2 className="text-white font-semibold text-base">InTheGreenYet</h2>
