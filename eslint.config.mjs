@@ -14,6 +14,8 @@ export default defineConfig([
         "node_modules",
         ".wrangler",
         "**/worker-configuration.d.ts",
+        "frontend/src/locales/**/messages.js",
+        "frontend/src/locales/**/messages.mjs",
     ]),
     {
         // Frontend specific configuration

@@ -4,6 +4,8 @@ node_modules/
 # Build
 dist/
 .wrangler/
+frontend/src/locales/**/messages.js
+frontend/src/locales/**/messages.mjs
 
 # Environment
 .env

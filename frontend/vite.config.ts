@@ -1,5 +1,6 @@
+import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
+import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { defineConfig } from "vite";
 import { imagetools } from "vite-imagetools";
@@ -8,7 +9,10 @@ import { VitePWA } from "vite-plugin-pwa";
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [
-        react(),
+        react({
+            plugins: [["@lingui/swc-plugin", {}]],
+        }),
+        lingui(),
         tailwindcss(),
         imagetools(),
         VitePWA({

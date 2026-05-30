@@ -10,3 +10,9 @@ declare module "*&imagetools" {
     const out: string;
     export default out;
 }
+
+declare module "*.po" {
+    import type { Messages } from "@lingui/core";
+
+    export const messages: Messages;
+}

@@ -54,5 +54,18 @@
   "lint-staged": {
     "*": "dprint fmt",
     "*.{js,ts,tsx,jsx}": "eslint --fix"
+  },
+  "allowScripts": {
+    "esbuild@0.27.3": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.27.7": true,
+    "@swc/core@1.15.40": true,
+    "fsevents@2.3.3": true,
+    "dprint@0.54.0": true,
+    "workerd@1.20260526.1": true,
+    "sharp@0.34.5": true,
+    "sharp@0.33.5": true,
+    "simple-git-hooks@2.13.1": true,
+    "msw@2.14.6": true
   }
 }
