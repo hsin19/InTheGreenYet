@@ -28,7 +28,7 @@ The **backend** worker handles all Notion API interactions (OAuth, database setu
 
 ```bash
 # Install dependencies for both frontend and backend
-npm install
+pnpm install
 
 # Copy example environment variables and fill in the values
 cp -n backend/.dev.vars.example backend/.dev.vars
@@ -39,7 +39,7 @@ cp -n frontend/.env.example frontend/.env.local
 
 ```bash
 # Run both frontend and backend
-npm run dev
+pnpm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) and click **Connect to Notion** to start.

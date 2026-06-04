@@ -162,14 +162,12 @@ Run commands from the repo root.
 
 Required:
 
-- `npm run build` — frontend typecheck + bundle, and whatever workspace builds CI runs.
-- `npm exec --workspace=@inthegreenyet/backend -- tsc --noEmit -p tsconfig.json` —
-  backend typecheck; eslint is not type-aware.
-- `npm run lint` and `npm run format:check`.
+- `pnpm run check` — format, lint, test, and build across workspaces. Backend
+  build regenerates Worker types before typechecking; eslint is not type-aware.
 
 If touching the backend signer or handler:
 
-- Smoke test without real keys: start the worker with `npm run dev:backend`, then
+- Smoke test without real keys: start the worker with `pnpm run dev:backend`, then
   `POST /api/<provider>/balance` with dummy credentials. Expect the request to reach
   the provider and come back as a friendly credential error — that proves the signing
   path runs end to end. A missing-field body should return the validation error.

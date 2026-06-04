@@ -37,6 +37,7 @@
     "**/.git",
     "**/node_modules",
     "**/*-lock.json",
+    "**/pnpm-lock.yaml",
     "dist/**",
     ".wrangler/**",
     "worker-configuration.d.ts",

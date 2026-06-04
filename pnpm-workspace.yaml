@@ -1,0 +1,12 @@
+packages:
+  - 'frontend'
+  - 'backend'
+
+allowBuilds:
+  '@swc/core': false
+  dprint: true
+  esbuild: false
+  msw: false
+  sharp: false
+  simple-git-hooks: true
+  workerd: true

@@ -22,18 +22,37 @@ Personal investment tracker. React 19 SPA → Cloudflare Worker → Notion API (
 
 ## Workspace
 
-npm workspaces; **always run commands from the repo root**.
+pnpm workspaces (`pnpm-workspace.yaml`); **always run commands from the repo root**.
 
 ```bash
-npm run dev          # frontend (5173) + backend (8787), concurrently
-npm run lint         # eslint in all workspaces
-npm run build        # frontend: tsc -b && vite build (real typecheck + bundle)
-npm run format       # dprint fmt (write)
-npm run format:check
-npm run test
+pnpm install
+pnpm run dev          # frontend (5173) + backend (8787), concurrently
+pnpm run lint         # eslint in all workspaces
+pnpm run build        # frontend: tsc -b && vite build (real typecheck + bundle)
+pnpm run format       # dprint fmt (write)
+pnpm run format:check
+pnpm run test
 ```
 
-After changes, run `npm run check` — it covers what CI checks (format, lint, test, real typecheck).
+After changes, run `pnpm run check` — it covers what CI checks (format, lint, test, real typecheck).
+
+Single-test examples from the repo root:
+
+```bash
+pnpm --filter @inthegreenyet/frontend test src/lib/exchange.test.ts
+pnpm --filter @inthegreenyet/backend test --run test/index.test.ts
+```
+
+Useful workspace-specific variants:
+
+```bash
+pnpm --filter @inthegreenyet/frontend lint
+pnpm --filter @inthegreenyet/backend lint
+pnpm --filter @inthegreenyet/frontend test
+CI=1 pnpm --filter @inthegreenyet/backend test
+pnpm --filter @inthegreenyet/frontend build
+pnpm --filter @inthegreenyet/backend build
+```
 
 ## Frontend
 
@@ -44,6 +63,8 @@ After changes, run `npm run check` — it covers what CI checks (format, lint, t
 ### Storage & State Rules
 
 Persistence (transfers, config, snapshots) flows through `DataStore` in `frontend/src/lib/datastore.ts`, reached via the `useAppData` hook.
+
+In local development, Vite proxies `/auth/*` and `/api/*` to the Worker, so frontend code should use relative `/auth/...` and `/api/...` paths.
 
 Quick routing rule:
 
@@ -62,6 +83,10 @@ Quick routing rule:
 - `workspace_id` acts as the IndexedDB namespace (`inthegreenyet-<workspace_id>`).
 - CSRF protected via `state` round-trip through `sessionStorage` (`oauth_state`).
 - Logout calls `disposeWorkspaceData(workspaceId)` which deletes the IDB database.
+
+### Localization
+
+- Frontend i18n uses Lingui (`@lingui/*` with the SWC/Vite plugins). Follow existing Lingui message patterns when changing user-facing text.
 
 ## Backend
 
