@@ -72,7 +72,7 @@ jobs:
 
       - name: Smoke (vite preview + headless render)
         run: |
-          pnpm --filter @inthegreenyet/frontend preview -- --port 4173 --strictPort --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          pnpm --filter @inthegreenyet/frontend preview --port 4173 --strictPort --host 127.0.0.1 > /tmp/vite.log 2>&1 &
           PID=$!
 
           for i in $(seq 1 30); do
