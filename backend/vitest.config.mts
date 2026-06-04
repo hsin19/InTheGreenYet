@@ -7,4 +7,14 @@ export default defineConfig({
             wrangler: { configPath: "./wrangler.jsonc" },
         }),
     ],
+    test: {
+        coverage: {
+            // workerd runtime lacks the node inspector Session API that v8
+            // coverage needs, so the workers pool must use istanbul.
+            provider: "istanbul",
+            reporter: ["text", "text-summary", "html"],
+            include: ["src/**/*.ts"],
+            exclude: ["src/**/*.test.ts", "src/env.d.ts"],
+        },
+    },
 });

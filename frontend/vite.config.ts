@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
@@ -70,6 +71,19 @@ export default defineConfig({
                     }
                 },
             },
+        },
+    },
+    test: {
+        coverage: {
+            provider: "v8",
+            reporter: ["text", "text-summary", "html"],
+            include: ["src/**/*.{ts,tsx}"],
+            exclude: [
+                "src/**/*.test.{ts,tsx}",
+                "src/**/*.d.ts",
+                "src/main.tsx",
+                "src/components/ui/**",
+            ],
         },
     },
 });
