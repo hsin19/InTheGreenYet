@@ -12,7 +12,7 @@ export default defineConfig({
             // workerd runtime lacks the node inspector Session API that v8
             // coverage needs, so the workers pool must use istanbul.
             provider: "istanbul",
-            reporter: ["text", "text-summary", "html"],
+            reporter: ["text", "text-summary", "html", "lcov"],
             include: ["src/**/*.ts"],
             exclude: ["src/**/*.test.ts", "src/env.d.ts"],
         },

@@ -8,6 +8,7 @@
     "start": "wrangler dev",
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:ci": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml",
     "lint": "eslint .",
     "prebuild": "pnpm run cf-typegen",
     "build": "tsc --noEmit",

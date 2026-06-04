@@ -46,7 +46,23 @@ jobs:
         run: pnpm --filter @inthegreenyet/frontend lint
 
       - name: Run Tests
-        run: pnpm --filter @inthegreenyet/frontend test
+        run: pnpm --filter @inthegreenyet/frontend test:ci
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: frontend/coverage
+          flags: frontend
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: frontend/test-report.junit.xml
+          flags: frontend
 
       - name: Build Frontend
         env:

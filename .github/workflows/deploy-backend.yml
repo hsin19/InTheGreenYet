@@ -42,7 +42,23 @@ jobs:
         run: pnpm --filter @inthegreenyet/backend lint
 
       - name: Run Tests
-        run: pnpm --filter @inthegreenyet/backend test
+        run: pnpm --filter @inthegreenyet/backend test:ci
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: backend/coverage
+          flags: backend
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: backend/test-report.junit.xml
+          flags: backend
 
       - name: Build Check (Dry Run)
         working-directory: backend

@@ -19,6 +19,10 @@ frontend/src/locales/**/messages.mjs
 *.swo
 .DS_Store
 
+# Test / coverage
+coverage/
+*.junit.xml
+
 # Logs
 *.log
 

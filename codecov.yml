@@ -1,0 +1,29 @@
+# Monorepo with path-filtered CI: a frontend-only PR never runs backend tests
+# (and vice versa), so each flag carries its last known coverage forward when a
+# given commit doesn't upload it. Without this, the absent side reads as 0%.
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+
+flag_management:
+  default_rules:
+    carryforward: true
+  individual_flags:
+    - name: frontend
+      paths:
+        - frontend/src
+      carryforward: true
+    - name: backend
+      paths:
+        - backend/src
+      carryforward: true
+
+comment:
+  layout: 'condensed_header, flags, files'
+  require_changes: false
