@@ -8,12 +8,16 @@ import { imagetools } from "vite-imagetools";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     plugins: [
         react({
             plugins: [["@lingui/swc-plugin", {}]],
         }),
-        lingui(),
+        // The lingui Vite plugin resolves lingui.config.ts from process.cwd(),
+        // which breaks when a runner (e.g. the VS Code Vitest extension) loads
+        // this config from the repo root. Tests don't import message catalogs,
+        // so skip it under Vitest; the SWC macro transform above still applies.
+        ...(mode === "test" ? [] : [lingui()]),
         tailwindcss(),
         imagetools(),
         VitePWA({
@@ -86,4 +90,4 @@ export default defineConfig({
             ],
         },
     },
-});
+}));

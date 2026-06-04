@@ -1,9 +1,11 @@
 import {
     createExecutionContext,
-    env,
-    SELF,
     waitOnExecutionContext,
 } from "cloudflare:test";
+import {
+    env,
+    exports,
+} from "cloudflare:workers";
 import {
     describe,
     expect,
@@ -27,7 +29,7 @@ describe("Hello World worker", () => {
     });
 
     it("responds with Hello World! (integration style)", async () => {
-        const response = await SELF.fetch("https://example.com/health");
+        const response = await exports.default.fetch("https://example.com/health");
         expect(await response.text()).toMatchInlineSnapshot(`"{"status":"ok","service":"inthegreen-backend"}"`);
     });
 });

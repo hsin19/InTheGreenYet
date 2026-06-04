@@ -41,6 +41,9 @@ jobs:
       - name: Lint Check
         run: pnpm --filter @inthegreenyet/backend lint
 
+      - name: Typecheck
+        run: pnpm --filter @inthegreenyet/backend typecheck
+
       - name: Run Tests
         run: pnpm --filter @inthegreenyet/backend test:ci
 

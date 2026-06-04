@@ -9,6 +9,7 @@
     "i18n:extract": "lingui extract",
     "i18n:compile": "lingui compile",
     "lint": "eslint .",
+    "typecheck": "tsc -b",
     "preview": "vite preview",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",

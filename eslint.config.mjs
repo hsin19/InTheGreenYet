@@ -13,6 +13,7 @@ export default defineConfig([
         "dist",
         "node_modules",
         ".wrangler",
+        "**/coverage",
         "**/worker-configuration.d.ts",
         "frontend/src/locales/**/messages.js",
         "frontend/src/locales/**/messages.mjs",

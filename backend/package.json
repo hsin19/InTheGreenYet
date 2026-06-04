@@ -10,8 +10,7 @@
     "test:coverage": "vitest run --coverage",
     "test:ci": "vitest run --coverage --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml",
     "lint": "eslint .",
-    "prebuild": "pnpm run cf-typegen",
-    "build": "tsc --noEmit",
+    "typecheck": "pnpm run cf-typegen && tsc --noEmit && tsc -p test/tsconfig.json --noEmit",
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
