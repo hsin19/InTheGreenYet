@@ -15,7 +15,9 @@
     "check": "pnpm run format && pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build",
     "test": "pnpm -r test",
     "test:coverage": "pnpm -r test:coverage",
-    "test:ci": "pnpm -r test:ci"
+    "test:ci": "pnpm -r test:ci",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260529.1",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
     "@types/node": "^25.3.3",
     "@vitest/coverage-istanbul": "~4.1.8",
     "@vitest/coverage-v8": "~4.1.8",

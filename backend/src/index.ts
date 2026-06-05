@@ -15,6 +15,7 @@ import {
     handleCreateTransfer,
     handleGetTransfers,
 } from "./handlers/transfers";
+import { configureNotion } from "./notion";
 import {
     corsHeaders,
     jsonResponse,
@@ -22,6 +23,7 @@ import {
 
 export default {
     async fetch(request, env, _ctx): Promise<Response> {
+        configureNotion(env.NOTION_API_BASE_URL);
         const url = new URL(request.url);
 
         if (request.method === "OPTIONS") {

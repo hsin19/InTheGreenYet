@@ -7,8 +7,24 @@ import {
 } from "@notionhq/client";
 import { DataSourceNotFoundError } from "./utils";
 
+// Deployment-level override for the Notion API base URL, set once per request
+// from `env.NOTION_API_BASE_URL` (see configureNotion). This is constant config,
+// not request-scoped state — every request sets it to the same value, so it does
+// not fall under the "no global request state" rule. Used by e2e to point the
+// real Worker at a local mock Notion; unset in prod → SDK default api.notion.com.
+let notionBaseUrl: string | undefined;
+
+/** Set the Notion API base URL override. Idempotent; called from the fetch entrypoint. */
+export function configureNotion(baseUrl?: string): void {
+    notionBaseUrl = baseUrl || undefined;
+}
+
 export function createClient(token?: string): Client {
-    return new Client({ ...(token ? { auth: token } : {}), fetch: globalThis.fetch.bind(globalThis) });
+    return new Client({
+        ...(token ? { auth: token } : {}),
+        ...(notionBaseUrl ? { baseUrl: notionBaseUrl } : {}),
+        fetch: globalThis.fetch.bind(globalThis),
+    });
 }
 
 // ─── Constants ───────────────────────────────────────────────
