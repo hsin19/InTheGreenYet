@@ -113,6 +113,7 @@ export default defineConfig(({ mode }) => ({
                 "src/**/*.d.ts",
                 "src/main.tsx",
                 "src/components/ui/**",
+                "src/test/**",
             ],
         },
     },
