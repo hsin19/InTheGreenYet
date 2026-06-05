@@ -2,6 +2,7 @@
 import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
+import { playwright } from "@vitest/browser-playwright";
 import path from "path";
 import { defineConfig } from "vite";
 import { imagetools } from "vite-imagetools";
@@ -78,6 +79,31 @@ export default defineConfig(({ mode }) => ({
         },
     },
     test: {
+        projects: [
+            {
+                // Fast pure-logic tests in Node (lib helpers, signing clients, ...).
+                extends: true,
+                test: {
+                    name: "unit",
+                    environment: "node",
+                    include: ["src/**/*.test.ts"],
+                },
+            },
+            {
+                // Component tests in a real browser via Playwright/Chromium.
+                extends: true,
+                test: {
+                    name: "browser",
+                    include: ["src/**/*.test.tsx"],
+                    browser: {
+                        enabled: true,
+                        provider: playwright(),
+                        headless: true,
+                        instances: [{ browser: "chromium" }],
+                    },
+                },
+            },
+        ],
         coverage: {
             provider: "v8",
             reporter: ["text", "text-summary", "html", "lcov"],

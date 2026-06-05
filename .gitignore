@@ -23,6 +23,10 @@ frontend/src/locales/**/messages.mjs
 coverage/
 *.junit.xml
 
+# Vitest browser mode artifacts (failure screenshots, attachments)
+**/__screenshots__/
+.vitest-attachments/
+
 # Logs
 *.log
 

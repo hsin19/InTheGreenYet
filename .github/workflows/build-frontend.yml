@@ -45,6 +45,15 @@ jobs:
       - name: Lint Check
         run: pnpm --filter @inthegreenyet/frontend lint
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @inthegreenyet/frontend exec playwright install --with-deps chromium
+
       - name: Run Tests
         run: pnpm --filter @inthegreenyet/frontend test:ci
 
