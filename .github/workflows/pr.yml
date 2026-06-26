@@ -191,7 +191,7 @@ jobs:
   auto-merge:
     name: Auto-merge Dependabot
     needs: [frontend, backend, e2e, dependency-review]
-    if: github.actor == 'dependabot[bot]'
+    if: ${{ success() && github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -202,3 +202,30 @@ jobs:
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  jules-fix:
+    name: Jules fix on failure
+    needs: [frontend, backend, e2e, dependency-review]
+    if: ${{ failure() && github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Invoke Jules
+        uses: google-labs-code/jules-invoke@v1
+        with:
+          jules_api_key: ${{ secrets.JULES_API_KEY }}
+          starting_branch: ${{ github.head_ref }}
+          include_last_commit: true
+          prompt: |
+            A Dependabot dependency update on branch `${{ github.head_ref }}` is failing the PR checks (${{ github.event.pull_request.html_url }}).
+
+            This is a pnpm workspace monorepo. Please review `AGENTS.md` for the full tech stack context (Frontend/Backend). Always run commands from the repo root.
+
+            Please:
+            1. Run `pnpm install --frozen-lockfile`, then `pnpm run check` (format, lint, real typecheck, tests) to reproduce the failure.
+            2. Make the MINIMAL change needed to make `pnpm run check` pass. Do NOT change application behavior or touch unrelated code.
+            3. Most common cause: a package was bumped without its peers — e.g. `@lingui/react` updated but `@lingui/core` left at the old version, producing a type mismatch. If so, bump the peer package(s) to the matching version and update `pnpm-lock.yaml`.
+            4. If the failure needs non-trivial behavioral changes or is ambiguous, do NOT guess — open the PR describing what is blocking instead of forcing a fix.
+            5. Push your fix directly as a new commit to the current branch `${{ github.head_ref }}`. Do NOT open a new PR. Include a short commit message describing the root cause.
