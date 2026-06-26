@@ -12,13 +12,6 @@ on:
       - 'pnpm-workspace.yaml'
   pull_request:
     branches: [main]
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/build-frontend.yml'
-      - '.github/workflows/deploy-frontend.yml'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
 
 jobs:
   build:

@@ -14,15 +14,6 @@ on:
       - 'pnpm-workspace.yaml'
   pull_request:
     branches: [main]
-    paths:
-      - 'frontend/**'
-      - 'backend/**'
-      - 'e2e/**'
-      - 'playwright.config.ts'
-      - '.github/workflows/e2e.yml'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
 
 jobs:
   e2e:
