@@ -25,7 +25,7 @@ jobs:
       # wrangler dev runs in local mode; keep it non-interactive in CI.
       WRANGLER_SEND_METRICS: 'false'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: pnpm/action-setup@v4
 
