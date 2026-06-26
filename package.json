@@ -57,7 +57,7 @@
     "pre-commit": "pnpm exec lint-staged"
   },
   "lint-staged": {
-    "*": "dprint fmt",
+    "*": "dprint fmt --allow-no-files",
     "*.{js,ts,tsx,jsx}": "eslint --fix"
   }
 }
