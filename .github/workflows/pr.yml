@@ -1,0 +1,204 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Format Check
+        run: pnpm run format:check
+
+      - name: Lint
+        run: pnpm --filter @inthegreenyet/frontend lint
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        run: pnpm --filter @inthegreenyet/frontend exec playwright install --with-deps chromium
+
+      - name: Test
+        run: pnpm --filter @inthegreenyet/frontend test:ci
+
+      - name: Build
+        env:
+          VITE_NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
+          VITE_API_BASE_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
+        run: pnpm --filter @inthegreenyet/frontend build
+
+      - name: Smoke (vite preview + headless render)
+        run: |
+          pnpm --filter @inthegreenyet/frontend preview --port 4173 --strictPort --host 127.0.0.1 > /tmp/vite.log 2>&1 &
+          PID=$!
+
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173 >/dev/null 2>&1; then
+              echo "Preview ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+
+          google-chrome --headless --dump-dom --virtual-time-budget=5000 \
+            --disable-gpu --no-sandbox \
+            http://127.0.0.1:4173 > /tmp/rendered.html 2> /tmp/chrome.log
+
+          grep -q 'Connect to Notion' /tmp/rendered.html
+          kill $PID || true
+
+      - name: Dump logs on failure
+        if: failure()
+        run: |
+          echo "=== vite.log ==="
+          cat /tmp/vite.log 2>/dev/null || echo "(no vite log)"
+          echo "=== chrome.log ==="
+          cat /tmp/chrome.log 2>/dev/null || echo "(no chrome log)"
+          echo "=== rendered.html (first 2KB) ==="
+          head -c 2048 /tmp/rendered.html 2>/dev/null || echo "(no rendered dump)"
+
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter @inthegreenyet/backend lint
+
+      - name: Typecheck
+        run: pnpm --filter @inthegreenyet/backend typecheck
+
+      - name: Test
+        run: pnpm --filter @inthegreenyet/backend test:ci
+
+      - name: Build Check (Dry Run)
+        working-directory: backend
+        run: pnpm exec wrangler deploy --dry-run
+
+      - name: Smoke (wrangler dev /health)
+        run: |
+          cat > backend/.dev.vars <<EOF
+          NOTION_CLIENT_ID=dummy
+          NOTION_CLIENT_SECRET=dummy
+          FRONTEND_URL=http://127.0.0.1:4173
+          EOF
+
+          pnpm --filter @inthegreenyet/backend dev -- --port 8787 --ip 127.0.0.1 > /tmp/wrangler.log 2>&1 &
+          PID=$!
+
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8787/health >/dev/null 2>&1; then
+              echo "Worker ready after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+
+          echo "--- /health ---"
+          curl -fsS http://127.0.0.1:8787/health
+          echo
+          curl -fsS http://127.0.0.1:8787/health | grep -q '"status":"ok"'
+          kill $PID || true
+          rm -f backend/.dev.vars
+
+      - name: Dump wrangler log on failure
+        if: failure()
+        run: |
+          echo "=== wrangler.log ==="
+          cat /tmp/wrangler.log 2>/dev/null || echo "(no wrangler log)"
+
+  e2e:
+    name: E2E Smoke
+    runs-on: ubuntu-latest
+    env:
+      WRANGLER_SEND_METRICS: 'false'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run E2E smoke (browser → Worker → mock Notion)
+        run: pnpm run test:e2e
+
+      - name: Upload Playwright report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 7
+
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: moderate
+          comment-summary-in-pr: on-failure
+
+  auto-merge:
+    name: Auto-merge Dependabot
+    needs: [frontend, backend, e2e, dependency-review]
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Squash-merge the PR
+        run: gh pr merge --squash --delete-branch "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -12,8 +12,6 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
-  pull_request:
-    branches: [main]
 
 jobs:
   e2e:
