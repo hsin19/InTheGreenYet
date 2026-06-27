@@ -3,31 +3,24 @@
 ## Architecture
 
 ```
-build-frontend.yml    push / PR → build + upload artifact
-deploy-frontend.yml   triggered after build completes:
-  └── deploy          event == push         → deploy to production
-  └── deploy-preview  event == pull_request → deploy preview (manual approval)
-deploy-backend.yml    PR → dry-run build check
-                      push to main → deploy
+pr.yml          pull_request → frontend / backend / e2e / dependency-review
+                              → auto-merge (Dependabot) | jules-fix (on failure)
+frontend.yml    push to main (frontend paths) → build + test + deploy to Cloudflare Pages
+backend.yml     push to main (backend paths)  → build + test + deploy to Cloudflare Workers
+e2e.yml         push to main → end-to-end smoke
 ```
 
-## Why this structure
+Validation runs on PRs via `pr.yml`. The per-stack `frontend.yml` / `backend.yml`
+re-run the build/tests on `main` and deploy in the same job, gated by
+`github.event_name == 'push' && github.ref == 'refs/heads/main'`. Build and deploy
+live in one workflow each (no `workflow_run` artifact hand-off) — there is a single
+deploy target and no fork-PR secret constraint to work around.
 
-Fork PRs cannot access secrets in `pull_request` workflows (GitHub security restriction).
+## Dependabot auto-merge → deploy
 
-The solution is to split build and deploy into separate workflows:
+`pr.yml` merges a green Dependabot PR using `secrets.AUTOMERGE_TOKEN` (a dedicated
+token, **not** the default `GITHUB_TOKEN`) so the resulting push to `main` triggers
+`frontend.yml` / `backend.yml`. A push made with `GITHUB_TOKEN` would not.
 
-1. `build-frontend.yml` runs in the `pull_request` context without needing secrets, then uploads the artifact
-2. `deploy-frontend.yml` listens via `workflow_run` and runs in the base repo context, where secrets are accessible
-
-## First-time setup: create the preview Environment
-
-PR preview deployments require manual approval via GitHub Environment protection rules.
-
-**Repo → Settings → Environments → New environment**
-
-1. Name it `preview`
-2. Enable **Required reviewers** and add yourself
-3. Save
-
-> If the environment is not created on GitHub, the `deploy-preview` job will run without pausing for approval.
+> `AUTOMERGE_TOKEN` and `JULES_API_KEY` must live in **Dependabot** secrets, not
+> Actions secrets — Dependabot-triggered runs only see the Dependabot secret store.

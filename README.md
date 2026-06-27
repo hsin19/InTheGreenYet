@@ -50,8 +50,8 @@ Open [http://localhost:5173](http://localhost:5173) and click **Connect to Notio
 
 Deployments are handled via GitHub Actions:
 
-- **Frontend** → Cloudflare Pages (`build-frontend.yml` → `deploy-frontend.yml`)
-- **Backend** → Cloudflare Workers (`deploy-backend.yml`)
+- **Frontend** → Cloudflare Pages (`frontend.yml`)
+- **Backend** → Cloudflare Workers (`backend.yml`)
 
 ### 1. Cloudflare Setup
 

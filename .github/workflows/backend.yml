@@ -1,18 +1,18 @@
-name: Deploy Backend Worker
+name: Backend
 
 on:
   push:
     branches: [main]
     paths:
       - 'backend/**'
-      - '.github/workflows/deploy-backend.yml'
+      - '.github/workflows/backend.yml'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
 
 jobs:
-  deploy-backend:
-    name: Deploy Backend Worker
+  backend:
+    name: Backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
