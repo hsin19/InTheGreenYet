@@ -82,12 +82,17 @@ describe("fetchBinanceTotal", () => {
         expect(err.message).toBe("Binance request failed: HTTP 503: <html>service unavailable</html>");
     });
 
-    it("surfaces a snippet of a non-JSON HTTP 403 body", async () => {
-        mockFetch("<html>403 Forbidden</html>", 403);
+    it("surfaces the page <title> on a non-JSON HTML 403 (CloudFront block page)", async () => {
+        mockFetch(
+            '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">'
+                + "<HTML><HEAD><TITLE>ERROR: The request could not be satisfied</TITLE></HEAD>"
+                + "<BODY><H1>403 ERROR</H1>Request blocked.</BODY></HTML>",
+            403,
+        );
 
         const err = await fetchBinanceTotal("key", "secret", "USDT").catch(e => e);
 
         expect(err).toBeInstanceOf(ClientError);
-        expect(err.message).toBe("Binance request failed: HTTP 403: <html>403 Forbidden</html>");
+        expect(err.message).toBe("Binance request failed: HTTP 403: ERROR: The request could not be satisfied");
     });
 });

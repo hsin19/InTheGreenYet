@@ -46,7 +46,7 @@ async function readError(res: Response): Promise<{ detail: string; code?: number
         // non-JSON body (HTML challenge page, empty, etc.)
     }
     // Log the raw response so `wrangler tail` shows exactly what MAX returned.
-    console.error(`MAX ${res.status} response:`, text.slice(0, 500));
+    console.error(`MAX ${res.status} response:`, text);
     const snippet = text.replace(/\s+/g, " ").trim().slice(0, 160);
     const detail = message
         ? `${message} (code ${code})`
