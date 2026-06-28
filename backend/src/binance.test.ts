@@ -73,12 +73,21 @@ describe("fetchBinanceTotal", () => {
         expect(err.message).toBe("Binance request failed: Too many requests (code -1003)");
     });
 
-    it("falls back to the HTTP status when the error body is not JSON", async () => {
+    it("surfaces a snippet of a non-JSON error body", async () => {
         mockFetch("<html>service unavailable</html>", 503);
 
         const err = await fetchBinanceTotal("key", "secret", "USDT").catch(e => e);
 
         expect(err).toBeInstanceOf(ClientError);
-        expect(err.message).toBe("Binance request failed: HTTP 503");
+        expect(err.message).toBe("Binance request failed: HTTP 503: <html>service unavailable</html>");
+    });
+
+    it("surfaces a snippet of a non-JSON HTTP 403 body", async () => {
+        mockFetch("<html>403 Forbidden</html>", 403);
+
+        const err = await fetchBinanceTotal("key", "secret", "USDT").catch(e => e);
+
+        expect(err).toBeInstanceOf(ClientError);
+        expect(err.message).toBe("Binance request failed: HTTP 403: <html>403 Forbidden</html>");
     });
 });

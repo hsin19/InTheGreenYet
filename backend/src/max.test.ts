@@ -67,7 +67,7 @@ describe("fetchMaxTotal", () => {
         expect(result.currency).toBe("TWD");
     });
 
-    it("throws an edge-blocked error when MAX serves a Cloudflare challenge", async () => {
+    it("surfaces a snippet when MAX serves a non-JSON challenge page", async () => {
         mockMax({
             accounts: "<html><title>Just a moment...</title>cloudflare cf-ray</html>",
             accountsStatus: 403,
@@ -76,7 +76,27 @@ describe("fetchMaxTotal", () => {
         const err = await fetchMaxTotal("key", "secret").catch(e => e);
 
         expect(err).toBeInstanceOf(ClientError);
-        expect(err.message).toMatch(/Cloudflare edge blocked/);
+        expect(err.message).toMatch(/MAX request failed/);
+        expect(err.message).toMatch(/Just a moment/i);
+    });
+
+    it("surfaces MAX's description field on a WAF block body", async () => {
+        mockMax({
+            accounts: JSON.stringify({
+                incidentId: "0000000000000000",
+                errorCode: "15",
+                clientIp: "2001:db8::1",
+                country: "TW",
+                hostName: "max-api.maicoin.com",
+                description: "waf block",
+            }),
+            accountsStatus: 403,
+        });
+
+        const err = await fetchMaxTotal("key", "secret").catch(e => e);
+
+        expect(err).toBeInstanceOf(ClientError);
+        expect(err.message).toBe("MAX request failed: waf block");
     });
 
     it.each([2006, 2008])("throws a credential error for MAX code %s", async code => {

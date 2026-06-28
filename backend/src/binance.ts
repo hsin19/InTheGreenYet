@@ -48,12 +48,18 @@ export async function fetchBinanceTotal(
     });
 
     if (!res.ok) {
+        const raw = await res.text();
+        // Log the raw response so `wrangler tail` shows exactly what Binance returned.
+        console.error(`Binance ${res.status} response:`, raw.slice(0, 500));
         let detail = `HTTP ${res.status}`;
         try {
-            const body = await res.json() as BinanceError;
+            const body = JSON.parse(raw) as BinanceError;
             if (body?.msg) detail = `${body.msg} (code ${body.code})`;
         } catch {
-            // non-JSON error body; keep the HTTP status
+            // non-JSON body (e.g. an edge/WAF block page); surface a snippet so the
+            // real cause is visible in the UI instead of a bare status code.
+            const snippet = raw.replace(/\s+/g, " ").trim().slice(0, 200);
+            if (snippet) detail = `HTTP ${res.status}: ${snippet}`;
         }
         if (res.status === 401) {
             throw new ClientError(`Binance rejected the API key — check it is valid and has read permission. ${detail}`);

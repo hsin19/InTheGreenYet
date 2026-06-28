@@ -175,6 +175,9 @@ importers:
       vitest-browser-react:
         specifier: ^2.2.0
         version: 2.2.0(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(vitest@4.1.9)
+      wrangler:
+        specifier: ^4.86.0
+        version: 4.103.0(@cloudflare/workers-types@4.20260604.1)
 
 packages:
 
