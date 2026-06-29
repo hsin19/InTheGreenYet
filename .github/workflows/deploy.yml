@@ -1,0 +1,67 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'worker/**'
+      - 'public/**'
+      - 'index.html'
+      - 'wrangler.jsonc'
+      - 'vite.config.ts'
+      - 'lingui.config.ts'
+      - 'pwa-assets.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      # Builds the SPA client AND the Worker bundle via @cloudflare/vite-plugin,
+      # emitting dist/ plus the .wrangler/deploy redirect that `wrangler deploy`
+      # picks up. VITE_API_BASE_URL is intentionally unset → the SPA calls /api
+      # on the same (Worker) origin.
+      - name: Build
+        env:
+          VITE_NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
+        run: pnpm run build
+
+      # One deploy uploads the Worker + the client assets together (single origin).
+      # wrangler-action `secrets:` works for Workers (it would NOT for Pages).
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
+          command: deploy
+          secrets: |
+            NOTION_CLIENT_ID
+            NOTION_CLIENT_SECRET
+            FRONTEND_URL
+        env:
+          NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
+          NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
+          FRONTEND_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev

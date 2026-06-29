@@ -4,8 +4,12 @@ on:
   push:
     branches: [main]
     paths:
-      - 'frontend/**'
-      - 'backend/**'
+      - 'src/**'
+      - 'worker/**'
+      - 'public/**'
+      - 'index.html'
+      - 'wrangler.jsonc'
+      - 'vite.config.ts'
       - 'e2e/**'
       - 'playwright.config.ts'
       - '.github/workflows/e2e.yml'
