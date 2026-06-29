@@ -189,6 +189,7 @@ async function findParentPage(token: string, pageName: string): Promise<string> 
     const notion = createClient(token);
 
     const response = await notion.search({
+        query: pageName,
         filter: { property: "object", value: "page" },
     });
 
@@ -273,15 +274,20 @@ export async function createTransfer(
     return response.id;
 }
 
-/** Find or create the application database. If existing, returns the actual parent database ID. */
+/**
+ * Find or create the application database, returning the parent database ID.
+ *
+ * Data sources live under a parent database. We recover that parent from any data
+ * source we actually create (Transfer/Config/Snapshots) — NOT DATABASE_NAME, which
+ * titles the database wrapper and is never itself a data source, so searching for
+ * it always misses. On a partial re-init (some data sources survive, some deleted)
+ * that miss would spawn a SECOND database and split the workspace's data; reusing a
+ * survivor's parent keeps every data source under the one original database.
+ */
 export async function findOrCreateDatabase(token: string): Promise<string> {
-    const existingDb = await searchDataSource(token, DATABASE_NAME);
-
-    // In the new Notion API, Data Sources belong to a parent Database.
-    // If we found an existing data source, we must use its parent database ID
-    // for creating other sibling data sources.
-    if (existingDb && existingDb.parentDatabaseId) {
-        return existingDb.parentDatabaseId;
+    for (const name of [DATASOURCE_NAME, CONFIG_DATASOURCE_NAME, SNAPSHOTS_DATASOURCE_NAME]) {
+        const existing = await searchDataSource(token, name);
+        if (existing?.parentDatabaseId) return existing.parentDatabaseId;
     }
 
     const parentPageId = await findParentPage(token, PARENT_PAGE_NAME);

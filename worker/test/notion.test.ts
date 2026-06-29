@@ -268,10 +268,23 @@ describe("snapshots", () => {
 });
 
 describe("database & data source provisioning", () => {
-    it("reuses the parent database when a data source already exists", async () => {
-        installRouter(url => url.endsWith("/v1/search") ? { body: { results: [dataSource("ds", "InTheGreenYet DB", "db-existing")] } } : undefined);
+    it("reuses the existing parent database from a surviving data source (no second DB on partial re-init)", async () => {
+        // Guards the split-database bug: searching for a data source titled like the
+        // DATABASE never matches (data sources are Transfer/Config/Snapshots), so a
+        // partial re-init must recover the parent from a survivor — never create a
+        // second database. Here a surviving "Transfer" yields its parent, no DB create.
+        let createdDatabase = false;
+        installRouter((url, method) => {
+            if (url.endsWith("/v1/search")) return { body: { results: [dataSource("ds-t", "Transfer", "db-existing")] } };
+            if (url.endsWith("/v1/databases") && method === "POST") {
+                createdDatabase = true;
+                return { body: { id: "db-new" } };
+            }
+            return undefined;
+        });
 
         await expect(findOrCreateDatabase("tok")).resolves.toBe("db-existing");
+        expect(createdDatabase).toBe(false);
     });
 
     it("creates the database under a shared page when none exists", async () => {
