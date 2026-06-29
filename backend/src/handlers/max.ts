@@ -1,5 +1,6 @@
 import { fetchMaxTotal } from "../max";
 import type { MaxBalanceRequest } from "../model";
+import { makeSend } from "../relay";
 import {
     ClientError,
     errorResponse,
@@ -18,7 +19,7 @@ export async function handleMaxBalance(request: Request, _url: URL, env: Env): P
             throw new ClientError("Missing apiKey/apiSecret");
         }
 
-        const result = await fetchMaxTotal(body.apiKey, body.apiSecret);
+        const result = await fetchMaxTotal(body.apiKey, body.apiSecret, makeSend(env));
         return jsonResponse(result, 200, env.FRONTEND_URL);
     } catch (err) {
         console.error("handleMaxBalance error:", err);

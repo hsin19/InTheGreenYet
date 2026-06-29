@@ -1,4 +1,5 @@
 import type { ProviderBalance } from "./model";
+import type { Send } from "./relay";
 import { ClientError } from "./utils";
 
 const BITGET_BASE = "https://api.bitget.com";
@@ -35,13 +36,14 @@ export async function fetchBitgetTotal(
     apiKey: string,
     apiSecret: string,
     passphrase: string,
+    send: Send = fetch,
 ): Promise<ProviderBalance> {
     const ts = String(Date.now());
     // This endpoint takes no query/body, so the prehash is just timestamp + method + path.
     const prehash = ts + "GET" + BALANCE_PATH;
     const sign = await signBitget(apiSecret, prehash);
 
-    const res = await fetch(`${BITGET_BASE}${BALANCE_PATH}`, {
+    const res = await send(`${BITGET_BASE}${BALANCE_PATH}`, {
         headers: {
             "ACCESS-KEY": apiKey,
             "ACCESS-SIGN": sign,

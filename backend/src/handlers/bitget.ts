@@ -1,5 +1,6 @@
 import { fetchBitgetTotal } from "../bitget";
 import type { BitgetBalanceRequest } from "../model";
+import { makeSend } from "../relay";
 import {
     ClientError,
     errorResponse,
@@ -18,7 +19,7 @@ export async function handleBitgetBalance(request: Request, _url: URL, env: Env)
             throw new ClientError("Missing apiKey/apiSecret/passphrase");
         }
 
-        const result = await fetchBitgetTotal(body.apiKey, body.apiSecret, body.passphrase);
+        const result = await fetchBitgetTotal(body.apiKey, body.apiSecret, body.passphrase, makeSend(env));
         return jsonResponse(result, 200, env.FRONTEND_URL);
     } catch (err) {
         console.error("handleBitgetBalance error:", err);

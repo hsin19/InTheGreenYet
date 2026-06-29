@@ -1,4 +1,5 @@
 import type { ProviderBalance } from "./model";
+import type { Send } from "./relay";
 import { ClientError } from "./utils";
 
 const MAX_BASE = "https://max-api.maicoin.com";
@@ -72,13 +73,13 @@ async function signMax(secret: string, payload: string): Promise<string> {
 }
 
 /** Fetch every spot-wallet currency balance via the signed accounts endpoint. */
-async function fetchSpotAccounts(apiKey: string, apiSecret: string): Promise<MaxAccount[]> {
+async function fetchSpotAccounts(apiKey: string, apiSecret: string, send: Send): Promise<MaxAccount[]> {
     const nonce = Date.now();
     // Payload keys must be sorted; with only nonce + path that's already the order.
     const payload = btoa(JSON.stringify({ nonce, path: ACCOUNTS_PATH }));
     const signature = await signMax(apiSecret, payload);
 
-    const res = await fetch(`${MAX_BASE}${ACCOUNTS_PATH}?nonce=${nonce}`, {
+    const res = await send(`${MAX_BASE}${ACCOUNTS_PATH}?nonce=${nonce}`, {
         headers: {
             "X-MAX-ACCESSKEY": apiKey,
             "X-MAX-PAYLOAD": payload,
@@ -102,8 +103,8 @@ async function fetchSpotAccounts(apiKey: string, apiSecret: string): Promise<Max
 }
 
 /** Fetch all market tickers (public) as a market-id → last-price map. */
-async function fetchPriceMap(): Promise<Map<string, number>> {
-    const res = await fetch(TICKERS_URL);
+async function fetchPriceMap(send: Send): Promise<Map<string, number>> {
+    const res = await send(TICKERS_URL);
     if (!res.ok) {
         const { detail } = await readError(res);
         throw new ClientError(`Couldn't load MAX market prices: ${detail}`);
@@ -123,10 +124,10 @@ async function fetchPriceMap(): Promise<Map<string, number>> {
  * <coin>twd directly, else <coin>usdt × usdttwd. Currencies with no TWD/USDT
  * market are skipped (logged), since they can't be valued.
  */
-export async function fetchMaxTotal(apiKey: string, apiSecret: string): Promise<ProviderBalance> {
+export async function fetchMaxTotal(apiKey: string, apiSecret: string, send: Send = fetch): Promise<ProviderBalance> {
     const [accounts, prices] = await Promise.all([
-        fetchSpotAccounts(apiKey, apiSecret),
-        fetchPriceMap(),
+        fetchSpotAccounts(apiKey, apiSecret, send),
+        fetchPriceMap(send),
     ]);
 
     const usdtTwd = prices.get("usdttwd");

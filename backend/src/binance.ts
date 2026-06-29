@@ -1,4 +1,5 @@
 import type { ProviderBalance } from "./model";
+import type { Send } from "./relay";
 import { ClientError } from "./utils";
 
 const BINANCE_BASE = "https://api.binance.com";
@@ -35,6 +36,7 @@ export async function fetchBinanceTotal(
     apiKey: string,
     apiSecret: string,
     quoteAsset: string,
+    send: Send = fetch,
 ): Promise<ProviderBalance> {
     const params = new URLSearchParams({
         quoteAsset,
@@ -43,7 +45,7 @@ export async function fetchBinanceTotal(
     });
     params.append("signature", await signQuery(apiSecret, params.toString()));
 
-    const res = await fetch(`${BINANCE_BASE}/sapi/v1/asset/wallet/balance?${params.toString()}`, {
+    const res = await send(`${BINANCE_BASE}/sapi/v1/asset/wallet/balance?${params.toString()}`, {
         headers: { "X-MBX-APIKEY": apiKey },
     });
 

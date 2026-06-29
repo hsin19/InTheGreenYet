@@ -40,7 +40,7 @@ export default defineConfig({
         },
         {
             // Real Worker via wrangler dev. CLI --var overrides any local .dev.vars.
-            command: `pnpm --filter @inthegreenyet/backend exec wrangler dev --port ${BACKEND_PORT}`
+            command: `pnpm --filter @inthegreenyet/backend exec wrangler dev --env dev --port ${BACKEND_PORT}`
                 + ` --var NOTION_API_BASE_URL:${MOCK_NOTION_URL}`
                 + ` --var FRONTEND_URL:${BASE_URL}`
                 + ` --var NOTION_CLIENT_ID:e2e-dummy`

@@ -1,5 +1,6 @@
 import { fetchBinanceTotal } from "../binance";
 import type { BinanceBalanceRequest } from "../model";
+import { makeSend } from "../relay";
 import {
     ClientError,
     errorResponse,
@@ -19,7 +20,7 @@ export async function handleBinanceBalance(request: Request, _url: URL, env: Env
         }
 
         const quoteAsset = (body.currency || "USDT").toUpperCase();
-        const result = await fetchBinanceTotal(body.apiKey, body.apiSecret, quoteAsset);
+        const result = await fetchBinanceTotal(body.apiKey, body.apiSecret, quoteAsset, makeSend(env));
         return jsonResponse(result, 200, env.FRONTEND_URL);
     } catch (err) {
         console.error("handleBinanceBalance error:", err);
