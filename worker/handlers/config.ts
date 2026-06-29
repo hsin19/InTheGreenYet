@@ -14,7 +14,17 @@ import {
 // client id (a public value) so the SPA can build the authorize URL without a
 // build-time env var; the secret never leaves the Worker.
 export function handleGetPublicConfig(_request: Request, env: Env): Response {
-    return jsonResponse({ notionClientId: env.NOTION_CLIENT_ID }, 200);
+    // Fail loudly on a misconfigured Worker instead of returning 200 with an
+    // undefined id, which would build an authorize URL with `client_id=undefined`
+    // and bounce the user to an off-site Notion error. A 5xx lets the SPA show its
+    // own "couldn't reach the server" message.
+    if (!env.NOTION_CLIENT_ID) {
+        console.error("handleGetPublicConfig: NOTION_CLIENT_ID is not configured");
+        return jsonResponse({ error: "client_id_unconfigured" }, 500);
+    }
+    return jsonResponse({ notionClientId: env.NOTION_CLIENT_ID }, 200, {
+        "Cache-Control": "public, max-age=3600",
+    });
 }
 
 export async function handleGetConfig(request: Request, url: URL, _env: Env): Promise<Response> {

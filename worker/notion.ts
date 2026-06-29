@@ -188,8 +188,11 @@ export async function queryTransfers(token: string): Promise<Transfer[]> {
 async function findParentPage(token: string, pageName: string): Promise<string> {
     const notion = createClient(token);
 
+    // No `query` filter: Notion's search `query` only returns pages whose title
+    // INCLUDES it, so a shared parent page named anything other than pageName would
+    // yield zero results and falsely throw below. The integration only ever sees
+    // pages explicitly shared with it, so this set is small; rank it in memory.
     const response = await notion.search({
-        query: pageName,
         filter: { property: "object", value: "page" },
     });
 

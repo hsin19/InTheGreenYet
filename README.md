@@ -82,11 +82,10 @@ Add these in your repo's **Settings > Secrets and variables > Actions**:
 
 #### Repository Variables (Non-sensitive)
 
-| Variable                       | Description                                       |
-| ------------------------------ | ------------------------------------------------- |
-| `CLOUDFLARE_ACCOUNT_ID`        | Your Cloudflare account ID                        |
-| `CLOUDFLARE_WORKERS_SUBDOMAIN` | Your Cloudflare Workers subdomain (e.g. `hsin19`) |
-| `NOTION_CLIENT_ID`             | Notion integration client ID (production)         |
+| Variable                | Description                               |
+| ----------------------- | ----------------------------------------- |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID                |
+| `NOTION_CLIENT_ID`      | Notion integration client ID (production) |
 
 Once configured, pushing to `main` automatically deploys the Worker.
 

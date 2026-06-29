@@ -41,6 +41,45 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Direct pushes to main skip the PR checks, so re-run the full suite here:
+      # this both gates the deploy on tests passing and uploads fresh coverage to
+      # Codecov (the PR-only pr.yml never runs for a direct push).
+      - name: Test
+        run: pnpm run test:ci
+
+      - name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: coverage
+          flags: frontend
+          fail_ci_if_error: false
+
+      - name: Upload worker coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: coverage-worker
+          flags: backend
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          report_type: test_results
+          files: test-report.junit.xml,worker-test-report.junit.xml
+
       # Builds the SPA client AND the Worker bundle via @cloudflare/vite-plugin,
       # emitting dist/ plus the .wrangler/deploy redirect that `wrangler deploy`
       # picks up. VITE_API_BASE_URL is intentionally unset → the SPA calls /api
@@ -61,6 +100,7 @@ jobs:
       # One deploy uploads the Worker + the client assets together (single origin).
       # wrangler-action `secrets:` works for Workers (it would NOT for Pages).
       - name: Deploy to Cloudflare Workers
+        id: deploy
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -73,3 +113,15 @@ jobs:
         env:
           NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
           NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
+
+      # Direct pushes to main skip the PR e2e job, so confirm the live Worker boots
+      # and serves /health after deploying. Skips if no deployment URL was returned.
+      - name: Smoke check deployed Worker
+        run: |
+          url="${{ steps.deploy.outputs.deployment-url }}"
+          if [ -z "$url" ]; then
+            echo "::warning::No deployment URL returned — skipping health smoke check"
+            exit 0
+          fi
+          echo "Probing $url/health"
+          curl -fsS --retry 5 --retry-all-errors --retry-delay 3 "$url/health" | grep -q '"status":"ok"'

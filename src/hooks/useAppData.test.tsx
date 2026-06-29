@@ -71,6 +71,8 @@ function Consumer() {
             <span data-testid="canwrite">{String(d.canWrite)}</span>
             <span data-testid="account">{d.getAccountName("cash")}</span>
             <span data-testid="account-unknown">{d.getAccountName("nope")}</span>
+            <span data-testid="account-a">{d.getAccountName("a")}</span>
+            <span data-testid="account-b">{d.getAccountName("b")}</span>
             <span data-testid="rate-base">{String(d.getFiatToBaseRate("TWD"))}</span>
             <span data-testid="rate-usd">{String(d.getFiatToBaseRate("USD"))}</span>
             <span data-testid="rate-empty">{String(d.getFiatToBaseRate(""))}</span>
@@ -92,6 +94,16 @@ function Consumer() {
             </button>
             <button onClick={() => void d.saveConfig("baseCurrency", "USD")}>save</button>
             <button onClick={() => void d.addSnapshots([{ account: "cash", date: "2026-06-02", amount: 5, currency: "USD" }])}>snap</button>
+            <button
+                onClick={() => {
+                    // Two writes in the same render. Each must merge against the
+                    // other's result, not the shared render-captured map.
+                    void d.updateAccounts(curr => ({ ...curr, a: { displayName: "Acct A" } }));
+                    void d.updateAccounts(curr => ({ ...curr, b: { displayName: "Acct B" } }));
+                }}
+            >
+                concurrent-add
+            </button>
         </div>
     );
 }
@@ -154,6 +166,22 @@ describe("useAppData", () => {
 
         await page.getByText("add", { exact: true }).click();
         await expect.element(page.getByTestId("count")).toHaveTextContent("1");
+    });
+
+    it("merges back-to-back account writes instead of clobbering one another", async () => {
+        installFetch([]);
+        authenticate();
+        renderApp();
+
+        await expect.element(page.getByTestId("status")).toHaveTextContent("ready");
+
+        await page.getByText("concurrent-add", { exact: true }).click();
+
+        // Without the configRef merge, the second write would start from the stale
+        // render map and drop "a". Both must survive alongside the seeded "cash".
+        await expect.element(page.getByTestId("account-a")).toHaveTextContent("Acct A");
+        await expect.element(page.getByTestId("account-b")).toHaveTextContent("Acct B");
+        await expect.element(page.getByTestId("account")).toHaveTextContent("Wallet");
     });
 
     it("saves config and posts snapshots without error", async () => {

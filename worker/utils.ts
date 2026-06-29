@@ -8,10 +8,10 @@ export class DataSourceNotFoundError extends Error {
 }
 
 // Same-origin (the Worker serves the SPA and the API), so no CORS headers needed.
-export function jsonResponse(data: unknown, status: number): Response {
+export function jsonResponse(data: unknown, status: number, headers?: Record<string, string>): Response {
     return new Response(JSON.stringify(data), {
         status,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...headers },
     });
 }
 

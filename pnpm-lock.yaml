@@ -72,6 +72,9 @@ importers:
       '@lingui/cli':
         specifier: ^6.4.0
         version: 6.4.0
+      '@lingui/format-po':
+        specifier: ^6.4.0
+        version: 6.4.0
       '@lingui/swc-plugin':
         specifier: ^6.4.0
         version: 6.4.0(@lingui/core@6.4.0)

@@ -61,11 +61,15 @@ export function Accounts() {
     const totalYield = totalNetCost > 0 ? (totalPL / totalNetCost) * 100 : 0;
 
     const handleSaveAccount = async (key: string, cfg: AccountConfig) => {
-        const prev = accounts[key];
-        const amountChanged = prev && prev.amount !== cfg.amount;
-
-        // Merge against the latest accounts map (updateAccounts is concurrency-safe).
-        await updateAccounts(curr => ({ ...curr, [key]: cfg }));
+        // Decide amountChanged against the same latest map the write merges into
+        // (curr), not the render-captured `accounts`, so a concurrent edit can't
+        // skew the snapshot decision.
+        let amountChanged = false;
+        await updateAccounts(curr => {
+            const prev = curr[key];
+            amountChanged = !!prev && prev.amount !== cfg.amount;
+            return { ...curr, [key]: cfg };
+        });
 
         // If amount changed, record a snapshot
         if (amountChanged && cfg.amount != null) {

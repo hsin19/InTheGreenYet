@@ -5,6 +5,9 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
     const error = url.searchParams.get("error");
 
     if (error) {
+        // Only the coarse `error` code is forwarded to the SPA (which maps it to a
+        // localized message); log Notion's human-readable description for debugging.
+        console.error("handleOAuthCallback provider error:", error, url.searchParams.get("error_description"));
         const target = new URL("/landing", url.origin);
         target.searchParams.set("error", error);
         return Response.redirect(target.toString(), 302);

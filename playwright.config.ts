@@ -44,11 +44,18 @@ export default defineConfig({
             // overrides inject the mock Notion URL and dummy secrets (no .dev.vars
             // needed in CI). VITE_API_BASE_URL is unset, so the SPA calls /api
             // same-origin.
+            //
+            // CLOUDFLARE_ENV=dev selects the `dev` wrangler env, which drops the
+            // remote VPC RELAY binding (wrangler.jsonc). It must cover the `vite
+            // build` too — wrangler dev serves the redirect config that build emits,
+            // so setting it only on `wrangler dev` would still ship RELAY and the
+            // Worker would fail to boot without Cloudflare credentials in CI.
             command: `pnpm exec vite build`
                 + ` && pnpm exec wrangler dev --port ${APP_PORT} --ip 127.0.0.1`
                 + ` --var NOTION_API_BASE_URL:${MOCK_NOTION_URL}`
                 + ` --var NOTION_CLIENT_ID:e2e-dummy`
                 + ` --var NOTION_CLIENT_SECRET:e2e-dummy`,
+            env: { CLOUDFLARE_ENV: "dev" },
             url: `${BASE_URL}/health`,
             reuseExistingServer: !process.env.CI,
             timeout: 180_000,
