@@ -18,7 +18,8 @@ import { TransferDialog } from "./components/TransferDialog";
 
 function Transfers() {
     const { auth } = useNotion();
-    const { status, transfers, config, error, refresh, getAccountName, getFiatToBaseRate } = useAppData();
+    const { status, syncing, transfers, config, error, refresh, getAccountName, getFiatToBaseRate } = useAppData();
+    const busy = status === "loading" || syncing;
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
     const [addOpen, setAddOpen] = useState(false);
     const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
@@ -64,11 +65,11 @@ function Transfers() {
                         variant="outline"
                         size="icon"
                         onClick={refresh}
-                        disabled={status === "loading"}
+                        disabled={busy}
                         aria-label={t`Refresh transfers`}
                         title={t`Refresh`}
                     >
-                        <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
+                        <RefreshCw className={`w-4 h-4 ${busy ? "animate-spin" : ""}`} />
                     </Button>
                     {auth && (
                         <Button size="icon" onClick={() => setAddOpen(true)} aria-label={t`Add transfer`} title={t`Add transfer`}>

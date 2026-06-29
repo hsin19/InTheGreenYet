@@ -24,7 +24,7 @@ import { AccountCard } from "./components/AccountCard";
 import { AccountDialog } from "./components/AccountDialog";
 
 export function Accounts() {
-    const { config, status, transfers, getFiatToBaseRate, refresh, saveConfig, addSnapshots } = useAppData();
+    const { config, status, syncing, transfers, getFiatToBaseRate, refresh, updateAccounts, addSnapshots } = useAppData();
     const { t } = useLingui();
 
     const [addOpen, setAddOpen] = useState(false);
@@ -35,6 +35,7 @@ export function Accounts() {
     };
 
     const accounts = status === "ready" ? config.accounts : {};
+    const busy = status === "loading" || syncing;
 
     // Compute performance
     const flows = status === "ready" ? computeAccountFlows(transfers, true, getFiatToBaseRate) : [];
@@ -59,16 +60,12 @@ export function Accounts() {
 
     const totalYield = totalNetCost > 0 ? (totalPL / totalNetCost) * 100 : 0;
 
-    const persistAccounts = async (next: Record<string, AccountConfig>) => {
-        await saveConfig("accounts", next);
-    };
-
     const handleSaveAccount = async (key: string, cfg: AccountConfig) => {
         const prev = accounts[key];
         const amountChanged = prev && prev.amount !== cfg.amount;
 
-        // Persist to config
-        await persistAccounts({ ...accounts, [key]: cfg });
+        // Merge against the latest accounts map (updateAccounts is concurrency-safe).
+        await updateAccounts(curr => ({ ...curr, [key]: cfg }));
 
         // If amount changed, record a snapshot
         if (amountChanged && cfg.amount != null) {
@@ -87,9 +84,11 @@ export function Accounts() {
     };
 
     const handleDelete = async (key: string) => {
-        const next = { ...accounts };
-        delete next[key];
-        await persistAccounts(next);
+        await updateAccounts(curr => {
+            const next = { ...curr };
+            delete next[key];
+            return next;
+        });
     };
 
     const sortedKeys = sortAccountKeys(accounts, accountPerformances);
@@ -105,11 +104,11 @@ export function Accounts() {
                         variant="outline"
                         size="icon"
                         onClick={refresh}
-                        disabled={status === "loading"}
+                        disabled={busy}
                         aria-label={t`Refresh accounts`}
                         title={t`Refresh`}
                     >
-                        <RefreshCw className={`w-4 h-4 ${status === "loading" ? "animate-spin" : ""}`} />
+                        <RefreshCw className={`w-4 h-4 ${busy ? "animate-spin" : ""}`} />
                     </Button>
                     <Button
                         size="icon"

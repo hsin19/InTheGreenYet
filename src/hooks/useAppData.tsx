@@ -11,6 +11,7 @@ import {
     useContext,
     useEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 import {
@@ -60,6 +61,9 @@ interface AppDataState {
     addTransfer: (input: CreateTransferInput) => Promise<string>;
     addSnapshots: (snapshots: CreateSnapshotInput[]) => Promise<void>;
     saveConfig: (key: string, value: unknown) => Promise<void>;
+    updateAccounts: (
+        updater: (prev: Record<string, AccountConfig>) => Record<string, AccountConfig>,
+    ) => Promise<void>;
     getAccountName: (key: string) => string;
     getFiatToBaseRate: (currency: string) => number | null;
 }
@@ -107,6 +111,13 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
         setError(null);
     }
 
+    // Always-latest config, so back-to-back account writes merge against the newest
+    // map instead of a stale render-captured one (see updateAccounts).
+    const configRef = useRef(config);
+    useEffect(() => {
+        configRef.current = config;
+    }, [config]);
+
     const refresh = useCallback(() => setRetryCount(c => c + 1), []);
 
     useEffect(() => {
@@ -114,10 +125,14 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
 
         let cancelled = false;
         let hasCache = false;
+        let latestRatesBase: string | undefined;
 
         const loadRates = (baseCurrency: string) => {
+            latestRatesBase = baseCurrency;
             loadExchangeRates(baseCurrency, rates => {
-                if (!cancelled) setExchangeRates(rates);
+                // Drop a stale base's late callback: the cached-base load and the
+                // upstream-base reload race, and rates carry no base identity.
+                if (!cancelled && baseCurrency === latestRatesBase) setExchangeRates(rates);
             });
         };
 
@@ -220,6 +235,19 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
         });
     }, [store]);
 
+    const updateAccounts = useCallback(
+        async (updater: (prev: Record<string, AccountConfig>) => Record<string, AccountConfig>): Promise<void> => {
+            // Build from the latest accounts (via ref, not a render-captured value) and
+            // advance the ref synchronously so back-to-back save/delete calls in the
+            // same render don't each start from the stale map and clobber one another.
+            const nextAccounts = updater(configRef.current.accounts);
+            configRef.current = { ...configRef.current, accounts: nextAccounts };
+            await store.saveConfig("accounts", nextAccounts);
+            setConfig(prev => ({ ...prev, accounts: nextAccounts }));
+        },
+        [store],
+    );
+
     const getAccountName = useCallback((key: string) => {
         if (!key) return key;
         const exactMatch = config.accounts[key];
@@ -271,6 +299,7 @@ export function AppDataProvider({ children }: { children: ReactNode; }) {
                 addTransfer,
                 addSnapshots,
                 saveConfig,
+                updateAccounts,
                 getAccountName,
                 getFiatToBaseRate,
             }}
