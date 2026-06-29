@@ -1,5 +1,5 @@
+import type { BitgetBalanceRequest } from "../../shared/model";
 import { fetchBitgetTotal } from "../bitget";
-import type { BitgetBalanceRequest } from "../model";
 import {
     ClientError,
     errorResponse,

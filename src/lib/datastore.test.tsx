@@ -1,3 +1,8 @@
+import type {
+    ConfigRow,
+    CreateTransferInput,
+    Transfer,
+} from "@shared/model";
 import {
     afterEach,
     describe,
@@ -14,11 +19,6 @@ import {
     ReadOnlyStore,
     SwrStore,
 } from "./datastore";
-import type {
-    ConfigRow,
-    CreateTransferInput,
-    Transfer,
-} from "./model";
 
 const INPUT: CreateTransferInput = {
     title: "Salary",

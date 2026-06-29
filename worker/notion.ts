@@ -78,7 +78,7 @@ import type {
     CreateTransferInput,
     Snapshot,
     Transfer,
-} from "./model";
+} from "../shared/model";
 
 // ─── Functions ───────────────────────────────────────────────
 

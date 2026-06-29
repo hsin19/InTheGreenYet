@@ -1,5 +1,5 @@
+import type { BinanceBalanceRequest } from "../../shared/model";
 import { fetchBinanceTotal } from "../binance";
-import type { BinanceBalanceRequest } from "../model";
 import {
     ClientError,
     errorResponse,

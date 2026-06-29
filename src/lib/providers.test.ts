@@ -1,3 +1,4 @@
+import type { ProviderBalance } from "@shared/model";
 import {
     afterEach,
     describe,
@@ -8,7 +9,6 @@ import {
 import { fetchBinanceBalance } from "./binance";
 import { fetchBitgetBalance } from "./bitget";
 import { fetchMaxBalance } from "./max";
-import type { ProviderBalance } from "./model";
 
 const BALANCE: ProviderBalance = { total: 42, currency: "USDT", fetchedAt: "2026-06-05T00:00:00Z" };
 

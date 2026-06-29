@@ -1,9 +1,9 @@
+import type { Transfer } from "@shared/model";
 import {
     describe,
     expect,
     it,
 } from "vitest";
-import type { Transfer } from "./model";
 import {
     accountBaseValue,
     type AccountFlow,

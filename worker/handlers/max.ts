@@ -1,5 +1,5 @@
+import type { MaxBalanceRequest } from "../../shared/model";
 import { fetchMaxTotal } from "../max";
-import type { MaxBalanceRequest } from "../model";
 import {
     ClientError,
     errorResponse,

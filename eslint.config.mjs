@@ -41,8 +41,8 @@ export default defineConfig([
         },
     },
     {
-        // Backend (Cloudflare Worker) specific configuration
-        files: ["worker/**/*.ts"],
+        // Backend (Cloudflare Worker) + shared contract types
+        files: ["worker/**/*.ts", "shared/**/*.ts"],
         extends: [
             js.configs.recommended,
             tseslint.configs.recommended,

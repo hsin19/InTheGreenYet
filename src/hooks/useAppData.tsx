@@ -1,3 +1,9 @@
+import type {
+    ConfigRow,
+    CreateSnapshotInput,
+    CreateTransferInput,
+    Transfer,
+} from "@shared/model";
 import {
     createContext,
     type ReactNode,
@@ -15,12 +21,6 @@ import {
     type ExchangeRates,
     loadExchangeRates,
 } from "../lib/exchange";
-import type {
-    ConfigRow,
-    CreateSnapshotInput,
-    CreateTransferInput,
-    Transfer,
-} from "../lib/model";
 import { useNotion } from "./useNotion";
 
 type Status = "loading" | "ready" | "error";

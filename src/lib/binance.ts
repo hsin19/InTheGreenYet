@@ -1,8 +1,8 @@
-import { apiFetch } from "./api";
 import type {
     BinanceBalanceRequest,
     ProviderBalance,
-} from "./model";
+} from "@shared/model";
+import { apiFetch } from "./api";
 
 /**
  * Fetch live total assets for a Binance account via the backend signing proxy.

@@ -1,4 +1,4 @@
-import type { ProviderBalance } from "./model";
+import type { ProviderBalance } from "../shared/model";
 import { ClientError } from "./utils";
 
 const MAX_BASE = "https://max-api.maicoin.com";

@@ -1,8 +1,8 @@
-import { apiFetch } from "./api";
 import type {
     MaxBalanceRequest,
     ProviderBalance,
-} from "./model";
+} from "@shared/model";
+import { apiFetch } from "./api";
 
 /**
  * Fetch live total assets (valued in TWD) for a MAX account via the backend signing

@@ -19,6 +19,7 @@ import {
     Trans,
     useLingui,
 } from "@lingui/react/macro";
+import type { ProviderBalance } from "@shared/model";
 import {
     Check,
     RefreshCw,
@@ -26,7 +27,6 @@ import {
     Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import type { ProviderBalance } from "../../../lib/model";
 import {
     type AccountFlow,
     type AccountPerformance,

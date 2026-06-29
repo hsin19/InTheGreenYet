@@ -1,4 +1,4 @@
-import type { Transfer } from "./model";
+import type { Transfer } from "@shared/model";
 
 export interface CurrencyFlow {
     currency: string;

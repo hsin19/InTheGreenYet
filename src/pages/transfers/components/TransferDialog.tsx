@@ -18,11 +18,11 @@ import {
     type AccountConfig,
     useAppData,
 } from "@/hooks/useAppData";
-import { type CreateTransferInput } from "@/lib/model";
 import {
     Trans,
     useLingui,
 } from "@lingui/react/macro";
+import { type CreateTransferInput } from "@shared/model";
 import { useState } from "react";
 
 const todayISO = () => new Date().toLocaleDateString("sv-SE");

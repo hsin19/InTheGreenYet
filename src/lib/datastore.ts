@@ -1,3 +1,9 @@
+import type {
+    ConfigRow,
+    CreateSnapshotInput,
+    CreateTransferInput,
+    Transfer,
+} from "@shared/model";
 import {
     type DBSchema,
     deleteDB,
@@ -7,12 +13,6 @@ import {
     apiFetch,
     DataSourceNotFoundError,
 } from "./api";
-import type {
-    ConfigRow,
-    CreateSnapshotInput,
-    CreateTransferInput,
-    Transfer,
-} from "./model";
 
 // ─── DataStore interface ──────────────────────────────────────
 

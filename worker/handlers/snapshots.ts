@@ -1,4 +1,4 @@
-import type { CreateSnapshotInput } from "../model";
+import type { CreateSnapshotInput } from "../../shared/model";
 import {
     createSnapshots,
     querySnapshots,

@@ -1,8 +1,8 @@
-import { apiFetch } from "./api";
 import type {
     BitgetBalanceRequest,
     ProviderBalance,
-} from "./model";
+} from "@shared/model";
+import { apiFetch } from "./api";
 
 /**
  * Fetch live total assets (in USDT) for a Bitget account via the backend signing

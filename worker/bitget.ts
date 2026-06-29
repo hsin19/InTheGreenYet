@@ -1,4 +1,4 @@
-import type { ProviderBalance } from "./model";
+import type { ProviderBalance } from "../shared/model";
 import { ClientError } from "./utils";
 
 const BITGET_BASE = "https://api.bitget.com";
