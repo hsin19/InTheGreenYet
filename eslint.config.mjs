@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import lingui from "eslint-plugin-lingui";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import {
@@ -27,6 +28,7 @@ export default defineConfig([
             tseslint.configs.recommended,
             reactHooks.configs.flat.recommended,
             reactRefresh.configs.vite,
+            lingui.configs["flat/recommended"],
         ],
         languageOptions: {
             ecmaVersion: 2020,

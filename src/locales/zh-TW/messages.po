@@ -197,6 +197,10 @@ msgstr "連線至 Notion"
 msgid "Connecting to Notion…"
 msgstr "正在連線至 Notion…"
 
+#: src/pages/Landing.tsx
+msgid "Connecting…"
+msgstr "連線中…"
+
 #: src/pages/accounts/components/BinanceKeyGuide.tsx
 msgid "Copy the <0>API Key</0> and <1>Secret Key</1> (the secret is shown only once) and paste them into the fields above."
 msgstr "複製 <0>API Key</0> 與 <1>Secret Key</1>（私鑰僅會顯示一次）並貼到上方欄位中。"
@@ -213,6 +217,10 @@ msgstr "複製憑證"
 #: src/pages/accounts/components/MaxKeyGuide.tsx
 msgid "Copy the keys"
 msgstr "複製金鑰"
+
+#: src/pages/Landing.tsx
+msgid "Couldn't reach the server — please try again."
+msgstr "無法連線至伺服器，請再試一次。"
 
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Covers your MAX Spot wallet (available + locked + staked), reported in TWD at MAX market prices. Margin (m-wallet) holdings aren't included. Live sync may fail on the hosted site — MAX blocks requests from Cloudflare; if refresh errors out, update the balance manually."

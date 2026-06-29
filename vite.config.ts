@@ -45,6 +45,10 @@ export default defineConfig(({ mode }) => ({
             workbox: {
                 globPatterns: ["**/*.{js,css,html,svg,png,ico,webp}"],
                 cleanupOutdatedCaches: true,
+                // Single origin: the SW must NOT serve index.html for the Worker's
+                // own routes, or it swallows the OAuth callback / API and the SPA
+                // renders its 404. Let these navigations hit the network (Worker).
+                navigateFallbackDenylist: [/^\/api\//, /^\/auth\//, /^\/health$/],
             },
             devOptions: {
                 enabled: false,

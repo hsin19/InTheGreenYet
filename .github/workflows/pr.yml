@@ -35,6 +35,9 @@ jobs:
       - name: Typecheck
         run: pnpm run typecheck
 
+      - name: i18n catalogs
+        run: pnpm run i18n:check
+
       - name: Cache Playwright browsers
         uses: actions/cache@v6
         with:

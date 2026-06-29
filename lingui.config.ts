@@ -9,6 +9,9 @@ export default defineConfig({
     catalogs: [{
         path: "<rootDir>/src/locales/{locale}/messages",
         include: ["<rootDir>/src"],
-        exclude: ["**/node_modules/**"],
+        // __screenshots__ holds vitest-browser artifacts in dirs named like the
+        // test file (e.g. useAppData.test.tsx/) — without this the extractor tries
+        // to read those dirs as .tsx files and crashes with EISDIR.
+        exclude: ["**/node_modules/**", "**/__screenshots__/**", "**/*.test.{ts,tsx}"],
     }],
 });
