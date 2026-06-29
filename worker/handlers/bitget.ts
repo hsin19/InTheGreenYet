@@ -11,7 +11,7 @@ import {
  * relay the all-account-balance call. No Notion token needed — credential storage
  * is handled separately by the config flow.
  */
-export async function handleBitgetBalance(request: Request, _url: URL, env: Env): Promise<Response> {
+export async function handleBitgetBalance(request: Request, _url: URL, _env: Env): Promise<Response> {
     try {
         const body = await request.json() as Partial<BitgetBalanceRequest>;
         if (!body.apiKey || !body.apiSecret || !body.passphrase) {
@@ -19,9 +19,9 @@ export async function handleBitgetBalance(request: Request, _url: URL, env: Env)
         }
 
         const result = await fetchBitgetTotal(body.apiKey, body.apiSecret, body.passphrase);
-        return jsonResponse(result, 200, env.FRONTEND_URL);
+        return jsonResponse(result, 200);
     } catch (err) {
         console.error("handleBitgetBalance error:", err);
-        return errorResponse(err, env.FRONTEND_URL);
+        return errorResponse(err);
     }
 }

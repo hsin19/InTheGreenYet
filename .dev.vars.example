@@ -4,7 +4,6 @@
 # NOTION_CLIENT_SECRET must stay server-side — never expose it to the browser.
 NOTION_CLIENT_ID=your-client-id-here
 NOTION_CLIENT_SECRET=your-client-secret-here
-FRONTEND_URL=http://localhost:5173
 
 # Optional: override the Notion API base URL (e2e points this at a local mock).
 # Leave unset for normal dev/prod so the SDK uses https://api.notion.com.

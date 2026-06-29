@@ -28,7 +28,7 @@ Single pnpm package (no workspace). React SPA in `src/`, Cloudflare Worker in `w
 
 ```bash
 pnpm install
-pnpm run dev          # vite: SPA + Worker on ONE origin (http://localhost:5173) with HMR
+pnpm run dev          # vite: SPA + Worker on ONE origin (http://localhost:4152) with HMR
 pnpm run lint         # eslint (src/ + worker/)
 pnpm run typecheck    # wrangler types + tsc -b (app/worker/node) + worker test tsconfig
 pnpm run build        # wrangler types + tsc -b + vite build (client + Worker bundle)

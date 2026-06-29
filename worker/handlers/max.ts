@@ -11,7 +11,7 @@ import {
  * the spot accounts call, then value every currency in TWD. No Notion token needed —
  * credential storage is handled separately by the config flow.
  */
-export async function handleMaxBalance(request: Request, _url: URL, env: Env): Promise<Response> {
+export async function handleMaxBalance(request: Request, _url: URL, _env: Env): Promise<Response> {
     try {
         const body = await request.json() as Partial<MaxBalanceRequest>;
         if (!body.apiKey || !body.apiSecret) {
@@ -19,9 +19,9 @@ export async function handleMaxBalance(request: Request, _url: URL, env: Env): P
         }
 
         const result = await fetchMaxTotal(body.apiKey, body.apiSecret);
-        return jsonResponse(result, 200, env.FRONTEND_URL);
+        return jsonResponse(result, 200);
     } catch (err) {
         console.error("handleMaxBalance error:", err);
-        return errorResponse(err, env.FRONTEND_URL);
+        return errorResponse(err);
     }
 }

@@ -21,7 +21,7 @@ One **Cloudflare Worker** serves the SPA's static assets and the `/api`, `/auth`
 2. A **Notion Public Integration**:
    - Go to [notion.so/profile/integrations/public](https://www.notion.so/profile/integrations/public)
    - Create a new **Public** integration
-   - Set Redirect URI to `http://localhost:5173/auth/notion/callback`
+   - Set Redirect URI to `http://localhost:4152/auth/notion/callback`
    - Copy your **Client ID** and **Client Secret**
 
 ### Setup
@@ -32,7 +32,7 @@ pnpm install
 
 # Copy the example config and fill in the values (one file — the SPA fetches the
 # public Notion client id from the Worker, so there is no separate client-side env)
-cp -n .dev.vars.example .dev.vars   # NOTION_CLIENT_ID/SECRET, FRONTEND_URL
+cp -n .dev.vars.example .dev.vars   # NOTION_CLIENT_ID, NOTION_CLIENT_SECRET
 ```
 
 ### Run
@@ -42,7 +42,7 @@ pnpm run dev
 ```
 
 `vite` runs the SPA **and** the Worker together on one origin with HMR. Open
-[http://localhost:5173](http://localhost:5173) and click **Connect to Notion** to
+[http://localhost:4152](http://localhost:4152) and click **Connect to Notion** to
 start. The SPA calls `/api` and `/auth` on the same origin — no proxy needed.
 
 ## Deployment

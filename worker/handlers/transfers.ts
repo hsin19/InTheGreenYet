@@ -8,18 +8,18 @@ import {
     jsonResponse,
 } from "../utils";
 
-export async function handleGetTransfers(request: Request, env: Env): Promise<Response> {
+export async function handleGetTransfers(request: Request, _env: Env): Promise<Response> {
     try {
         const token = getToken(request);
         const transfers = await queryTransfers(token);
-        return jsonResponse({ transfers }, 200, env.FRONTEND_URL);
+        return jsonResponse({ transfers }, 200);
     } catch (err) {
         console.error("handleGetTransfers error", err);
-        return errorResponse(err, env.FRONTEND_URL);
+        return errorResponse(err);
     }
 }
 
-export async function handleCreateTransfer(request: Request, env: Env): Promise<Response> {
+export async function handleCreateTransfer(request: Request, _env: Env): Promise<Response> {
     try {
         const token = getToken(request);
         const body = await request.json() as Record<string, unknown>;
@@ -34,9 +34,9 @@ export async function handleCreateTransfer(request: Request, env: Env): Promise<
             to: (body.to as string) ?? "",
             note: (body.note as string) ?? "",
         });
-        return jsonResponse({ id }, 201, env.FRONTEND_URL);
+        return jsonResponse({ id }, 201);
     } catch (err) {
         console.error("handleCreateTransfer error", err);
-        return errorResponse(err, env.FRONTEND_URL);
+        return errorResponse(err);
     }
 }

@@ -7,28 +7,21 @@ export class DataSourceNotFoundError extends Error {
     }
 }
 
-export function corsHeaders(origin: string): Record<string, string> {
-    return {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    };
-}
-
-export function jsonResponse(data: unknown, status: number, origin: string): Response {
+// Same-origin (the Worker serves the SPA and the API), so no CORS headers needed.
+export function jsonResponse(data: unknown, status: number): Response {
     return new Response(JSON.stringify(data), {
         status,
-        headers: { "Content-Type": "application/json", ...corsHeaders(origin) },
+        headers: { "Content-Type": "application/json" },
     });
 }
 
-export function errorResponse(err: unknown, origin: string): Response {
+export function errorResponse(err: unknown): Response {
     if (err instanceof DataSourceNotFoundError) {
-        return jsonResponse({ error: "data_source_not_found" }, 404, origin);
+        return jsonResponse({ error: "data_source_not_found" }, 404);
     }
     const message = err instanceof Error ? err.message : "Unknown error";
     const status = err instanceof ClientError ? 400 : 500;
-    return jsonResponse({ error: message }, status, origin);
+    return jsonResponse({ error: message }, status);
 }
 
 export function getToken(request: Request): string {

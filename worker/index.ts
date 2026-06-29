@@ -17,19 +17,12 @@ import {
     handleGetTransfers,
 } from "./handlers/transfers";
 import { configureNotion } from "./notion";
-import {
-    corsHeaders,
-    jsonResponse,
-} from "./utils";
+import { jsonResponse } from "./utils";
 
 export default {
     async fetch(request, env, _ctx): Promise<Response> {
         configureNotion(env.NOTION_API_BASE_URL);
         const url = new URL(request.url);
-
-        if (request.method === "OPTIONS") {
-            return new Response(null, { status: 204, headers: corsHeaders(env.FRONTEND_URL) });
-        }
 
         if (url.pathname === "/auth/notion/callback") {
             return handleOAuthCallback(request, url, env);
@@ -80,7 +73,7 @@ export default {
         }
 
         if (url.pathname === "/health") {
-            return jsonResponse({ status: "ok", service: "inthegreen-backend" }, 200, env.FRONTEND_URL);
+            return jsonResponse({ status: "ok", service: "inthegreen-backend" }, 200);
         }
 
         return new Response(null, { status: 404 });

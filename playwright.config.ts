@@ -47,7 +47,6 @@ export default defineConfig({
             command: `pnpm exec vite build`
                 + ` && pnpm exec wrangler dev --port ${APP_PORT} --ip 127.0.0.1`
                 + ` --var NOTION_API_BASE_URL:${MOCK_NOTION_URL}`
-                + ` --var FRONTEND_URL:${BASE_URL}`
                 + ` --var NOTION_CLIENT_ID:e2e-dummy`
                 + ` --var NOTION_CLIENT_SECRET:e2e-dummy`,
             url: `${BASE_URL}/health`,

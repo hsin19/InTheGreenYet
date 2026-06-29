@@ -11,6 +11,13 @@ import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+    // Pin the dev port so it always matches the registered OAuth redirect URI
+    // (http://localhost:4152/auth/notion/callback). strictPort fails loudly if
+    // 4152 is taken instead of silently moving to 4153 and breaking the callback.
+    server: {
+        port: 4152,
+        strictPort: true,
+    },
     plugins: [
         react({
             plugins: [["@lingui/swc-plugin", {}]],

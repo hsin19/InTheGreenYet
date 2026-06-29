@@ -58,8 +58,6 @@ jobs:
           secrets: |
             NOTION_CLIENT_ID
             NOTION_CLIENT_SECRET
-            FRONTEND_URL
         env:
           NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
           NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
-          FRONTEND_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev

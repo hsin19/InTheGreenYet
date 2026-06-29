@@ -12,7 +12,7 @@ import {
     jsonResponse,
 } from "../utils";
 
-export async function handleInit(request: Request, env: Env): Promise<Response> {
+export async function handleInit(request: Request, _env: Env): Promise<Response> {
     try {
         const token = getToken(request);
 
@@ -40,9 +40,9 @@ export async function handleInit(request: Request, env: Env): Promise<Response> 
             ]);
         }
 
-        return jsonResponse({ ok: true }, 200, env.FRONTEND_URL);
+        return jsonResponse({ ok: true }, 200);
     } catch (err) {
         console.error("handleInit error", err);
-        return errorResponse(err, env.FRONTEND_URL);
+        return errorResponse(err);
     }
 }

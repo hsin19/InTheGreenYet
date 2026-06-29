@@ -5,7 +5,7 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
     const error = url.searchParams.get("error");
 
     if (error) {
-        const target = new URL("/landing", env.FRONTEND_URL);
+        const target = new URL("/landing", url.origin);
         target.searchParams.set("error", error);
         return Response.redirect(target.toString(), 302);
     }
@@ -25,7 +25,7 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
             client_secret: env.NOTION_CLIENT_SECRET,
         });
 
-        const callbackUrl = new URL("/callback", env.FRONTEND_URL);
+        const callbackUrl = new URL("/callback", url.origin);
         if (data.workspace_name) callbackUrl.searchParams.set("workspace_name", data.workspace_name);
         if (data.workspace_id) callbackUrl.searchParams.set("workspace_id", data.workspace_id);
         const state = url.searchParams.get("state");
@@ -35,7 +35,7 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
         return Response.redirect(callbackUrl.toString(), 302);
     } catch (err) {
         console.error("handleOAuthCallback error", err);
-        const target = new URL("/landing", env.FRONTEND_URL);
+        const target = new URL("/landing", url.origin);
         target.searchParams.set("error", "token_exchange_failed");
         return Response.redirect(target.toString(), 302);
     }

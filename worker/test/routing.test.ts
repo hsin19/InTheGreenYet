@@ -22,14 +22,6 @@ async function dispatch(path: string, init?: RequestInit<IncomingRequestCfProper
 }
 
 describe("worker routing", () => {
-    it("answers CORS preflight with 204 and the allow-origin header", async () => {
-        const res = await dispatch("/api/transfers", { method: "OPTIONS" });
-
-        expect(res.status).toBe(204);
-        expect(res.headers.has("Access-Control-Allow-Origin")).toBe(true);
-        expect(res.headers.get("Access-Control-Allow-Methods")).toContain("POST");
-    });
-
     it("returns 404 for an unknown path", async () => {
         const res = await dispatch("/api/does-not-exist");
         expect(res.status).toBe(404);
