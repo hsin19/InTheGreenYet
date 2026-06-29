@@ -40,7 +40,9 @@ export function makeSend(env: Env): Send {
     return async (url, init) => {
         const u = new URL(url);
         const upstreamHost = u.host;
-        u.protocol = "https:";
+        // Plain HTTP on :80 — the relay's nginx listens on 80, and the VPC service
+        // picks the origin port from this scheme (https would dial :443 → refused).
+        u.protocol = "http:";
         u.host = "relay";
         const headers = new Headers(init?.headers);
         headers.set("X-Upstream-Host", upstreamHost);
