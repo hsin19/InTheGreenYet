@@ -24,7 +24,7 @@ export default {
         configureNotion(env.NOTION_API_BASE_URL);
         const url = new URL(request.url);
 
-        if (url.pathname === "/auth/notion/callback") {
+        if (url.pathname === "/auth/notion/callback" && request.method === "GET") {
             return handleOAuthCallback(request, url, env);
         }
 
@@ -73,7 +73,7 @@ export default {
         }
 
         if (url.pathname === "/health") {
-            return jsonResponse({ status: "ok", service: "inthegreen-backend" }, 200);
+            return jsonResponse({ status: "ok", service: "inthegreenyet" }, 200);
         }
 
         return new Response(null, { status: 404 });

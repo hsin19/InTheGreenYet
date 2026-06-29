@@ -4,6 +4,7 @@ import {
     ClientError,
     errorResponse,
     jsonResponse,
+    parseJsonBody,
 } from "../utils";
 
 /**
@@ -13,7 +14,7 @@ import {
  */
 export async function handleBitgetBalance(request: Request, _url: URL, _env: Env): Promise<Response> {
     try {
-        const body = await request.json() as Partial<BitgetBalanceRequest>;
+        const body = await parseJsonBody<Partial<BitgetBalanceRequest>>(request);
         if (!body.apiKey || !body.apiSecret || !body.passphrase) {
             throw new ClientError("Missing apiKey/apiSecret/passphrase");
         }

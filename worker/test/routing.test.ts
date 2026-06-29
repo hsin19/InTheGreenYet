@@ -27,12 +27,17 @@ describe("worker routing", () => {
         expect(res.status).toBe(404);
     });
 
-    it("serves the public Notion client id at GET /api/public-config (no auth)", async () => {
+    it("serves only the public Notion client id at GET /api/public-config (no auth, no secret leak)", async () => {
         const res = await dispatch("/api/public-config");
         expect(res.status).toBe(200);
-        const body = await res.json() as { notionClientId?: string; };
-        // Mirrors env.NOTION_CLIENT_ID (undefined in CI when no .dev.vars is present).
+        const body = await res.json() as Record<string, unknown>;
+        // Contract: returns the configured client id and nothing else.
         expect(body.notionClientId).toBe(env.NOTION_CLIENT_ID);
+        expect(typeof body.notionClientId).toBe("string");
+        expect((body.notionClientId as string).length).toBeGreaterThan(0);
+        expect(Object.keys(body)).toEqual(["notionClientId"]);
+        // The secret must never be exposed.
+        expect(JSON.stringify(body)).not.toContain(env.NOTION_CLIENT_SECRET);
     });
 
     it("returns 404 when the method does not match a known route", async () => {

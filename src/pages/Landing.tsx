@@ -5,6 +5,7 @@ import {
     Trans,
     useLingui,
 } from "@lingui/react/macro";
+import { useState } from "react";
 import {
     Navigate,
     useSearchParams,
@@ -26,16 +27,35 @@ function Landing() {
     const [searchParams] = useSearchParams();
     const oauthError = searchParams.get("error");
     const { t } = useLingui();
+    const [busy, setBusy] = useState(false);
+    const [configError, setConfigError] = useState(false);
 
     if (auth) return <Navigate to="/" replace />;
 
+    // login() fetches the public client id from the Worker before redirecting, so
+    // it is async — drive a busy/disabled state and surface a failed fetch instead
+    // of swallowing the rejection. On success the browser navigates away.
+    const handleConnect = () => {
+        setConfigError(false);
+        setBusy(true);
+        login().catch(() => {
+            setBusy(false);
+            setConfigError(true);
+        });
+    };
+
     const errorMsg = oauthError ? OAUTH_ERROR_MESSAGES[oauthError] : null;
+    const showError = configError || oauthError;
 
     const actionBlock = (
         <div className="mt-6 flex flex-col items-center gap-4">
-            {oauthError && (
+            {showError && (
                 <p className="text-red-400 text-sm font-medium max-w-[280px] text-center">
-                    {errorMsg ? t(errorMsg) : t`Authorization failed.`}
+                    {configError
+                        ? t`Couldn't reach the server — please try again.`
+                        : errorMsg
+                        ? t(errorMsg)
+                        : t`Authorization failed.`}
                 </p>
             )}
             <div className="relative group">
@@ -44,11 +64,12 @@ function Landing() {
                     <div className="relative rounded-[10px] bg-green-700">
                         <Button
                             size="lg"
-                            onClick={login}
+                            onClick={handleConnect}
+                            disabled={busy}
                             className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
                         >
                             <NotionIcon className="w-5 h-5 mr-2" aria-hidden="true" />
-                            <Trans>Connect to Notion</Trans>
+                            {busy ? <Trans>Connecting…</Trans> : <Trans>Connect to Notion</Trans>}
                         </Button>
                     </div>
                 </div>

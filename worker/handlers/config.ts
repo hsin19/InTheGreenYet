@@ -7,6 +7,7 @@ import {
     errorResponse,
     getToken,
     jsonResponse,
+    parseJsonBody,
 } from "../utils";
 
 // Public app config — no auth, no Notion token. Exposes only the Notion OAuth
@@ -31,7 +32,7 @@ export async function handleGetConfig(request: Request, url: URL, _env: Env): Pr
 export async function handleUpdateConfig(request: Request, _env: Env): Promise<Response> {
     try {
         const token = getToken(request);
-        const body = await request.json() as { key?: string; value?: unknown; };
+        const body = await parseJsonBody<{ key?: string; value?: unknown; }>(request);
         if (!body.key || typeof body.key !== "string") {
             throw new ClientError("Missing or invalid field: key");
         }

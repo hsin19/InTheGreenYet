@@ -6,10 +6,12 @@ on:
     paths:
       - 'src/**'
       - 'worker/**'
+      - 'shared/**'
       - 'public/**'
       - 'index.html'
       - 'wrangler.jsonc'
       - 'vite.config.ts'
+      - 'tsconfig*.json'
       - 'lingui.config.ts'
       - 'pwa-assets.config.ts'
       - 'package.json'

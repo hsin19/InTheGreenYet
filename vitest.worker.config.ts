@@ -8,6 +8,14 @@ export default defineConfig({
     plugins: [
         cloudflareTest({
             wrangler: { configPath: "./wrangler.jsonc" },
+            // Deterministic secret values for the worker pool so tests assert real
+            // values (not the CI tautology where env vars are absent).
+            miniflare: {
+                bindings: {
+                    NOTION_CLIENT_ID: "test-client-id",
+                    NOTION_CLIENT_SECRET: "test-secret-shhh",
+                },
+            },
         }),
     ],
     test: {

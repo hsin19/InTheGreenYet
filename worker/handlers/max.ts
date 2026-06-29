@@ -4,6 +4,7 @@ import {
     ClientError,
     errorResponse,
     jsonResponse,
+    parseJsonBody,
 } from "../utils";
 
 /**
@@ -13,7 +14,7 @@ import {
  */
 export async function handleMaxBalance(request: Request, _url: URL, _env: Env): Promise<Response> {
     try {
-        const body = await request.json() as Partial<MaxBalanceRequest>;
+        const body = await parseJsonBody<Partial<MaxBalanceRequest>>(request);
         if (!body.apiKey || !body.apiSecret) {
             throw new ClientError("Missing apiKey/apiSecret");
         }

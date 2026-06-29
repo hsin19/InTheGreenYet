@@ -24,6 +24,16 @@ export function errorResponse(err: unknown): Response {
     return jsonResponse({ error: message }, status);
 }
 
+// Parse a JSON request body, mapping malformed JSON to a ClientError (→ 400)
+// instead of letting the raw SyntaxError fall through to a 500.
+export async function parseJsonBody<T>(request: Request): Promise<T> {
+    try {
+        return await request.json() as T;
+    } catch {
+        throw new ClientError("Invalid JSON body");
+    }
+}
+
 export function getToken(request: Request): string {
     const auth = request.headers.get("Authorization");
     if (!auth?.startsWith("Bearer ")) throw new ClientError("Missing Authorization header");

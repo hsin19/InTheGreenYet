@@ -23,8 +23,7 @@ function sentBody(spy: ReturnType<typeof vi.spyOn>): unknown {
     return JSON.parse(init.body as string);
 }
 
-// VITE_API_BASE_URL may prefix the path (empty in prod, a host in dev), so match
-// the endpoint by suffix rather than an exact URL.
+// apiFetch hits relative same-origin paths, so match the endpoint by suffix.
 function calledPath(spy: ReturnType<typeof vi.spyOn>): string {
     return (spy.mock.calls[0] as [string, RequestInit])[0];
 }

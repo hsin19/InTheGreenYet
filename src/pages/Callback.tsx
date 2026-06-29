@@ -1,5 +1,8 @@
 import { Trans } from "@lingui/react/macro";
-import { useEffect } from "react";
+import {
+    useEffect,
+    useRef,
+} from "react";
 import {
     useNavigate,
     useSearchParams,
@@ -10,10 +13,19 @@ function Callback() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { setAuthData } = useNotion();
+    // Guard against React StrictMode's double effect invocation: oauth_state is
+    // single-use, so the second run would otherwise read null and spuriously fail.
+    const handled = useRef(false);
 
     useEffect(() => {
+        if (handled.current) return;
+        handled.current = true;
+
         const fragment = new URLSearchParams(window.location.hash.slice(1));
         const accessToken = fragment.get("access_token");
+        // Scrub the token-bearing fragment from the address bar / history.
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+
         const workspaceName = searchParams.get("workspace_name");
         const workspaceId = searchParams.get("workspace_id");
         const error = searchParams.get("error");

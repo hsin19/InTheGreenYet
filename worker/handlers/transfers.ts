@@ -6,6 +6,7 @@ import {
     errorResponse,
     getToken,
     jsonResponse,
+    parseJsonBody,
 } from "../utils";
 
 export async function handleGetTransfers(request: Request, _env: Env): Promise<Response> {
@@ -22,7 +23,7 @@ export async function handleGetTransfers(request: Request, _env: Env): Promise<R
 export async function handleCreateTransfer(request: Request, _env: Env): Promise<Response> {
     try {
         const token = getToken(request);
-        const body = await request.json() as Record<string, unknown>;
+        const body = await parseJsonBody<Record<string, unknown>>(request);
         const id = await createTransfer(token, {
             title: (body.title as string) ?? "",
             amount: (body.amount as number | null) ?? null,

@@ -1,5 +1,3 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
-
 export class DataSourceNotFoundError extends Error {
     constructor() {
         super("data_source_not_found");
@@ -7,12 +5,13 @@ export class DataSourceNotFoundError extends Error {
     }
 }
 
+// Same-origin: the Worker serves the SPA and the API, so paths are relative.
 export async function apiFetch<T>(
     path: string,
     token?: string | null,
     options: RequestInit = {},
 ): Promise<T> {
-    const res = await fetch(`${API_BASE_URL}${path}`, {
+    const res = await fetch(path, {
         ...options,
         headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
