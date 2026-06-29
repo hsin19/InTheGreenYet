@@ -5,7 +5,7 @@ import {
     it,
     vi,
 } from "vitest";
-import { DataSourceNotFoundError } from "../src/utils";
+import { DataSourceNotFoundError } from "../utils";
 
 import {
     createConfigDataSource,
@@ -20,7 +20,7 @@ import {
     searchDataSource,
     updateConfig,
     waitForDataSource,
-} from "../src/notion";
+} from "../notion";
 
 type Reply = { status?: number; body?: unknown; };
 type Handler = (url: string, method: string, init?: RequestInit) => Reply | undefined;

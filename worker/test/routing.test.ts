@@ -9,7 +9,7 @@ import {
     it,
     vi,
 } from "vitest";
-import worker from "../src/index";
+import worker from "../index";
 
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 

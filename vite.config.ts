@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
@@ -14,11 +15,12 @@ export default defineConfig(({ mode }) => ({
         react({
             plugins: [["@lingui/swc-plugin", {}]],
         }),
-        // The lingui Vite plugin resolves lingui.config.ts from process.cwd(),
-        // which breaks when a runner (e.g. the VS Code Vitest extension) loads
-        // this config from the repo root. Tests don't import message catalogs,
-        // so skip it under Vitest; the SWC macro transform above still applies.
-        ...(mode === "test" ? [] : [lingui()]),
+        // cloudflare() runs the Worker (with the ASSETS binding) in dev/build on a
+        // single origin — not wanted under Vitest, which would otherwise spin up
+        // workerd. lingui() loads the .po catalogs at build time and resolves its
+        // config from process.cwd(), which breaks test runners; the SWC macro above
+        // still applies, so skip both plugins under "test".
+        ...(mode === "test" ? [] : [cloudflare(), lingui()]),
         tailwindcss(),
         imagetools(),
         VitePWA({
@@ -45,23 +47,6 @@ export default defineConfig(({ mode }) => ({
             },
         }),
     ],
-    server: {
-        proxy: {
-            // Forward /auth/* and /api/* to the CF Worker backend during dev
-            "/auth": {
-                target: "http://localhost:8787",
-                changeOrigin: true,
-                headers: {
-                    "X-Forwarded-Proto": "http",
-                    "X-Forwarded-Host": "localhost:5173",
-                },
-            },
-            "/api": {
-                target: "http://localhost:8787",
-                changeOrigin: true,
-            },
-        },
-    },
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
@@ -81,7 +66,7 @@ export default defineConfig(({ mode }) => ({
     test: {
         projects: [
             {
-                // Fast pure-logic tests in Node (lib helpers, signing clients, ...).
+                // Fast pure-logic tests in Node (lib helpers, exchange math, ...).
                 extends: true,
                 test: {
                     name: "unit",

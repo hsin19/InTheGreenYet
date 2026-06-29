@@ -1,0 +1,34 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "inthegreenyet",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-02-24",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  // Single Worker serves the SPA (static assets) AND the /api, /auth, /health
+  // routes on one origin. The @cloudflare/vite-plugin injects assets.directory
+  // from the client build output, so it is intentionally omitted here.
+  // run_worker_first MUST list every server route — anything not listed is
+  // served as a static asset / SPA-fallback to index.html (so omitting /auth
+  // would break the OAuth callback).
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*",
+      "/auth/*",
+      "/health"
+    ]
+  }
+  // Secrets (set via .dev.vars locally, `wrangler secret put` for prod):
+  // NOTION_CLIENT_ID, NOTION_CLIENT_SECRET, FRONTEND_URL
+}

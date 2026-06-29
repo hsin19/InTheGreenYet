@@ -4,8 +4,9 @@ node_modules/
 # Build
 dist/
 .wrangler/
-frontend/src/locales/**/messages.js
-frontend/src/locales/**/messages.mjs
+worker-configuration.d.ts
+src/locales/**/messages.js
+src/locales/**/messages.mjs
 
 # Environment
 .env
@@ -21,6 +22,7 @@ frontend/src/locales/**/messages.mjs
 
 # Test / coverage
 coverage/
+coverage-worker/
 *.junit.xml
 
 # Vitest browser mode artifacts (failure screenshots, attachments)
