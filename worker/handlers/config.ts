@@ -9,6 +9,13 @@ import {
     jsonResponse,
 } from "../utils";
 
+// Public app config — no auth, no Notion token. Exposes only the Notion OAuth
+// client id (a public value) so the SPA can build the authorize URL without a
+// build-time env var; the secret never leaves the Worker.
+export function handleGetPublicConfig(_request: Request, env: Env): Response {
+    return jsonResponse({ notionClientId: env.NOTION_CLIENT_ID }, 200, env.FRONTEND_URL);
+}
+
 export async function handleGetConfig(request: Request, url: URL, env: Env): Promise<Response> {
     try {
         const token = getToken(request);

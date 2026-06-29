@@ -3,6 +3,7 @@ import { handleBinanceBalance } from "./handlers/binance";
 import { handleBitgetBalance } from "./handlers/bitget";
 import {
     handleGetConfig,
+    handleGetPublicConfig,
     handleUpdateConfig,
 } from "./handlers/config";
 import { handleInit } from "./handlers/init";
@@ -32,6 +33,10 @@ export default {
 
         if (url.pathname === "/auth/notion/callback") {
             return handleOAuthCallback(request, url, env);
+        }
+
+        if (url.pathname === "/api/public-config" && request.method === "GET") {
+            return handleGetPublicConfig(request, env);
         }
 
         if (url.pathname === "/api/init" && request.method === "POST") {

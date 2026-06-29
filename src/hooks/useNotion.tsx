@@ -5,6 +5,7 @@ import {
     useContext,
     useState,
 } from "react";
+import { apiFetch } from "../lib/api";
 import { disposeWorkspaceData } from "../lib/datastore";
 
 interface NotionAuth {
@@ -15,14 +16,12 @@ interface NotionAuth {
 
 interface NotionState {
     auth: NotionAuth | null;
-    login: () => void;
+    login: () => Promise<void>;
     logout: () => void;
     setAuthData: (auth: NotionAuth) => void;
 }
 
 const STORAGE_AUTH_KEY = "notion_auth";
-
-const NOTION_CLIENT_ID = import.meta.env.VITE_NOTION_CLIENT_ID;
 
 const NotionContext = createContext<NotionState | null>(null);
 
@@ -38,12 +37,15 @@ export function NotionProvider({ children }: { children: ReactNode; }) {
         }
     });
 
-    const login = useCallback(() => {
+    const login = useCallback(async () => {
+        // The Notion client id is public but lives only in the Worker config; fetch
+        // it at click time so there is a single source of truth (no build-time env).
+        const { notionClientId } = await apiFetch<{ notionClientId: string; }>("/api/public-config");
         const apiBase = import.meta.env.VITE_API_BASE_URL || window.location.origin;
         const redirectUri = `${apiBase}/auth/notion/callback`;
         const state = crypto.randomUUID();
         sessionStorage.setItem("oauth_state", state);
-        const url = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${NOTION_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&state=${state}`;
+        const url = `https://api.notion.com/v1/oauth/authorize?owner=user&client_id=${notionClientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&state=${state}`;
         window.location.href = url;
     }, []);
 

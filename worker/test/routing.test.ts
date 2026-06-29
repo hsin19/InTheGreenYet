@@ -35,6 +35,14 @@ describe("worker routing", () => {
         expect(res.status).toBe(404);
     });
 
+    it("serves the public Notion client id at GET /api/public-config (no auth)", async () => {
+        const res = await dispatch("/api/public-config");
+        expect(res.status).toBe(200);
+        const body = await res.json() as { notionClientId?: string; };
+        // Mirrors env.NOTION_CLIENT_ID (undefined in CI when no .dev.vars is present).
+        expect(body.notionClientId).toBe(env.NOTION_CLIENT_ID);
+    });
+
     it("returns 404 when the method does not match a known route", async () => {
         // /api/transfers exists for GET and POST, but not DELETE.
         const res = await dispatch("/api/transfers", { method: "DELETE" });

@@ -73,8 +73,6 @@ jobs:
           files: test-report.junit.xml,worker-test-report.junit.xml
 
       - name: Build
-        env:
-          VITE_NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
         run: pnpm run build
 
   e2e:

@@ -30,9 +30,9 @@ One **Cloudflare Worker** serves the SPA's static assets and the `/api`, `/auth`
 # Install dependencies
 pnpm install
 
-# Copy example environment files and fill in the values
-cp -n .dev.vars.example .dev.vars   # Worker secrets (NOTION_CLIENT_ID/SECRET, FRONTEND_URL)
-cp -n .env.example .env.local       # VITE_NOTION_CLIENT_ID for the SPA
+# Copy the example config and fill in the values (one file — the SPA fetches the
+# public Notion client id from the Worker, so there is no separate client-side env)
+cp -n .dev.vars.example .dev.vars   # NOTION_CLIENT_ID/SECRET, FRONTEND_URL
 ```
 
 ### Run

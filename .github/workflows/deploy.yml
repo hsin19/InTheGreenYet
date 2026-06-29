@@ -44,8 +44,6 @@ jobs:
       # picks up. VITE_API_BASE_URL is intentionally unset → the SPA calls /api
       # on the same (Worker) origin.
       - name: Build
-        env:
-          VITE_NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
         run: pnpm run build
 
       # One deploy uploads the Worker + the client assets together (single origin).
