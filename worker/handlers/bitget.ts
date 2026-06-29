@@ -1,5 +1,6 @@
 import type { BitgetBalanceRequest } from "../../shared/model";
 import { fetchBitgetTotal } from "../bitget";
+import { makeSend } from "../relay";
 import {
     ClientError,
     errorResponse,
@@ -12,14 +13,14 @@ import {
  * relay the all-account-balance call. No Notion token needed — credential storage
  * is handled separately by the config flow.
  */
-export async function handleBitgetBalance(request: Request, _url: URL, _env: Env): Promise<Response> {
+export async function handleBitgetBalance(request: Request, _url: URL, env: Env): Promise<Response> {
     try {
         const body = await parseJsonBody<Partial<BitgetBalanceRequest>>(request);
         if (!body.apiKey || !body.apiSecret || !body.passphrase) {
             throw new ClientError("Missing apiKey/apiSecret/passphrase");
         }
 
-        const result = await fetchBitgetTotal(body.apiKey, body.apiSecret, body.passphrase);
+        const result = await fetchBitgetTotal(body.apiKey, body.apiSecret, body.passphrase, makeSend(env));
         return jsonResponse(result, 200);
     } catch (err) {
         console.error("handleBitgetBalance error:", err);

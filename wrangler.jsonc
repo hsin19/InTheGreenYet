@@ -28,6 +28,19 @@
       "/auth/*",
       "/health"
     ]
+  },
+  // Residential-IP egress relay for exchange APIs that block Cloudflare's IPs;
+  // see worker/relay.ts. service_id is from the dashboard VPC service.
+  "vpc_services": [
+    { "binding": "RELAY", "service_id": "019f136e-3f3a-7773-8b5d-dc5fdc5e8864", "remote": true }
+  ],
+  // A VPC binding can't run in `wrangler dev`, so the `dev` env drops RELAY for
+  // offline local dev (the Worker then falls back to a direct fetch). The
+  // "RELAY not on env.dev" warning is intentional.
+  "env": {
+    "dev": {
+      "vpc_services": []
+    }
   }
   // Secrets (set via .dev.vars locally, `wrangler secret put` for prod):
   // NOTION_CLIENT_ID, NOTION_CLIENT_SECRET
