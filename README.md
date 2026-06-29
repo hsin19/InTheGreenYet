@@ -7,11 +7,11 @@ A personal investment tracking app powered by [Notion](https://www.notion.so/) a
 ## Architecture
 
 ```
-frontend/   → React + TypeScript + Tailwind (Vite)
-backend/     → Cloudflare Worker (OAuth + Notion API)
+src/      → React 19 + TypeScript + Tailwind SPA (Vite)
+worker/   → Cloudflare Worker (OAuth + Notion API + provider proxies)
 ```
 
-The **backend** worker handles all Notion API interactions (OAuth, database setup, schema management) so the frontend stays a thin client. The two can be deployed on the same or different domains.
+One **Cloudflare Worker** serves the SPA's static assets and the `/api`, `/auth` routes on a single origin — the client and the Worker are built together by [`@cloudflare/vite-plugin`](https://developers.cloudflare.com/workers/vite-plugin/) using Workers Static Assets. The Worker handles all Notion API interactions (OAuth, database setup, schema management) and signs provider balance requests, so the SPA stays a thin client that calls `/api` relative — no CORS, no separate API host.
 
 ## Getting Started
 
@@ -27,31 +27,28 @@ The **backend** worker handles all Notion API interactions (OAuth, database setu
 ### Setup
 
 ```bash
-# Install dependencies for both frontend and backend
+# Install dependencies
 pnpm install
 
-# Copy example environment variables and fill in the values
-cp -n backend/.dev.vars.example backend/.dev.vars
-cp -n frontend/.env.example frontend/.env.local
+# Copy example environment files and fill in the values
+cp -n .dev.vars.example .dev.vars   # Worker secrets (NOTION_CLIENT_ID/SECRET, FRONTEND_URL)
+cp -n .env.example .env.local       # VITE_NOTION_CLIENT_ID for the SPA
 ```
 
 ### Run
 
 ```bash
-# Run both frontend and backend
 pnpm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) and click **Connect to Notion** to start.
-
-> In dev, Vite proxies `/auth/*` and `/api/*` to the Worker automatically. No extra configuration needed.
+`vite` runs the SPA **and** the Worker together on one origin with HMR. Open
+[http://localhost:5173](http://localhost:5173) and click **Connect to Notion** to
+start. The SPA calls `/api` and `/auth` on the same origin — no proxy needed.
 
 ## Deployment
 
-Deployments are handled via GitHub Actions:
-
-- **Frontend** → Cloudflare Pages (`frontend.yml`)
-- **Backend** → Cloudflare Workers (`backend.yml`)
+A single Cloudflare Worker (SPA assets + API) is deployed via GitHub Actions
+(`deploy.yml`): `pnpm run build` then `wrangler deploy`.
 
 ### 1. Cloudflare Setup
 
@@ -59,7 +56,7 @@ Deployments are handled via GitHub Actions:
 2. Go to the [Workers & Pages dashboard](https://dash.cloudflare.com/?to=/:account/workers-and-pages) and note down your **Account ID** and **Workers Subdomain** (found in the right sidebar under **Account Details**)
 3. Create an **API Token**:
    - Go to **My Profile > API Tokens > Create Token**
-   - Use the **Edit Cloudflare Workers** template (or create a custom token with `Workers Scripts:Edit`, `Pages:Edit`, `Account Settings:Read` permissions)
+   - Use the **Edit Cloudflare Workers** template (or a custom token with `Workers Scripts:Edit`, `Account Settings:Read`)
    - Copy the generated token
 
 ### 2. Notion Integration (Production)
@@ -68,7 +65,7 @@ Deployments are handled via GitHub Actions:
 
 1. Go to [notion.so/profile/integrations/public](https://www.notion.so/profile/integrations/public)
 2. Create a new **Public** integration for production
-3. Set **Redirect URI** to your Worker URL:
+3. Set **Redirect URI** to your Worker URL (the SPA is served from the same origin):
    `https://inthegreenyet.<your-workers-subdomain>.workers.dev/auth/notion/callback`
 4. Copy the **Client ID** and **Client Secret**
 
@@ -85,19 +82,18 @@ Add these in your repo's **Settings > Secrets and variables > Actions**:
 
 #### Repository Variables (Non-sensitive)
 
-| Variable                       | Description                                          |
-| ------------------------------ | ---------------------------------------------------- |
-| `CLOUDFLARE_ACCOUNT_ID`        | Your Cloudflare account ID                           |
-| `CLOUDFLARE_PAGE_NAME`         | Cloudflare Pages project name (e.g. `inthegreenyet`) |
-| `CLOUDFLARE_WORKERS_SUBDOMAIN` | Your Cloudflare Workers subdomain (e.g. `hsin19`)    |
-| `NOTION_CLIENT_ID`             | Notion integration client ID (production)            |
+| Variable                       | Description                                       |
+| ------------------------------ | ------------------------------------------------- |
+| `CLOUDFLARE_ACCOUNT_ID`        | Your Cloudflare account ID                        |
+| `CLOUDFLARE_WORKERS_SUBDOMAIN` | Your Cloudflare Workers subdomain (e.g. `hsin19`) |
+| `NOTION_CLIENT_ID`             | Notion integration client ID (production)         |
 
-Once configured, pushing to `main` will automatically deploy the affected services.
+Once configured, pushing to `main` automatically deploys the Worker.
 
 ## Tech Stack
 
 - **Frontend**: React 19, TypeScript, Tailwind CSS v4, Vite
-- **Backend**: Cloudflare Workers
+- **Backend**: Cloudflare Workers + Static Assets (`@cloudflare/vite-plugin`)
 - **Database**: Notion API (v2025-09-03)
 - **Auth**: Notion OAuth 2.0
 - **CI/CD**: GitHub Actions

@@ -44,8 +44,8 @@ piece rather than forcing them into a template's mold. The boilerplate around th
 
 | Template                 | Credentials                   | Signing                                     |
 | ------------------------ | ----------------------------- | ------------------------------------------- |
-| `backend/src/binance.ts` | key + secret                  | HMAC-SHA256 of the query string, **hex**    |
-| `backend/src/bitget.ts`  | key + secret + **passphrase** | HMAC-SHA256 of `ts+method+path`, **base64** |
+| `worker/binance.ts` | key + secret                  | HMAC-SHA256 of the query string, **hex**    |
+| `worker/bitget.ts`  | key + secret + **passphrase** | HMAC-SHA256 of `ts+method+path`, **base64** |
 
 **Encoding is two independent axes, not one toggle:** how the signed string is built
 _and_ how the digest is encoded vary separately. MAX is a third combo — it signs a
@@ -53,7 +53,7 @@ _and_ how the digest is encoded vary separately. MAX is a third combo — it sig
 Don't classify a provider as "base64" or "hex"; confirm each axis on its own.
 
 The frontend is fully declarative: adding a provider there is mostly **one entry**
-in `frontend/src/pages/accounts/components/apiProviders.ts`.
+in `src/pages/accounts/components/apiProviders.ts`.
 
 ## Step 0 — Research the provider API first (the part that varies)
 
@@ -92,29 +92,29 @@ Worker runs on Cloudflare's rotating IPs, so a fixed allowlist blocks it).
 
 ## Backend (mirror the closer template)
 
-1. **`backend/src/<provider>.ts`** — `fetch<Provider>Total(...creds): Promise<ProviderBalance>`.
+1. **`worker/<provider>.ts`** — `fetch<Provider>Total(...creds): Promise<ProviderBalance>`.
    - Sign with `crypto.subtle` (Web Crypto is in the Workers runtime — do **not**
      import Node `crypto`). For base64 use `btoa(String.fromCharCode(...new Uint8Array(sig)))`.
    - Parse the response, sum the wallet values, return `{ total, currency, fetchedAt }`.
    - On failure throw `ClientError` (from `./utils`) with a message the user can act
      on — distinguish bad-credential errors from IP/permission errors when the API
      gives you a code for it.
-2. **`backend/src/handlers/<provider>.ts`** — validate that every required
+2. **`worker/handlers/<provider>.ts`** — validate that every required
    credential is present (throw `ClientError` if not), call the signer, return
    `jsonResponse` / `errorResponse`. No Notion token. Copy `handlers/bitget.ts`.
-3. **`backend/src/index.ts`** — add `POST /api/<provider>/balance` next to the
+3. **`worker/index.ts`** — add `POST /api/<provider>/balance` next to the
    existing provider routes.
-4. **`backend/src/model.ts`** — add `<Provider>BalanceRequest` (the credential
+4. **`worker/model.ts`** — add `<Provider>BalanceRequest` (the credential
    fields). Reuse `ProviderBalance` for the response.
 
 ## Frontend
 
-1. **`frontend/src/lib/model.ts`** — mirror the new `<Provider>BalanceRequest`
+1. **`src/lib/model.ts`** — mirror the new `<Provider>BalanceRequest`
    (keep frontend/backend models in sync; `ProviderBalance` is already shared).
-2. **`frontend/src/lib/<provider>.ts`** — `fetch<Provider>Balance(...creds)` →
+2. **`src/lib/<provider>.ts`** — `fetch<Provider>Balance(...creds)` →
    `apiFetch<ProviderBalance>("/api/<provider>/balance", null, { method: "POST", body })`.
    Copy `lib/bitget.ts`.
-3. **`frontend/src/pages/accounts/components/apiProviders.ts`** — add one entry:
+3. **`src/pages/accounts/components/apiProviders.ts`** — add one entry:
    ```ts
    <provider>: {
        label: "<Label>",
@@ -149,7 +149,7 @@ Worker runs on Cloudflare's rotating IPs, so a fixed allowlist blocks it).
 a token, an account-mode select…):
 
 - add the optional `api…`-prefixed field to `AccountConfig` in
-  `frontend/src/hooks/useAppData.tsx` — the `api` prefix makes it auto-join
+  `src/hooks/useAppData.tsx` — the `api` prefix makes it auto-join
   `CredentialFieldName`, no union to hand-edit,
 - add a `CredentialField` (secret) or `SelectField` (dropdown) constant in `apiProviders.ts`,
 - reference it in the provider's `fields` and `fetchBalance`.
@@ -162,12 +162,12 @@ Run commands from the repo root.
 
 Required:
 
-- `pnpm run check` — format, lint, test, and build across workspaces. Backend
+- `pnpm run check` — format, lint, test, and build for the whole project. Backend
   build regenerates Worker types before typechecking; eslint is not type-aware.
 
 If touching the backend signer or handler:
 
-- Smoke test without real keys: start the worker with `pnpm run dev:backend`, then
+- Smoke test without real keys: start the worker with `pnpm run dev`, then
   `POST /api/<provider>/balance` with dummy credentials. Expect the request to reach
   the provider and come back as a friendly credential error — that proves the signing
   path runs end to end. A missing-field body should return the validation error.
@@ -201,7 +201,7 @@ Manual final check:
   to value holdings, verify the call actually returns everything: MAX's `/api/v3/tickers`
   rejects a param-less call (`markets is missing`), while v2 `/api/v2/tickers` returns
   every market in one shot. Pick the version that does what you need.
-- **`erasableSyntaxOnly`** is on in the frontend tsconfig: no `enum`, `namespace`,
+- **`erasableSyntaxOnly`** is on in tsconfig.app.json: no `enum`, `namespace`,
   or constructor parameter properties. Use plain field declarations / unions.
 - **`<provider.guide />`** (dot notation) is a valid JSX component reference, so the
   guide can live in the descriptor without a per-provider ternary.

@@ -17,11 +17,11 @@ flag_management:
   individual_flags:
     - name: frontend
       paths:
-        - frontend/src
+        - src
       carryforward: true
     - name: backend
       paths:
-        - backend/src
+        - worker
       carryforward: true
 
 comment:
