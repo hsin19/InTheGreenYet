@@ -1,6 +1,6 @@
-# Monorepo with path-filtered CI: a frontend-only PR never runs backend tests
-# (and vice versa), so each flag carries its last known coverage forward when a
-# given commit doesn't upload it. Without this, the absent side reads as 0%.
+# CI runs both the SPA and Worker test suites on every PR in one job, uploading the
+# `frontend` (coverage/) and `backend` (coverage-worker/) flags each time.
+# carryforward is kept only as a safety net should an upload step ever fail.
 coverage:
   status:
     project:
@@ -17,11 +17,11 @@ flag_management:
   individual_flags:
     - name: frontend
       paths:
-        - frontend/src
+        - src
       carryforward: true
     - name: backend
       paths:
-        - backend/src
+        - worker
       carryforward: true
 
 comment:

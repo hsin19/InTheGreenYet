@@ -30,6 +30,18 @@ for (const path of ["/accounts", "/transfers", "/config"]) {
     });
 }
 
+// Exercises the single-origin routing layer that worker.fetch() unit tests can't
+// reach: run_worker_first sends /api/* to the Worker (404 returned verbatim, not
+// rewritten), while unknown client routes fall back to index.html for the SPA.
+test("single-origin routing: unknown /api hits the Worker 404, unknown client route serves the SPA", async ({ page }) => {
+    const api = await page.request.get("/api/does-not-exist");
+    expect(api.status()).toBe(404);
+
+    const client = await page.request.get("/accounts/does-not-exist");
+    expect(client.status()).toBe(200);
+    expect(client.headers()["content-type"]).toContain("text/html");
+});
+
 test("accounts data loads through the Worker → Notion path", async ({ authedPage }) => {
     await authedPage.goto("/accounts");
 

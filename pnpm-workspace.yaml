@@ -1,11 +1,11 @@
-packages:
-  - 'frontend'
-  - 'backend'
-
+# Single-package repo (no `packages:` list). This file only carries pnpm
+# settings — notably which dependencies are allowed to run install scripts.
 allowBuilds:
   '@swc/core': false
   dprint: true
   esbuild: false
+  # Transitive (via @vitest/mocker → @vitest/browser); its build script isn't
+  # needed here. Listed so pnpm doesn't fail with ERR_PNPM_IGNORED_BUILDS.
   msw: false
   sharp: false
   simple-git-hooks: true

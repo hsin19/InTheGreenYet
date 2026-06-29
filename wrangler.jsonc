@@ -1,0 +1,47 @@
+/**
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "inthegreenyet",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-02-24",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "upload_source_maps": true,
+  // Single Worker serves the SPA (static assets) AND the /api, /auth, /health
+  // routes on one origin. The @cloudflare/vite-plugin injects assets.directory
+  // from the client build output, so it is intentionally omitted here.
+  // run_worker_first MUST list every server route — anything not listed is
+  // served as a static asset / SPA-fallback to index.html (so omitting /auth
+  // would break the OAuth callback).
+  "assets": {
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": [
+      "/api/*",
+      "/auth/*",
+      "/health"
+    ]
+  },
+  // Residential-IP egress relay for exchange APIs that block Cloudflare's IPs;
+  // see worker/relay.ts. service_id is from the dashboard VPC service.
+  "vpc_services": [
+    { "binding": "RELAY", "service_id": "019f136e-3f3a-7773-8b5d-dc5fdc5e8864", "remote": true }
+  ],
+  // A VPC binding can't run in `wrangler dev`, so the `dev` env drops RELAY for
+  // offline local dev (the Worker then falls back to a direct fetch). The
+  // "RELAY not on env.dev" warning is intentional.
+  "env": {
+    "dev": {
+      "vpc_services": []
+    }
+  }
+  // Secrets (set via .dev.vars locally, `wrangler secret put` for prod):
+  // NOTION_CLIENT_ID, NOTION_CLIENT_SECRET
+}

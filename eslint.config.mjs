@@ -14,13 +14,14 @@ export default defineConfig([
         "node_modules",
         ".wrangler",
         "**/coverage",
+        "coverage-worker",
         "**/worker-configuration.d.ts",
-        "frontend/src/locales/**/messages.js",
-        "frontend/src/locales/**/messages.mjs",
+        "src/locales/**/messages.js",
+        "src/locales/**/messages.mjs",
     ]),
     {
-        // Frontend specific configuration
-        files: ["frontend/**/*.{ts,tsx}"],
+        // Frontend (React SPA) specific configuration
+        files: ["src/**/*.{ts,tsx}"],
         extends: [
             js.configs.recommended,
             tseslint.configs.recommended,
@@ -40,8 +41,8 @@ export default defineConfig([
         },
     },
     {
-        // Backend (Cloudflare Worker) specific configuration
-        files: ["backend/**/*.ts"],
+        // Backend (Cloudflare Worker) + shared contract types
+        files: ["worker/**/*.ts", "shared/**/*.ts"],
         extends: [
             js.configs.recommended,
             tseslint.configs.recommended,

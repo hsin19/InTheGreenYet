@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  frontend:
-    name: Frontend
+  checks:
+    name: Checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -30,7 +30,10 @@ jobs:
         run: pnpm run format:check
 
       - name: Lint
-        run: pnpm --filter @inthegreenyet/frontend lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
 
       - name: Cache Playwright browsers
         uses: actions/cache@v6
@@ -39,105 +42,38 @@ jobs:
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright Chromium
-        run: pnpm --filter @inthegreenyet/frontend exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium
 
+      # Runs both suites: the SPA (node + Chromium browser) and the Worker pool.
       - name: Test
-        run: pnpm --filter @inthegreenyet/frontend test:ci
+        run: pnpm run test:ci
+
+      - name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: coverage
+          flags: frontend
+          fail_ci_if_error: false
+
+      - name: Upload worker coverage to Codecov
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: coverage-worker
+          flags: backend
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v7
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          report_type: test_results
+          files: test-report.junit.xml,worker-test-report.junit.xml
 
       - name: Build
-        env:
-          VITE_NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
-          VITE_API_BASE_URL: https://inthegreenyet.${{ vars.CLOUDFLARE_WORKERS_SUBDOMAIN }}.workers.dev
-        run: pnpm --filter @inthegreenyet/frontend build
-
-      - name: Smoke (vite preview + headless render)
-        run: |
-          pnpm --filter @inthegreenyet/frontend preview --port 4173 --strictPort --host 127.0.0.1 > /tmp/vite.log 2>&1 &
-          PID=$!
-
-          for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:4173 >/dev/null 2>&1; then
-              echo "Preview ready after ${i}s"
-              break
-            fi
-            sleep 1
-          done
-
-          google-chrome --headless --dump-dom --virtual-time-budget=5000 \
-            --disable-gpu --no-sandbox \
-            http://127.0.0.1:4173 > /tmp/rendered.html 2> /tmp/chrome.log
-
-          grep -q 'Connect to Notion' /tmp/rendered.html
-          kill $PID || true
-
-      - name: Dump logs on failure
-        if: failure()
-        run: |
-          echo "=== vite.log ==="
-          cat /tmp/vite.log 2>/dev/null || echo "(no vite log)"
-          echo "=== chrome.log ==="
-          cat /tmp/chrome.log 2>/dev/null || echo "(no chrome log)"
-          echo "=== rendered.html (first 2KB) ==="
-          head -c 2048 /tmp/rendered.html 2>/dev/null || echo "(no rendered dump)"
-
-  backend:
-    name: Backend
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version-file: '.node-version'
-          cache: 'pnpm'
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm --filter @inthegreenyet/backend lint
-
-      - name: Typecheck
-        run: pnpm --filter @inthegreenyet/backend typecheck
-
-      - name: Test
-        run: pnpm --filter @inthegreenyet/backend test:ci
-
-      - name: Build Check (Dry Run)
-        working-directory: backend
-        run: pnpm exec wrangler deploy --dry-run
-
-      - name: Smoke (wrangler dev /health)
-        run: |
-          cat > backend/.dev.vars <<EOF
-          NOTION_CLIENT_ID=dummy
-          NOTION_CLIENT_SECRET=dummy
-          FRONTEND_URL=http://127.0.0.1:4173
-          EOF
-
-          pnpm --filter @inthegreenyet/backend dev -- --port 8787 --ip 127.0.0.1 > /tmp/wrangler.log 2>&1 &
-          PID=$!
-
-          for i in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:8787/health >/dev/null 2>&1; then
-              echo "Worker ready after ${i}s"
-              break
-            fi
-            sleep 1
-          done
-
-          echo "--- /health ---"
-          curl -fsS http://127.0.0.1:8787/health
-          echo
-          curl -fsS http://127.0.0.1:8787/health | grep -q '"status":"ok"'
-          kill $PID || true
-          rm -f backend/.dev.vars
-
-      - name: Dump wrangler log on failure
-        if: failure()
-        run: |
-          echo "=== wrangler.log ==="
-          cat /tmp/wrangler.log 2>/dev/null || echo "(no wrangler log)"
+        run: pnpm run build
 
   e2e:
     name: E2E Smoke
@@ -190,7 +126,7 @@ jobs:
 
   auto-merge:
     name: Auto-merge Dependabot
-    needs: [frontend, backend, e2e, dependency-review]
+    needs: [checks, e2e, dependency-review]
     if: ${{ success() && github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions: {}
@@ -203,7 +139,7 @@ jobs:
 
   jules-fix:
     name: Jules fix on failure
-    needs: [frontend, backend, e2e, dependency-review]
+    needs: [checks, e2e, dependency-review]
     if: ${{ failure() && github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions:
@@ -219,14 +155,14 @@ jobs:
           prompt: |
             A Dependabot dependency update on branch `${{ github.head_ref }}` is failing the PR checks (${{ github.event.pull_request.html_url }}).
 
-            This is a pnpm workspace monorepo. Please review `AGENTS.md` for the full tech stack context (Frontend/Backend). Always run commands from the repo root.
+            This is a single-package pnpm project: a Vite + React 19 SPA in `src/` plus a Cloudflare Worker in `worker/`, built with `@cloudflare/vite-plugin` and deployed as ONE Worker that serves the SPA static assets and the `/api`, `/auth` routes on a single origin. Review `AGENTS.md` for the full tech stack context. Run all commands from the repo root.
 
             Please:
-            1. Run `pnpm install --frozen-lockfile`, then `pnpm run check` (format, lint, real typecheck, tests) to reproduce the failure.
-            2. Make the change needed to make `pnpm run check` pass, scoped to the dependency update. Editing `package.json` and `pnpm-lock.yaml` to align dependency versions IS the expected fix and is explicitly IN SCOPE — including dev/test dependencies and transitive peers (e.g. vitest, lingui). This is NOT "unrelated code". "Unrelated code" / "do not touch" refers to application source logic and runtime behavior — do NOT change those.
+            1. Run `pnpm install --frozen-lockfile`, then `pnpm run check` (format, lint, real typecheck, tests, build) to reproduce the failure.
+            2. Make the change needed to make `pnpm run check` pass, scoped to the dependency update. Editing `package.json` and `pnpm-lock.yaml` to align dependency versions IS the expected fix and is explicitly IN SCOPE — including dev/test dependencies and transitive peers (e.g. vitest, lingui, wrangler, @cloudflare/vite-plugin). This is NOT "unrelated code". "Unrelated code" / "do not touch" refers to application source logic and runtime behavior — do NOT change those.
             3. Common causes, all in scope to fix:
                - A package bumped without its peers — e.g. `@lingui/react` updated but `@lingui/core` / `@lingui/cli` / `@lingui/swc-plugin` / `@lingui/vite-plugin` left behind, producing a type mismatch. Bump the peers to the matching version.
-               - A workspace version skew in `pnpm-lock.yaml` — e.g. `vitest` resolving to both 4.1.8 and 4.1.9 across packages, producing a type mismatch. Align the versions (bump in `package.json` and/or `pnpm dedupe`) so a single version resolves.
+               - A version skew in `pnpm-lock.yaml` — e.g. `vitest` resolving to two versions, or `wrangler` not satisfying the `@cloudflare/vite-plugin` peer range. Align the versions (bump in `package.json` and/or `pnpm dedupe`) so a single version resolves.
                In all cases, run `pnpm install` (without `--frozen-lockfile`) to update `pnpm-lock.yaml` to match.
             4. Source-code edits ARE in scope when a dependency changed its API and call sites must be adapted to keep the SAME behavior — e.g. a renamed export, changed function signature, or moved import path. That mechanical, behavior-preserving migration is expected. What stays OUT of scope: changing what the app does, refactoring beyond the migration, or guessing at intent. If the migration is non-trivial/ambiguous, or you would be guessing, do NOT force it — leave a PR comment describing what is blocking instead.
             5. Before opening the PR, run `pnpm run check` once more and confirm it passes. You start from branch `${{ github.head_ref }}` (the Dependabot branch), so your work already includes the dependency bump plus your fix. Open a pull request with that combined change. Give it a clear title and a description that states the root cause of the failure and what you changed to fix it, and link the original Dependabot PR (${{ github.event.pull_request.html_url }}).

@@ -1,0 +1,10 @@
+# Notion OAuth — get from https://www.notion.so/profile/integrations
+# NOTION_CLIENT_ID is public: the SPA fetches it from GET /api/public-config to
+# build the authorize URL, so it lives only here (no separate client-side .env).
+# NOTION_CLIENT_SECRET must stay server-side — never expose it to the browser.
+NOTION_CLIENT_ID=your-client-id-here
+NOTION_CLIENT_SECRET=your-client-secret-here
+
+# Optional: override the Notion API base URL (e2e points this at a local mock).
+# Leave unset for normal dev/prod so the SDK uses https://api.notion.com.
+# NOTION_API_BASE_URL=http://localhost:8888

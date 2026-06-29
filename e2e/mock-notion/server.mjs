@@ -4,7 +4,7 @@
 // full browser → Worker → Notion path is exercised without touching real Notion
 // or needing any secret. Responses are structurally valid but intentionally
 // minimal: enough that the Worker's notion.ts helpers don't throw and the SPA
-// renders empty states. Response shapes mirror backend/test/notion.test.ts.
+// renders empty states. Response shapes mirror worker/test/notion.test.ts.
 //
 // Run: node e2e/mock-notion/server.mjs   (PORT env overrides the default 8888)
 
