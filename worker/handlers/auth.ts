@@ -34,7 +34,7 @@ export async function handleOAuthCallback(request: Request, url: URL, env: Env):
 
         return Response.redirect(callbackUrl.toString(), 302);
     } catch (err) {
-        console.error("handleOAuthCallback error", err);
+        console.error("handleOAuthCallback error:", err);
         const target = new URL("/landing", url.origin);
         target.searchParams.set("error", "token_exchange_failed");
         return Response.redirect(target.toString(), 302);

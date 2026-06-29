@@ -24,7 +24,7 @@ export async function handleGetConfig(request: Request, url: URL, _env: Env): Pr
         const rows = await queryConfig(token, key);
         return jsonResponse({ config: rows }, 200);
     } catch (err) {
-        console.error("handleGetConfig error", err);
+        console.error("handleGetConfig error:", err);
         return errorResponse(err);
     }
 }
@@ -42,7 +42,7 @@ export async function handleUpdateConfig(request: Request, _env: Env): Promise<R
         await updateConfig(token, body.key, body.value);
         return jsonResponse({ ok: true }, 200);
     } catch (err) {
-        console.error("handleUpdateConfig error", err);
+        console.error("handleUpdateConfig error:", err);
         return errorResponse(err);
     }
 }

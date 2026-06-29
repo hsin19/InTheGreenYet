@@ -46,18 +46,20 @@ describe("worker routing", () => {
         expect(res.status).toBe(404);
     });
 
-    it("routes POST /api/binance/balance to its handler and validates input", async () => {
-        // Missing credentials short-circuit before any outbound call, so this
-        // exercises the route + handler without hitting Binance.
-        vi.spyOn(console, "error").mockImplementation(() => {});
-        const res = await dispatch("/api/binance/balance", {
-            method: "POST",
-            body: JSON.stringify({}),
-        });
+    // Missing credentials short-circuit before any outbound call, so this pins the
+    // route + method guard + handler validation for every provider without network.
+    for (const provider of ["binance", "bitget", "max"]) {
+        it(`routes POST /api/${provider}/balance to its handler and validates input`, async () => {
+            vi.spyOn(console, "error").mockImplementation(() => {});
+            const res = await dispatch(`/api/${provider}/balance`, {
+                method: "POST",
+                body: JSON.stringify({}),
+            });
 
-        expect(res.status).toBe(400);
-        const body = await res.json() as { error: string; };
-        expect(body.error).toMatch(/Missing apiKey/);
-        vi.restoreAllMocks();
-    });
+            expect(res.status).toBe(400);
+            const body = await res.json() as { error: string; };
+            expect(body.error).toMatch(/Missing apiKey/);
+            vi.restoreAllMocks();
+        });
+    }
 });

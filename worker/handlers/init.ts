@@ -42,7 +42,7 @@ export async function handleInit(request: Request, _env: Env): Promise<Response>
 
         return jsonResponse({ ok: true }, 200);
     } catch (err) {
-        console.error("handleInit error", err);
+        console.error("handleInit error:", err);
         return errorResponse(err);
     }
 }

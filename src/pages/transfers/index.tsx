@@ -151,11 +151,11 @@ function Transfers() {
             {status === "ready" && filteredTransfers.length > 0 && (
                 <ul className="flex flex-col gap-3">
                     {filteredTransfers.map(transfer => {
+                        const isBaseCurrency = (transfer.currency ?? "").toUpperCase() === config.baseCurrency.toUpperCase();
                         const baseCost = (() => {
                             const amount = transfer.amount ?? 0;
                             const fee = transfer.fee ?? 0;
-                            const base = config.baseCurrency.toUpperCase();
-                            if (transfer.currency === base) return amount + fee;
+                            if (isBaseCurrency) return amount + fee;
                             if (transfer.exchangeRate != null) return (amount + fee) * transfer.exchangeRate;
 
                             const liveRate = getFiatToBaseRate(transfer.currency ?? "");
@@ -228,7 +228,7 @@ function Transfers() {
                                                         </span>
                                                     </span>
                                                 )}
-                                                {effectiveRate != null && transfer.currency !== config.baseCurrency && (
+                                                {effectiveRate != null && !isBaseCurrency && (
                                                     <span className="flex items-center gap-1 text-xs">
                                                         <span className="text-white/30">
                                                             <Trans>Eff. Rate</Trans>
@@ -239,7 +239,7 @@ function Transfers() {
                                                     </span>
                                                 )}
                                             </div>
-                                            {baseCost != null && transfer.currency !== config.baseCurrency && (
+                                            {baseCost != null && !isBaseCurrency && (
                                                 <span className="flex items-baseline gap-1">
                                                     <span className="text-white/30 text-xs">≈</span>
                                                     <span className="text-white font-semibold tabular-nums">

@@ -48,6 +48,16 @@ jobs:
       - name: Build
         run: pnpm run build
 
+      # Refuse to push an empty NOTION_CLIENT_ID: an empty GitHub var would silently
+      # overwrite the live Worker secret and break login (the SPA fetches it from
+      # /api/public-config to build the OAuth authorize URL).
+      - name: Verify required vars
+        run: |
+          if [ -z "${{ vars.NOTION_CLIENT_ID }}" ]; then
+            echo "::error::vars.NOTION_CLIENT_ID is empty — refusing to overwrite the Worker secret"
+            exit 1
+          fi
+
       # One deploy uploads the Worker + the client assets together (single origin).
       # wrangler-action `secrets:` works for Workers (it would NOT for Pages).
       - name: Deploy to Cloudflare Workers
