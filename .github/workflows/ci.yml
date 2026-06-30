@@ -1,15 +1,17 @@
-name: PR
+name: CI
 
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 permissions:
   contents: read
 
 concurrency:
-  group: pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   checks:
@@ -47,7 +49,6 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      # Runs both suites: the SPA (node + Chromium browser) and the Worker pool.
       - name: Test
         run: pnpm run test:ci
 
@@ -79,7 +80,7 @@ jobs:
         run: pnpm run build
 
   e2e:
-    name: E2E Smoke
+    name: E2E
     runs-on: ubuntu-latest
     env:
       WRANGLER_SEND_METRICS: 'false'
@@ -103,7 +104,7 @@ jobs:
       - name: Install Playwright Chromium
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Run E2E smoke (browser → Worker → mock Notion)
+      - name: Run E2E tests
         run: pnpm run test:e2e
 
       - name: Upload Playwright report
@@ -116,8 +117,60 @@ jobs:
             e2e/test-results
           retention-days: 7
 
+  deploy:
+    name: Deploy
+    needs: [checks, e2e]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Verify required vars
+        run: |
+          if [ -z "${{ vars.NOTION_CLIENT_ID }}" ]; then
+            echo "::error::vars.NOTION_CLIENT_ID is empty — refusing to overwrite the Worker secret"
+            exit 1
+          fi
+
+      - name: Deploy to Cloudflare Workers
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
+          command: deploy
+          secrets: |
+            NOTION_CLIENT_ID
+            NOTION_CLIENT_SECRET
+        env:
+          NOTION_CLIENT_ID: ${{ vars.NOTION_CLIENT_ID }}
+          NOTION_CLIENT_SECRET: ${{ secrets.NOTION_CLIENT_SECRET }}
+
+      - name: Smoke check deployed Worker
+        run: |
+          url="${{ steps.deploy.outputs.deployment-url }}"
+          if [ -z "$url" ]; then
+            echo "::warning::No deployment URL returned — skipping health smoke check"
+            exit 0
+          fi
+          echo "Probing $url/health"
+          curl -fsS --retry 5 --retry-all-errors --retry-delay 3 "$url/health" | grep -q '"status":"ok"'
+
   dependency-review:
     name: Dependency Review
+    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

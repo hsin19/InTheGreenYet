@@ -48,7 +48,7 @@ start. The SPA calls `/api` and `/auth` on the same origin — no proxy needed.
 ## Deployment
 
 A single Cloudflare Worker (SPA assets + API) is deployed via GitHub Actions
-(`deploy.yml`): `pnpm run build` then `wrangler deploy`.
+(`ci.yml`, on push to `main`): `pnpm run build` then `wrangler deploy`.
 
 ### 1. Cloudflare Setup
 

@@ -11,7 +11,7 @@ Personal investment tracker. A React 19 SPA and a Cloudflare Worker ship as **on
 - **Persistence path** — reads and writes go through `DataStore` (`src/lib/datastore.ts`) via `useAppData`: `client + Notion token → Worker → Notion`. Reads are cached in IndexedDB and revalidated in the background (SWR).
 - **Provider path** — live provider calls are separate from persistence: first read the provider secret from Notion config, then `client + that secret → Worker → provider` (no Notion token involved for the provider request itself).
 - **Backend seam** — Notion is today's backend, not a hard dependency. `DataStore` is the swappable seam, so the app can later run IDB-only or point at a different remote.
-- **Deploy** — one Cloudflare Worker (SPA assets + API) via GitHub Actions (`deploy.yml`): `pnpm run build` (the vite-plugin emits the client build + Worker bundle + a `.wrangler/deploy` redirect config) then `wrangler deploy`. `wrangler` is also used for local dev, secrets, and debugging.
+- **Deploy** — one Cloudflare Worker (SPA assets + API) via GitHub Actions (`ci.yml`, deploy job on push to `main`): `pnpm run build` (the vite-plugin emits the client build + Worker bundle + a `.wrangler/deploy` redirect config) then `wrangler deploy`. `wrangler` is also used for local dev, secrets, and debugging.
 
 ## Where to Start
 
