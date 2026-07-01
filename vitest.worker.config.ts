@@ -5,6 +5,12 @@ import { defineConfig } from "vitest/config";
 // Kept separate from vite.config.ts (the SPA dev/build + browser/node test
 // config) so the workerd pool never mixes with the browser provider.
 export default defineConfig({
+    // Separate config from vite.config.ts, so redeclare these or the globals are
+    // undefined and /health throws in the workerd pool.
+    define: {
+        __APP_VERSION__: JSON.stringify("test"),
+        __BUILD_TIME__: JSON.stringify("1970-01-01T00:00:00.000Z"),
+    },
     plugins: [
         cloudflareTest({
             // Use the `dev` environment so the test worker omits the VPC binding.

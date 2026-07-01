@@ -9,6 +9,7 @@ import {
     Route,
     Routes,
 } from "react-router-dom";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 import { NotionProvider } from "./hooks/useNotion";
 import AppLayout from "./layouts/AppLayout";
 
@@ -48,6 +49,7 @@ function App() {
                     </Routes>
                 </Suspense>
             </BrowserRouter>
+            <UpdatePrompt />
         </NotionProvider>
     );
 }

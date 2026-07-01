@@ -473,6 +473,10 @@ msgstr "新增帳戶"
 msgid "New Transfer"
 msgstr "新增交易"
 
+#: src/components/UpdatePrompt.tsx
+msgid "New version available ({buildDate})"
+msgstr "有新版本可用（{buildDate}）"
+
 #: src/pages/accounts/index.tsx
 msgid "No accounts yet."
 msgstr "目前沒有帳戶。"
@@ -710,6 +714,14 @@ msgstr "交易記錄"
 msgid "Under <0>Scope Settings</0>, check the <1>Read</1> boxes (the balance comes from <2>Account & Personal Information</2>) and leave every <3>Write</3> box unchecked — this app never trades or withdraws."
 msgstr "在 <0>Scope 設定</0> 下，勾選所有的 <1>Read (讀取)</1> 欄位（餘額資訊來自 <2>Account & Personal Information</2>）並保持所有 <3>Write (寫入)</3> 欄位不勾選 — 本應用程式絕不進行交易或提幣。"
 
+#: src/components/UpdatePrompt.tsx
+msgid "Update"
+msgstr "立即更新"
+
+#: src/components/UpdatePrompt.tsx
+msgid "Update later"
+msgstr "稍後更新"
+
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Use a read-only key (disable Trading & Withdrawals)."
 msgstr "請使用唯讀金鑰（停用交易與提幣功能）。"
@@ -721,6 +733,10 @@ msgstr "請使用 IP 存取限制為未限制的唯讀金鑰。"
 #: src/pages/accounts/components/AccountDialog.tsx
 msgid "Use a read-only key."
 msgstr "請使用唯讀金鑰。"
+
+#: src/pages/Config.tsx
+msgid "Version"
+msgstr "版本"
 
 #: src/pages/Config.tsx
 #: src/pages/Landing.tsx

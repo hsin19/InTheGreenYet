@@ -4,13 +4,33 @@ import { lingui } from "@lingui/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react-swc";
 import { playwright } from "@vitest/browser-playwright";
+import { execSync } from "child_process";
 import path from "path";
 import { defineConfig } from "vite";
 import { imagetools } from "vite-imagetools";
 import { VitePWA } from "vite-plugin-pwa";
 
+// CI passes the commit via VITE_GIT_SHA (github.sha); local builds fall back to
+// the short SHA. __BUILD_TIME__ stays a raw UTC ISO string — the frontend formats
+// it in the viewer's local timezone.
+function resolveGitSha(): string {
+    const fromEnv = process.env.VITE_GIT_SHA;
+    if (fromEnv) return fromEnv.slice(0, 7);
+    try {
+        return execSync("git rev-parse --short HEAD").toString().trim();
+    } catch {
+        return "dev";
+    }
+}
+const appVersion = resolveGitSha();
+const buildTime = new Date().toISOString();
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+    define: {
+        __APP_VERSION__: JSON.stringify(appVersion),
+        __BUILD_TIME__: JSON.stringify(buildTime),
+    },
     // Pin the dev port so it always matches the registered OAuth redirect URI
     // (http://localhost:4152/auth/notion/callback). strictPort fails loudly if
     // 4152 is taken instead of silently moving to 4153 and breaking the callback.
@@ -31,7 +51,7 @@ export default defineConfig(({ mode }) => ({
         tailwindcss(),
         imagetools(),
         VitePWA({
-            registerType: "autoUpdate",
+            registerType: "prompt",
             pwaAssets: {
                 disabled: false,
                 config: true,

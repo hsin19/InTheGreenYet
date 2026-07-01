@@ -25,11 +25,15 @@ describe("Hello World worker", () => {
         const response = await worker.fetch(request, env, ctx);
         // Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
         await waitOnExecutionContext(ctx);
-        expect(await response.text()).toMatchInlineSnapshot(`"{"status":"ok","service":"inthegreenyet"}"`);
+        expect(await response.text()).toMatchInlineSnapshot(
+            `"{"status":"ok","service":"inthegreenyet","version":"test","builtAt":"1970-01-01T00:00:00.000Z"}"`,
+        );
     });
 
     it("responds with Hello World! (integration style)", async () => {
         const response = await exports.default.fetch("https://example.com/health");
-        expect(await response.text()).toMatchInlineSnapshot(`"{"status":"ok","service":"inthegreenyet"}"`);
+        expect(await response.text()).toMatchInlineSnapshot(
+            `"{"status":"ok","service":"inthegreenyet","version":"test","builtAt":"1970-01-01T00:00:00.000Z"}"`,
+        );
     });
 });

@@ -1,4 +1,5 @@
 import bgMainDark from "@/assets/images/bg-main-dark.png?format=webp&quality=80&imagetools";
+import { formatBuildDate } from "@/lib/version";
 import type { MessageDescriptor } from "@lingui/core";
 import { msg } from "@lingui/core/macro";
 import {
@@ -177,6 +178,7 @@ function Landing() {
                 >
                     <GitHubIcon className="w-3.5 h-3.5" aria-hidden="true" />
                     hsin19/InTheGreenYet
+                    <span className="text-muted/40">· {formatBuildDate()}</span>
                 </a>
             </footer>
         </div>

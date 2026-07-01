@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["../../worker-configuration.d.ts", "node", "@cloudflare/vitest-pool-workers"]
   },
-  "include": ["./**/*.ts", "../../worker-configuration.d.ts", "../env.d.ts"],
+  "include": ["./**/*.ts", "../../worker-configuration.d.ts", "../env.d.ts", "../version.d.ts"],
   "exclude": []
 }

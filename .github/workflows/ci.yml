@@ -149,6 +149,8 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          VITE_GIT_SHA: ${{ github.sha }}
 
       - name: Verify required vars
         run: |

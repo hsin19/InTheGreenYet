@@ -7,6 +7,10 @@ import {
 } from "@/components/ui/select";
 import { useAppData } from "@/hooks/useAppData";
 import {
+    APP_VERSION,
+    formatBuildDate,
+} from "@/lib/version";
+import {
     Trans,
     useLingui,
 } from "@lingui/react/macro";
@@ -502,6 +506,9 @@ function Config() {
                     </div>
                     <p className="text-muted/40 text-xs">
                         <Trans>Your data stays in your Notion workspace and is never stored or transmitted externally.</Trans>
+                    </p>
+                    <p className="text-muted/40 text-xs">
+                        <Trans>Version</Trans>: {APP_VERSION} · {formatBuildDate()}
                     </p>
                 </Card>
             </div>

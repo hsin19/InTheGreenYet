@@ -473,6 +473,10 @@ msgstr "New Account"
 msgid "New Transfer"
 msgstr "New Transfer"
 
+#: src/components/UpdatePrompt.tsx
+msgid "New version available ({buildDate})"
+msgstr "New version available ({buildDate})"
+
 #: src/pages/accounts/index.tsx
 msgid "No accounts yet."
 msgstr "No accounts yet."
@@ -710,6 +714,14 @@ msgstr "Transfers"
 msgid "Under <0>Scope Settings</0>, check the <1>Read</1> boxes (the balance comes from <2>Account & Personal Information</2>) and leave every <3>Write</3> box unchecked — this app never trades or withdraws."
 msgstr "Under <0>Scope Settings</0>, check the <1>Read</1> boxes (the balance comes from <2>Account & Personal Information</2>) and leave every <3>Write</3> box unchecked — this app never trades or withdraws."
 
+#: src/components/UpdatePrompt.tsx
+msgid "Update"
+msgstr "Update"
+
+#: src/components/UpdatePrompt.tsx
+msgid "Update later"
+msgstr "Update later"
+
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Use a read-only key (disable Trading & Withdrawals)."
 msgstr "Use a read-only key (disable Trading & Withdrawals)."
@@ -721,6 +733,10 @@ msgstr "Use a read-only key with IP access unrestricted."
 #: src/pages/accounts/components/AccountDialog.tsx
 msgid "Use a read-only key."
 msgstr "Use a read-only key."
+
+#: src/pages/Config.tsx
+msgid "Version"
+msgstr "Version"
 
 #: src/pages/Config.tsx
 #: src/pages/Landing.tsx

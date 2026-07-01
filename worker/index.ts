@@ -73,7 +73,7 @@ export default {
         }
 
         if (url.pathname === "/health") {
-            return jsonResponse({ status: "ok", service: "inthegreenyet" }, 200);
+            return jsonResponse({ status: "ok", service: "inthegreenyet", version: __APP_VERSION__, builtAt: __BUILD_TIME__ }, 200);
         }
 
         return new Response(null, { status: 404 });
