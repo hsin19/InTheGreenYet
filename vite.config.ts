@@ -64,6 +64,13 @@ export default defineConfig(({ mode }) => ({
             "@shared": path.resolve(__dirname, "./shared"),
         },
     },
+    // Pre-bundle these up front so Vitest's browser-mode Vite server doesn't
+    // discover them mid-run and reload — a reload flakily aborts the in-flight
+    // test-file imports in clean CI (react-dom/client + react-router-dom were the
+    // culprits; the local .vite cache masked it).
+    optimizeDeps: {
+        include: ["react", "react-dom", "react-dom/client", "react/jsx-dev-runtime", "react-router-dom"],
+    },
     build: {
         rollupOptions: {
             output: {

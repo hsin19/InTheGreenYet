@@ -40,6 +40,23 @@ jobs:
       - name: i18n catalogs
         run: pnpm run i18n:check
 
+      - name: Build
+        run: pnpm run build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.node-version'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Cache Playwright browsers
         uses: actions/cache@v6
         with:
@@ -75,9 +92,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           report_type: test_results
           files: test-report.junit.xml,worker-test-report.junit.xml
-
-      - name: Build
-        run: pnpm run build
 
   e2e:
     name: E2E
@@ -119,7 +133,7 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [checks, e2e]
+    needs: [checks, test, e2e]
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
@@ -182,7 +196,7 @@ jobs:
 
   auto-merge:
     name: Auto-merge Dependabot
-    needs: [checks, e2e, dependency-review]
+    needs: [checks, test, e2e, dependency-review]
     if: ${{ success() && github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions: {}
@@ -195,7 +209,7 @@ jobs:
 
   jules-fix:
     name: Jules fix on failure
-    needs: [checks, e2e, dependency-review]
+    needs: [checks, test, e2e, dependency-review]
     if: ${{ failure() && github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     permissions:
