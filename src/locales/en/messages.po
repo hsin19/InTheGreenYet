@@ -32,10 +32,6 @@ msgstr "{v} is not a supported currency"
 msgid "{val} is not a supported currency"
 msgstr "{val} is not a supported currency"
 
-#: src/pages/Landing.tsx
-#~ msgid "A personal investment tracking app powered by Notion as the database backend."
-#~ msgstr "A personal investment tracking app powered by Notion as the database backend."
-
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Access Key"
 msgstr "Access Key"
@@ -404,10 +400,6 @@ msgstr "Include in portfolio totals?"
 msgid "It’s not about today’s profit — it’s about knowing where you truly stand."
 msgstr "It’s not about today’s profit — it’s about knowing where you truly stand."
 
-#: src/pages/Landing.tsx
-#~ msgid "It’s not about today’s profit —<0/>it’s about knowing where you truly stand."
-#~ msgstr "It’s not about today’s profit —<0/>it’s about knowing where you truly stand."
-
 #: src/pages/accounts/components/AccountDialog.tsx
 msgid "Key"
 msgstr "Key"
@@ -545,6 +537,10 @@ msgstr "Page Not Found"
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Passphrase"
 msgstr "Passphrase"
+
+#: src/pages/Landing.tsx
+msgid "Paste this link into your browser’s address bar."
+msgstr "Paste this link into your browser’s address bar."
 
 #: src/pages/transfers/index.tsx
 msgid "Rate"
@@ -730,10 +726,6 @@ msgstr "Use a read-only key."
 #: src/pages/Landing.tsx
 msgid "Your data stays in your Notion workspace and is never stored or transmitted externally."
 msgstr "Your data stays in your Notion workspace and is never stored or transmitted externally."
-
-#: src/pages/Landing.tsx
-#~ msgid "Your data stays in your Notion workspace."
-#~ msgstr "Your data stays in your Notion workspace."
 
 #: src/pages/accounts/components/BinanceKeyGuide.tsx
 #: src/pages/accounts/components/BitgetKeyGuide.tsx

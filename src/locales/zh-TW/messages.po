@@ -32,10 +32,6 @@ msgstr "{v} 不是支援的幣種"
 msgid "{val} is not a supported currency"
 msgstr "{val} 不是支援的幣種"
 
-#: src/pages/Landing.tsx
-#~ msgid "A personal investment tracking app powered by Notion as the database backend."
-#~ msgstr "以 Notion 作為資料庫後端的個人投資追蹤工具。"
-
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Access Key"
 msgstr "Access Key"
@@ -404,10 +400,6 @@ msgstr "是否納入投資組合總計？"
 msgid "It’s not about today’s profit — it’s about knowing where you truly stand."
 msgstr "無關今日的損益漲跌 — 而是真正掌握您的資產全貌。"
 
-#: src/pages/Landing.tsx
-#~ msgid "It’s not about today’s profit —<0/>it’s about knowing where you truly stand."
-#~ msgstr "無關今日的損益漲跌 —<0/>而是真正掌握您的資產全貌。"
-
 #: src/pages/accounts/components/AccountDialog.tsx
 msgid "Key"
 msgstr "鍵值 (Key)"
@@ -545,6 +537,10 @@ msgstr "頁面未找到"
 #: src/pages/accounts/components/apiProviders.ts
 msgid "Passphrase"
 msgstr "Passphrase (API 口令)"
+
+#: src/pages/Landing.tsx
+msgid "Paste this link into your browser’s address bar."
+msgstr "把連結貼到瀏覽器網址列開啟。"
 
 #: src/pages/transfers/index.tsx
 msgid "Rate"
@@ -730,10 +726,6 @@ msgstr "請使用唯讀金鑰。"
 #: src/pages/Landing.tsx
 msgid "Your data stays in your Notion workspace and is never stored or transmitted externally."
 msgstr "您的資料僅會留存在您的 Notion 工作區，絕不會被外部儲存或傳輸。"
-
-#: src/pages/Landing.tsx
-#~ msgid "Your data stays in your Notion workspace."
-#~ msgstr "您的資料只會儲存在您的 Notion 工作區中。"
 
 #: src/pages/accounts/components/BinanceKeyGuide.tsx
 #: src/pages/accounts/components/BitgetKeyGuide.tsx

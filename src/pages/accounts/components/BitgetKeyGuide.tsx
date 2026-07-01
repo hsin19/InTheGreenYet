@@ -1,3 +1,4 @@
+import { CopyableValue } from "@/components/CopyableValue";
 import {
     Dialog,
     DialogContent,
@@ -20,7 +21,6 @@ import {
     type ReactNode,
     useState,
 } from "react";
-import { CopyableValue } from "./CopyableValue";
 
 const API_MANAGEMENT_URL = "https://www.bitget.com/account/newapi";
 

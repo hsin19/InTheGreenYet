@@ -30,4 +30,15 @@ describe("CopyableValue", () => {
         expect(writeText).toHaveBeenCalledWith("paste-me");
         vi.restoreAllMocks();
     });
+
+    it("shows the label but still copies the full value", async () => {
+        const writeText = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
+        render(<CopyableValue value="https://example.com/very/long/url" label="Login link" />);
+
+        await expect.element(page.getByText("Login link")).toBeVisible();
+        await page.getByRole("button", { name: "Copy Login link" }).click();
+
+        expect(writeText).toHaveBeenCalledWith("https://example.com/very/long/url");
+        vi.restoreAllMocks();
+    });
 });

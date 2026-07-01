@@ -7,10 +7,7 @@ import {
     useNavigate,
     useSearchParams,
 } from "react-router-dom";
-import {
-    OAUTH_STATE_KEY,
-    useNotion,
-} from "../hooks/useNotion";
+import { useNotion } from "../hooks/useNotion";
 
 function Callback() {
     const [searchParams] = useSearchParams();
@@ -33,8 +30,8 @@ function Callback() {
         const workspaceId = searchParams.get("workspace_id");
         const error = searchParams.get("error");
         const returnedState = searchParams.get("state");
-        const storedState = localStorage.getItem(OAUTH_STATE_KEY);
-        localStorage.removeItem(OAUTH_STATE_KEY);
+        const storedState = sessionStorage.getItem("oauth_state");
+        sessionStorage.removeItem("oauth_state");
 
         if (error) {
             console.error("OAuth error:", error);
@@ -60,11 +57,6 @@ function Callback() {
         });
 
         navigate("/", { replace: true });
-
-        // If login opened us in a new tab, the opener already mirrors notion_auth via
-        // its storage listener; close this tab so the user returns there. No-op (and
-        // harmless) when we are the same tab that started login.
-        if (window.opener && !window.opener.closed) window.close();
     }, [searchParams, navigate, setAuthData]);
 
     return (

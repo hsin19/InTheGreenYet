@@ -5,11 +5,15 @@ import {
     Trans,
     useLingui,
 } from "@lingui/react/macro";
-import { useState } from "react";
+import {
+    useEffect,
+    useState,
+} from "react";
 import {
     Navigate,
     useSearchParams,
 } from "react-router-dom";
+import { CopyableValue } from "../components/CopyableValue";
 import { GitHubIcon } from "../components/icons/GitHubIcon";
 import { NotionIcon } from "../components/icons/NotionIcon";
 import { Button } from "../components/ui/button";
@@ -23,12 +27,40 @@ const OAUTH_ERROR_MESSAGES: Record<string, MessageDescriptor> = {
 };
 
 function Landing() {
-    const { auth, login } = useNotion();
+    const { auth, prepareLogin, login } = useNotion();
     const [searchParams] = useSearchParams();
     const oauthError = searchParams.get("error");
     const { t } = useLingui();
     const [busy, setBusy] = useState(false);
     const [configError, setConfigError] = useState(false);
+    const [authorizeUrl, setAuthorizeUrl] = useState<string | null>(null);
+    const [stuck, setStuck] = useState(false);
+
+    // Prefetch the authorize URL so the connect link can carry a real href (iOS
+    // long-press → "Copy Link") and the stuck-state fallback has a URL to copy.
+    useEffect(() => {
+        prepareLogin().then(setAuthorizeUrl).catch(() => {});
+    }, [prepareLogin]);
+
+    // On iOS with the Notion app installed, tapping connect hands off to the app
+    // and dead-ends, leaving this page alive in the background. If we return to the
+    // foreground still unauthenticated after a connect attempt, drop the spinner and
+    // reveal a copy-the-link fallback — a URL pasted into the address bar is exempt
+    // from the app's universal link, so it reliably opens the consent page.
+    useEffect(() => {
+        const onReturn = () => {
+            if (document.visibilityState === "visible" && busy) {
+                setBusy(false);
+                setStuck(true);
+            }
+        };
+        document.addEventListener("visibilitychange", onReturn);
+        window.addEventListener("pageshow", onReturn);
+        return () => {
+            document.removeEventListener("visibilitychange", onReturn);
+            window.removeEventListener("pageshow", onReturn);
+        };
+    }, [busy]);
 
     if (auth) return <Navigate to="/" replace />;
 
@@ -37,6 +69,7 @@ function Landing() {
     // of swallowing the rejection. On success the browser navigates away.
     const handleConnect = () => {
         setConfigError(false);
+        setStuck(false);
         setBusy(true);
         login().catch(() => {
             setBusy(false);
@@ -62,18 +95,33 @@ function Landing() {
                 <div className="relative p-[2px] rounded-xl overflow-hidden group-hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
                     <div className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,transparent_0%,transparent_25%,rgba(255,255,255,0.8)_95%,rgba(255,255,255,1)_100%)] opacity-100" />
                     <div className="relative rounded-[10px] bg-green-700">
+                        {
+                            /* Anchor (not button) so iOS long-press offers "Copy Link"; the tap is
+                            preventDefault'd to keep the click-gated JS redirect, which is less
+                            likely than an anchor navigation to be hijacked by the Notion app. */
+                        }
                         <Button
+                            asChild
                             size="lg"
-                            onClick={handleConnect}
-                            disabled={busy}
-                            className="relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0"
+                            className={`relative w-full rounded-[10px] bg-transparent px-8 h-14 font-semibold text-white hover:bg-white/10 hover:text-white transition-all duration-300 border-none m-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)] ring-0 focus:ring-0${busy ? " opacity-70" : ""}`}
                         >
-                            <NotionIcon className="w-5 h-5 mr-2" aria-hidden="true" />
-                            {busy ? <Trans>Connecting…</Trans> : <Trans>Connect to Notion</Trans>}
+                            <a
+                                href={authorizeUrl ?? undefined}
+                                aria-disabled={busy}
+                                onClick={e => {
+                                    e.preventDefault();
+                                    if (!busy) handleConnect();
+                                }}
+                            >
+                                <NotionIcon className="w-5 h-5 mr-2" aria-hidden="true" />
+                                {busy ? <Trans>Connecting…</Trans> : <Trans>Connect to Notion</Trans>}
+                            </a>
                         </Button>
                     </div>
                 </div>
             </div>
+
+            {stuck && authorizeUrl && <CopyableValue value={authorizeUrl} label={t`Paste this link into your browser’s address bar.`} />}
         </div>
     );
 

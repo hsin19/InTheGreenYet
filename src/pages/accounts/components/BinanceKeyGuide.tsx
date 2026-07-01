@@ -1,3 +1,4 @@
+import { CopyableValue } from "@/components/CopyableValue";
 import {
     Dialog,
     DialogContent,
@@ -17,7 +18,6 @@ import {
     ShieldCheck,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { CopyableValue } from "./CopyableValue";
 
 const API_MANAGEMENT_URL = "https://www.binance.com/en/my/settings/api-management";
 
