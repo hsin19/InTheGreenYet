@@ -81,7 +81,7 @@
     "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^4.3.0",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.62.1",
+    "typescript-eslint": "^8.63.0",
     "vite": "^8.0.14",
     "vite-imagetools": "^10.0.0",
     "vite-plugin-pwa": "^1.2.0",
