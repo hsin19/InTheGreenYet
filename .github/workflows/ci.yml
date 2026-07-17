@@ -188,6 +188,9 @@ jobs:
     name: Dependency Review
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
       - name: Dependency Review
@@ -199,20 +202,21 @@ jobs:
   auto-merge:
     name: Auto-merge Dependabot
     needs: [checks, test, e2e, dependency-review]
-    if: ${{ success() && github.actor == 'dependabot[bot]' }}
+    if: ${{ success() && github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions: {}
     steps:
       - name: Squash-merge the PR
-        run: gh pr merge --squash --delete-branch "$PR_URL"
+        run: gh pr merge --squash --delete-branch --match-head-commit "$HEAD_SHA" "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN }}
 
   jules-fix:
     name: Jules fix on failure
     needs: [checks, test, e2e, dependency-review]
-    if: ${{ failure() && github.actor == 'dependabot[bot]' }}
+    if: ${{ failure() && github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
