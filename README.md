@@ -48,7 +48,8 @@ start. The SPA calls `/api` and `/auth` on the same origin — no proxy needed.
 ## Deployment
 
 A single Cloudflare Worker (SPA assets + API) is deployed via GitHub Actions
-(`ci.yml`, on push to `main`): `pnpm run build` then `wrangler deploy`.
+(`deploy.yml`, on push to `main`, after the shared `check.yml` gate passes):
+`pnpm run build` then `wrangler deploy`.
 
 ### 1. Cloudflare Setup
 
@@ -79,6 +80,7 @@ Add these in your repo's **Settings > Secrets and variables > Actions**:
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `CLOUDFLARE_API_TOKEN` | Cloudflare API token ([Guide](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/#api-token)) |
 | `NOTION_CLIENT_SECRET` | Notion integration client secret (production)                                                                           |
+| `CODECOV_TOKEN`        | Codecov upload token                                                                                                    |
 
 #### Repository Variables (Non-sensitive)
 
@@ -86,6 +88,12 @@ Add these in your repo's **Settings > Secrets and variables > Actions**:
 | ----------------------- | ----------------------------------------- |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID                |
 | `NOTION_CLIENT_ID`      | Notion integration client ID (production) |
+
+#### Dependabot Secrets
+
+`AUTOMERGE_TOKEN` goes in **Settings > Secrets and variables > Dependabot**, not
+Actions — a Dependabot-triggered run sees only that store. See
+[`.github/workflows/README.md`](.github/workflows/README.md).
 
 Once configured, pushing to `main` automatically deploys the Worker.
 
