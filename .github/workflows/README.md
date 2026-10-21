@@ -82,6 +82,11 @@ so track the expiry date. A red Dependabot PR (typically peer-dependency skew â€
 for a human; there is no auto-repair job. The groups in `dependabot.yml` exist to
 keep those sets moving together in one PR.
 
+A green PR merges only if `main` has not moved since its check ran; otherwise the
+job comments `@dependabot rebase` and the rebased PR goes through the gate again.
+Merging anyway would land a tree no check saw â€” two bumps of one transitive
+package can merge as clean text into a broken lockfile.
+
 The `deploy-actions` group in `dependabot.yml` is excluded from auto-merge.
 `cloudflare/wrangler-action` only ever runs on a push to `main`, so a green PR
 proves nothing about it and a bad bump would land straight in the production
