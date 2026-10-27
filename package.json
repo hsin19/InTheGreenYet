@@ -88,7 +88,7 @@
     "vitest": "~4.1.11",
     "vitest-browser-react": "^2.2.0",
     "workbox-window": "^7.4.1",
-    "wrangler": "^4.151.0"
+    "wrangler": "^4.151.3"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged"
