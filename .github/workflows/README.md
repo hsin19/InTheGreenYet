@@ -31,14 +31,14 @@ The Playwright suite is a second job inside `check.yml` rather than more steps o
 instead of hiding inside a long step list. Its `webServer` builds the app and
 serves it through `wrangler dev` itself, so there is no artifact to hand over.
 
-`e2e` runs inside the `mcr.microsoft.com/playwright` image, which ships the
-browser and its system libraries, instead of running
+`check` and `e2e` both run inside the `mcr.microsoft.com/playwright` image
+(`check` because the SPA's `browser` test project needs Chromium too), which
+ships the browser and its system libraries, instead of running
 `playwright install --with-deps` on the bare runner — that apt fetch stalled on
 Ubuntu's mirrors often enough to time the job out with no test run. The image is
 built for a single Playwright release, so the small `playwright-image` job reads
-the `@playwright/test` version out of `pnpm-lock.yaml` and hands `e2e` the
-matching tag; the `playwright` Dependabot group moves the image with it. `check`
-still installs Chromium on the runner for the `browser` test project.
+the `@playwright/test` version out of `pnpm-lock.yaml` and hands both jobs
+the matching tag; the `playwright` Dependabot group moves the image with it.
 
 Neither caller is called `ci.yml`, and that is the point: CI is not what tells them
 apart — both run the same gate — so they are named for the event that starts them.
