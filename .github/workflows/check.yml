@@ -119,13 +119,43 @@ jobs:
           files: test-report.junit.xml,worker-test-report.junit.xml
           fail_ci_if_error: false
 
+  # The Playwright image's browsers are built for one release only, so e2e's
+  # container tag must name the exact @playwright/test the lockfile resolves. It is
+  # read from the lockfile rather than pinned here, where a Dependabot bump would
+  # leave it behind.
+  playwright-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      image: ${{ steps.version.outputs.image }}
+
+    steps:
+      - name: Checkout lockfile
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: pnpm-lock.yaml
+          sparse-checkout-cone-mode: false
+
+      - name: Read Playwright version
+        id: version
+        run: |
+          version=$(grep -oE "^  '@playwright/test@[0-9.]+'" pnpm-lock.yaml | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+          test -n "$version"
+          echo "image=mcr.microsoft.com/playwright:v$version-noble" >> "$GITHUB_OUTPUT"
+
   # A job, not more steps on `check`: e2e runs in parallel with the rest instead of
   # after it, and a failure still says "e2e" rather than hiding inside a long step
   # list. Playwright's webServer builds and serves the Worker itself, so there is
-  # no dist to hand over from `check`.
+  # no dist to hand over from `check`. The browser and its system libraries come
+  # baked into the container, so nothing runs `playwright install --with-deps`:
+  # its apt fetch has stalled on Ubuntu's mirrors for the whole timeout.
   e2e:
+    needs: playwright-image
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    container:
+      image: ${{ needs.playwright-image.outputs.image }}
+      options: --user 1001
     env:
       WRANGLER_SEND_METRICS: 'false'
 
@@ -144,15 +174,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
 
       - name: Run E2E tests
         run: pnpm run test:e2e
