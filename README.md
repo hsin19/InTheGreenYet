@@ -1,5 +1,7 @@
 # InTheGreenYet
 
+> **Archived.** InTheGreenYet is retired: [Finchie](https://github.com/hsin19/finchie) took it over and reads the same exchanges (its ADR 0018). The Worker is no longer deployed.
+
 It's not about today's profit — it's about knowing where you truly stand.
 
 A personal investment tracking app powered by [Notion](https://www.notion.so/) as the database backend. Your data stays in your own Notion workspace.
